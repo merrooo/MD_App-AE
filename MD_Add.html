@@ -9,11 +9,20 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --bg: #f4f7f6;
+            --primary: #1e293b;
+            --primary-light: #334155;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f1f5f9;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
@@ -23,69 +32,214 @@
             padding: 20px;
             display: flex;
             justify-content: center;
+            min-height: 100vh;
         }
 
         .form-container {
             width: 100%;
-            max-width: 900px;
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 950px;
+            background: var(--white);
+            padding: 30px 35px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            align-self: flex-start;
         }
 
         h2 {
             text-align: center;
             color: var(--primary);
             border-bottom: 3px solid var(--accent);
-            padding-bottom: 10px;
-            margin-bottom: 30px;
+            padding-bottom: 12px;
+            margin: 0 0 30px 0;
+            font-size: 1.5rem;
         }
 
+        /* ===== DROPDOWN STYLES ===== */
         .record-date-wrapper {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 20px;
             margin-bottom: 25px;
-            padding: 15px 25px;
-            background: #eef2f7;
-            border-radius: 12px;
-            border: 1px dashed var(--accent);
+            padding: 12px 20px;
+            background: #f8fafc;
+            border-radius: var(--radius);
+            border: 1px solid #e2e8f0;
+            flex-wrap: wrap;
         }
 
-        .back-link-top {
-            text-decoration: none;
-            color: var(--primary);
-            font-weight: bold;
-            background: #fff;
-            padding: 8px 15px;
+        .modern-dropdown {
+            position: relative;
+            min-width: 220px;
+            flex: 1;
+        }
+
+        .dropdown-btn {
+            background: var(--primary);
+            color: var(--white);
+            padding: 10px 18px;
             border-radius: 8px;
-            border: 1px solid #ddd;
-            transition: 0.3s;
+            border: none;
+            cursor: pointer;
             font-size: 0.9rem;
+            font-family: 'Cairo', sans-serif;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            transition: all 0.3s ease;
+            gap: 10px;
         }
 
-        .back-link-top:hover {
+        .dropdown-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+        }
+
+        .dropdown-btn .arrow {
+            font-size: 0.7rem;
+            transition: transform 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .dropdown-btn .arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-btn .icon-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 2000;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            animation: dropdownFade 0.25s ease;
+        }
+
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-family: 'Cairo', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f5f9;
+            color: var(--accent);
+            padding-right: 28px;
+        }
+
+        .dropdown-item .item-icon {
+            font-size: 1.1rem;
+            width: 28px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .dropdown-item .item-label {
+            flex: 1;
+        }
+
+        .dropdown-item .item-badge {
             background: var(--accent);
             color: white;
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        /* ===== DATE INPUT ===== */
+        .date-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white);
+            padding: 6px 14px 6px 6px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .date-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .date-group input[type="date"] {
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.85rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: var(--primary);
+            outline: none;
+            transition: border 0.2s;
+            min-width: 150px;
+        }
+
+        .date-group input[type="date"]:focus {
             border-color: var(--accent);
         }
 
-        #record_date {
-            width: 200px;
-            margin-top: 5px;
-        }
-
+        /* ===== REST OF FORM ===== */
         .section-title {
-            background: #eef2f7;
-            padding: 10px;
-            border-right: 5px solid var(--accent);
+            background: #f8fafc;
+            padding: 10px 15px;
+            border-right: 4px solid var(--accent);
             margin: 20px 0 15px 0;
-            font-weight: bold;
+            font-weight: 700;
             color: var(--primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 0 6px 6px 0;
         }
 
         .input-group {
@@ -94,21 +248,32 @@
 
         .input-group label {
             display: block;
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            color: #555;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #475569;
         }
 
         .input-group input,
-        .input-group textarea {
+        .input-group textarea,
+        .input-group select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 9px 12px;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
-            font-family: 'Cairo';
-            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
             font-size: 0.9rem;
+            background: var(--white);
+            transition: border 0.2s, box-shadow 0.2s;
+            color: var(--primary);
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .row-flex {
@@ -119,188 +284,190 @@
 
         .row-flex .input-group {
             flex: 1;
-            min-width: 200px;
+            min-width: 170px;
         }
 
         .meter-card {
-            background: #fff;
-            border: 2px dashed #cbd5e0;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            position: relative;
-            transition: 0.3s;
+            background: #fafcff;
+            border: 2px solid #e2e8f0;
+            padding: 18px 20px 10px 20px;
+            border-radius: var(--radius);
+            margin-bottom: 18px;
+            transition: border-color 0.3s;
         }
 
         .meter-card:hover {
             border-color: var(--accent);
-            background: #fcfdfd;
         }
 
         .remove-meter-btn {
             background: var(--danger);
             color: white;
             border: none;
-            padding: 5px 12px;
-            border-radius: 5px;
+            padding: 4px 14px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-family: 'Cairo', sans-serif;
+            transition: background 0.2s;
+        }
+
+        .remove-meter-btn:hover {
+            background: #b91c1c;
         }
 
         .btn-add-meter {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 22px;
             border-radius: 8px;
             cursor: pointer;
-            font-family: 'Cairo';
-            font-weight: bold;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s, transform 0.1s;
             margin-bottom: 20px;
+        }
+
+        .btn-add-meter:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
         }
 
         .btn-submit {
             background: var(--success);
             color: white;
             border: none;
-            padding: 18px;
+            padding: 16px;
             border-radius: 8px;
             cursor: pointer;
-            font-family: 'Cairo';
-            font-weight: bold;
-            font-size: 1.1rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
             width: 100%;
             margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.25);
+        }
+
+        .btn-submit:hover {
+            background: #15803d;
+            transform: translateY(-1px);
         }
 
         .back-link {
             display: block;
             text-align: right;
             margin-top: 20px;
-            color: #7f8c8d;
+            color: #64748b;
             text-decoration: none;
-            font-weight: bold;
-        }
-
-        .modern-dropdown {
-            position: relative;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .dropdown-btn {
-            background: var(--primary);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            border: 2px solid var(--accent);
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: 0.3s;
-        }
-
-        .dropdown-btn:hover {
-            background: var(--accent);
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            display: none;
-            z-index: 2000;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            overflow: hidden;
-        }
-
-        .dropdown-item {
-            padding: 12px 15px;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-            transition: 0.2s;
-            color: var(--primary);
+            font-weight: 600;
             font-size: 0.9rem;
+            transition: color 0.2s;
         }
 
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background: #f4f7f6;
+        .back-link:hover {
             color: var(--accent);
-            padding-right: 25px;
         }
 
-        .show {
-            display: block !important;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .form-container {
+                padding: 18px 16px;
+            }
+
+            .record-date-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .modern-dropdown {
+                min-width: 100%;
+            }
+
+            .date-group {
+                width: 100%;
+            }
+
+            .date-group input[type="date"] {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .row-flex .input-group {
+                min-width: 100%;
+            }
+
+            .dropdown-menu {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                border-radius: var(--radius) var(--radius) 0 0;
+                max-height: 60vh;
+                overflow-y: auto;
+                animation: slideUp 0.3s ease;
+            }
+
+            @keyframes slideUp {
+                from {
+                    transform: translateY(100%);
+                }
+
+                to {
+                    transform: translateY(0);
+                }
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="form-container">
+        <!-- HEADER WITH DROPDOWN & DATE -->
         <div class="record-date-wrapper">
             <div class="modern-dropdown">
                 <button class="dropdown-btn" id="dropdownBtn">
-                    <span>🚀 اختر وجهتك للانتقال</span>
-                    <span id="arrow">▾</span>
+                    <span class="icon-text">🚀 <span>اختر وجهتك</span></span>
+                    <span class="arrow" id="arrow">▾</span>
                 </button>
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <div class="dropdown-item" data-page="MD.html">📊 بيانات كبار المشتركين</div>
-                    <div class="dropdown-item" data-page="MD_Add.html">➕ إضافة مشترك جديد</div>
-                    <div class="dropdown-item" data-page="MD_Pass.html">🔍 تسجيل مرور ميداني</div>
-                    <div class="dropdown-item" data-page="MD_Pass_Dashboard.html">📅 تقرير المرور العام</div>
-                    <div class="dropdown-item" data-page="index.html">📅 الصفحة الرئيسية</div>
+                    <div class="dropdown-item" data-page="MD.html">
+                        <span class="item-icon">📊</span>
+                        <span class="item-label">بيانات كبار المشتركين</span>
+                    </div>
+                    <div class="dropdown-item" data-page="MD_Add.html">
+                        <span class="item-icon">➕</span>
+                        <span class="item-label">إضافة مشترك جديد</span>
+                        <span class="item-badge">الحالية</span>
+                    </div>
+                    <div class="dropdown-item" data-page="MD_Pass.html">
+                        <span class="item-icon">🔍</span>
+                        <span class="item-label">تسجيل مرور ميداني</span>
+                    </div>
+                    <div class="dropdown-item" data-page="MD_Pass_Dashboard.html">
+                        <span class="item-icon">📅</span>
+                        <span class="item-label">تقرير المرور العام</span>
+                    </div>
+                    <div class="dropdown-item" data-page="index.html">
+                        <span class="item-icon">🏠</span>
+                        <span class="item-label">الصفحة الرئيسية</span>
+                    </div>
+                    <div class="dropdown-item" data-page="M_D_PF.html">
+                        <span class="item-icon">⚡</span>
+                        <span class="item-label">تقرير معامل القدرة</span>
+                    </div>
                 </div>
             </div>
-            <div class="input-group" style="margin-bottom: 0;">
-                <label>📅 تاريخ تسجيل البيان</label>
+
+            <div class="date-group">
+                <label>📅 تاريخ التسجيل</label>
                 <input type="date" id="record_date" disabled>
             </div>
-
         </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const btn = document.getElementById('dropdownBtn');
-                const menu = document.getElementById('dropdownMenu');
-
-                // 1. فتح وإغلاق القائمة عند الضغط على الزر
-                btn.addEventListener('click', function (e) {
-                    e.stopPropagation(); // منع انتقال الضغطة للعناصر الأب
-                    menu.classList.toggle('show');
-                });
-
-                // 2. التنقل بين الصفحات عند الضغط على أي خيار
-                const items = document.querySelectorAll('.dropdown-item');
-                items.forEach(item => {
-                    item.addEventListener('click', function () {
-                        const page = this.getAttribute('data-page');
-                        if (page) {
-                            window.location.href = page;
-                        }
-                    });
-                });
-
-                // 3. إغلاق القائمة تلقائياً إذا ضغطت في أي مكان خارجها
-                window.addEventListener('click', function () {
-                    if (menu.classList.contains('show')) {
-                        menu.classList.remove('show');
-                    }
-                });
-            });
-        </script>
-
 
         <h2>➕ تسجيل مشترك وعدادات جديدة</h2>
 
@@ -310,8 +477,75 @@
             <input type="text" id="mname" placeholder="أدخل اسم المشترك">
         </div>
         <div class="row-flex">
-            <div class="input-group"><label>القطاع</label><input id="keta3"></div>
-            <div class="input-group"><label>الهندسة</label><input id="handsa"></div>
+            <div class="input-group">
+                <select id="keta3" aria-label="القطاع">
+                    <option value="">القطاع</option>
+                    <option>دمياط</option>
+                    <option>شمال الدقهلية</option>
+                    <option>جنوب الدقهلية</option>
+                    <option>كفر الشيخ</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <select id="handsa" aria-label="الهندسة">
+                    <option value="">الهندسة</option>
+                    <option>هندسة شمال دمياط</option>
+                    <option>هندسة جنوب دمياط</option>
+                    <option>هندسة عزبة البرج</option>
+                    <option>هندسة كفر سعد</option>
+                    <option>هندسة كفر البطيخ</option>
+                    <option>هندسة راس البر</option>
+                    <option>هندسة دمياط الجديدة</option>
+                    <option>هندسة الزرقا</option>
+                    <option>هندسة فارسكور</option>
+                    <option>هندسة الروضة</option>
+                    <option>هندسة الشعراء</option>
+                    <option>هندسة مدينة شربين</option>
+                    <option>هندسة قري شربين</option>
+                    <option>هندسة دكرنس</option>
+                    <option>هندسة جمصة</option>
+                    <option>هندسة قري بلقاس</option>
+                    <option>هندسة مدينة بلقاس</option>
+                    <option>هندسة الستاموني</option>
+                    <option>هندسة بني عبيد</option>
+                    <option>هندسة منية النصر</option>
+                    <option>هندسة ميت سلسيل</option>
+                    <option>هندسة الجمالية</option>
+                    <option>هندسة قري المنزلة</option>
+                    <option>هندسة مدينة المنزلة</option>
+                    <option>هندسة المطرية</option>
+                    <option>هندسة شرق المنصورة</option>
+                    <option>هندسة غرب المنصورة</option>
+                    <option>هندسة طلخا</option>
+                    <option>هندسة نبروه</option>
+                    <option>هندسة قري المنصورة 1</option>
+                    <option>هندسة قري المنصورة 2</option>
+                    <option>هندسة اجا</option>
+                    <option>هندسة مدينة السنبلاوين</option>
+                    <option>هندسة قري السنبلاوين</option>
+                    <option>هندسة تمي الامديد</option>
+                    <option>هندسة مدينة ميت غمر</option>
+                    <option>هندسة قري ميت غمر</option>
+                    <option>هندسة كوم النور</option>
+                    <option>هندسة مدينة كفر الشيخ</option>
+                    <option>هندسة غرب كفر الشيخ</option>
+                    <option>هندسة شرق كفر الشيخ</option>
+                    <option>هندسة قلين</option>
+                    <option>هندسة قرى سيدي سالم</option>
+                    <option>هندسة مدينة سيدي سالم</option>
+                    <option>هندسة الرياض</option>
+                    <option>هندسة مدينة دسوق</option>
+                    <option>هندسة قرى شمال دسوق</option>
+                    <option>هندسة قرى جنوب دسوق</option>
+                    <option>هندسة فوه</option>
+                    <option>هندسة مطوبس</option>
+                    <option>هندسة مدينة الحامول</option>
+                    <option>هندسة قرى الحامول</option>
+                    <option>هندسة بيلا</option>
+                    <option>هندسة بلطيم</option>
+                    <option>هندسة برج البرلس</option>
+                </select>
+            </div>
         </div>
         <div class="row-flex">
             <div class="input-group"><label>معامل القدرة (PF)</label><input type="number" step="0.01" id="power_factor">
@@ -365,7 +599,6 @@
             measurementId: "G-W3TZ1EKWWN"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         try {
@@ -376,13 +609,39 @@
 
         let meterCount = 1;
 
-        // 1. تعيين تاريخ اليوم تلقائياً
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('record_date').value = today;
+
+            // Dropdown toggle
+            const btn = document.getElementById('dropdownBtn');
+            const menu = document.getElementById('dropdownMenu');
+            const arrow = document.getElementById('arrow');
+
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                menu.classList.toggle('show');
+                arrow.classList.toggle('open');
+            });
+
+            const items = document.querySelectorAll('.dropdown-item');
+            items.forEach(item => {
+                item.addEventListener('click', function () {
+                    const page = this.getAttribute('data-page');
+                    if (page) {
+                        window.location.href = page;
+                    }
+                });
+            });
+
+            window.addEventListener('click', function () {
+                if (menu.classList.contains('show')) {
+                    menu.classList.remove('show');
+                    arrow.classList.remove('open');
+                }
+            });
         });
 
-        // إضافة نموذج عداد جديد
         window.addNewMeterForm = function () {
             const container = document.getElementById('meters-list');
             const newMeter = document.createElement('div');
@@ -391,7 +650,7 @@
             newMeter.innerHTML = `
                 <div class="section-title">
                     <span>⚡ بيانات العداد (${meterCount + 1})</span>
-                    <button class="remove-meter-btn" onclick="document.getElementById('meter-${meterCount}').remove()">حذف</button>
+                    <button class="remove-meter-btn" onclick="document.getElementById('meter-${meterCount}').remove()">✕ حذف</button>
                 </div>
                 <div class="row-flex">
                     <div class="input-group"><label>رقم العداد</label><input type="text" class="mno"></div>
@@ -419,7 +678,6 @@
             return String(key).replace(/[.#$\[\]\(\)\/\s]/g, "").trim();
         }
 
-        // 2. دالة الحفظ مع التحقق من وجود المشترك مسبقاً
         window.saveAllToFirebase = async function () {
             const mname = document.getElementById("mname").value.trim();
             if (!mname) return Swal.fire("خطأ", "يرجى إدخال اسم المشترك", "error");
@@ -431,7 +689,6 @@
             try {
                 Swal.fire({ title: 'جاري التحقق والحفظ...', didOpen: () => Swal.showLoading() });
 
-                // التحقق من وجود المشترك
                 const snapshot = await get(ref(db, `MD/customers/${customerKey}`));
                 if (snapshot.exists()) {
                     return Swal.fire({
@@ -442,7 +699,6 @@
                     });
                 }
 
-                // تجهيز بيانات العدادات
                 let metersData = {};
                 let hasError = false;
 
@@ -469,7 +725,6 @@
 
                 if (hasError) return Swal.fire("تنبيه", "تأكد من كتابة رقم العداد لكل العدادات", "warning");
 
-                // تجهيز بيانات المشترك بالكامل
                 const finalData = {
                     metername: mname,
                     keta3: document.getElementById("keta3").value || "-",
@@ -479,7 +734,6 @@
                     meters: metersData
                 };
 
-                // الحفظ النهائي
                 await set(ref(db, `MD/customers/${customerKey}`), finalData);
 
                 Swal.fire("تم الحفظ!", "تم تسجيل المشترك والعدادات بنجاح", "success")

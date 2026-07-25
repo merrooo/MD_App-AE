@@ -3,80 +3,819 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
     <title>نظام إدارة المشتركين - النسخة الأمنية</title>
-    <link rel="stylesheet" href="MD.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        .btn-add-meter {
-            background-color: var(--success, #27ae60);
-            color: white;
+        :root {
+            --primary: #1e293b;
+            --primary-light: #334155;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --bg: #f1f5f9;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        /* ===== SIDE PANEL ===== */
+        .side-panel {
+            flex: 0 0 380px;
+            max-width: 380px;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .side-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .side-panel::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .side-panel h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin: 15px 0 12px 0;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 8px;
+        }
+
+        /* ===== DROPDOWN (matching MD_Add) ===== */
+        .modern-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-btn {
+            background: var(--primary);
+            color: var(--white);
+            padding: 10px 18px;
+            border-radius: 8px;
             border: none;
-            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Cairo', sans-serif;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            transition: all 0.3s ease;
+            gap: 10px;
+        }
+
+        .dropdown-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+        }
+
+        .dropdown-btn .arrow {
+            font-size: 0.7rem;
+            transition: transform 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .dropdown-btn .arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-btn .icon-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 2000;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            animation: dropdownFade 0.25s ease;
+        }
+
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-family: 'Cairo', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f5f9;
+            color: var(--accent);
+            padding-right: 28px;
+        }
+
+        .dropdown-item .item-icon {
+            font-size: 1.1rem;
+            width: 28px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .dropdown-item .item-label {
+            flex: 1;
+        }
+
+        .dropdown-item .item-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        /* ===== MODE TAGS ===== */
+        .mode-tag {
+            display: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 6px 0 12px 0;
+            text-align: center;
+        }
+
+        .customer-edit-mode {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .meter-edit-mode {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-muted);
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
             border-radius: 8px;
             font-family: 'Cairo', sans-serif;
-            font-weight: bold;
+            font-size: 0.9rem;
+            background: var(--white);
+            transition: border 0.2s, box-shadow 0.2s;
+            color: var(--text);
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .input-group input:disabled,
+        .input-group textarea:disabled {
+            background: #f1f5f9;
+            cursor: not-allowed;
+        }
+
+        .row-flex {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .row-flex .input-group {
+            flex: 1;
+            min-width: 130px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 12px 0;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-excel {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
             cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
             width: 100%;
-            margin-top: 8px;
-            transition: 0.3s;
+            transition: background 0.2s;
+        }
+
+        .btn-excel:hover {
+            background: #15803d;
+        }
+
+        .action-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .action-btns button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-add-meter {
+            background: var(--success);
+            color: white;
         }
 
         .btn-add-meter:hover {
-            background-color: #219150;
+            background: #15803d;
+            transform: translateY(-1px);
+        }
+
+        .btn-update-all {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-update-all:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+        }
+
+        .btn-clear {
+            background: #e2e8f0;
+            color: var(--text);
+        }
+
+        .btn-clear:hover {
+            background: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        .btn-delete-db {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-delete-db:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        #updateAllBtn {
+            display: none;
+        }
+
+        #saveBtn {
+            display: block;
+        }
+
+        #addMeterBtn {
+            display: block;
+        }
+
+        /* ===== DISPLAY PANEL ===== */
+        .display-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 4px solid var(--accent);
+        }
+
+        .stat-card h4 {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stat-card span {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .top-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            background: var(--white);
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .top-bar h3 {
+            font-size: 1rem;
+            color: var(--primary);
+            flex: 1;
+            min-width: 120px;
+            margin: 0;
+        }
+
+        .top-bar input {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .top-bar input:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .top-bar button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            cursor: pointer;
+            font-size: 1rem;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .top-bar button:hover {
+            background: var(--accent-hover);
+        }
+
+        /* ===== CARDS ===== */
+        #cardsGrid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .grouped-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .grouped-card:hover {
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            background: #fafcff;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-header-main .customer-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .merged-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 4px 16px;
+            margin-top: 4px;
+        }
+
+        .merged-info-grid .info-item {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .delete-customer-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-family: 'Cairo', sans-serif;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .delete-customer-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* ===== TABLE ===== */
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 0 4px 4px 4px;
+        }
+
+        .sub-records-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            min-width: 600px;
+        }
+
+        .sub-records-table th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 6px 4px;
+            border-bottom: 2px solid var(--border);
+            text-align: center;
+            font-size: 0.65rem;
+            white-space: nowrap;
+        }
+
+        .sub-records-table td {
+            padding: 4px 4px;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: center;
+            cursor: pointer;
+            vertical-align: middle;
+            font-size: 0.7rem;
+        }
+
+        .sub-records-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        .sub-records-table .delete-btn {
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .sub-records-table .delete-btn:hover {
+            color: #b91c1c;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .side-panel {
+                flex: 1;
+                max-width: 100%;
+                position: static;
+                max-height: none;
+                padding: 16px 18px;
+            }
+
+            .side-panel h2 {
+                font-size: 1rem;
+            }
+
+            .stats-dashboard {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 8px;
+            }
+
+            .side-panel {
+                padding: 14px 16px;
+            }
+
+            .side-panel h2 {
+                font-size: 0.9rem;
+                margin: 10px 0 8px 0;
+            }
+
+            .row-flex {
+                gap: 6px;
+            }
+
+            .row-flex .input-group {
+                min-width: 100%;
+            }
+
+            .input-group input,
+            .input-group textarea,
+            .input-group select {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+
+            .action-btns button {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+
+            .stats-dashboard {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 10px 8px;
+            }
+
+            .stat-card span {
+                font-size: 1.1rem;
+            }
+
+            .top-bar {
+                padding: 10px 12px;
+                gap: 6px;
+            }
+
+            .top-bar h3 {
+                font-size: 0.85rem;
+                min-width: 80px;
+            }
+
+            .top-bar input {
+                min-width: 100px;
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+
+            .top-bar button {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
+
+            .card-header-main {
+                padding: 10px 12px;
+            }
+
+            .card-header-main .customer-title {
+                font-size: 0.85rem;
+            }
+
+            .merged-info-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2px 10px;
+            }
+
+            .merged-info-grid .info-item {
+                font-size: 0.65rem;
+            }
+
+            .delete-customer-btn {
+                font-size: 0.6rem;
+                padding: 3px 8px;
+            }
+
+            .sub-records-table {
+                font-size: 0.65rem;
+                min-width: 480px;
+            }
+
+            .sub-records-table th {
+                font-size: 0.55rem;
+                padding: 4px 2px;
+            }
+
+            .sub-records-table td {
+                font-size: 0.6rem;
+                padding: 3px 2px;
+            }
+
+            /* Mobile dropdown - slides from bottom */
+            .dropdown-menu {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                border-radius: var(--radius) var(--radius) 0 0;
+                max-height: 60vh;
+                overflow-y: auto;
+                animation: slideUp 0.3s ease;
+            }
+
+            @keyframes slideUp {
+                from {
+                    transform: translateY(100%);
+                }
+
+                to {
+                    transform: translateY(0);
+                }
+            }
+
+            .dropdown-item {
+                padding: 14px 18px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .stats-dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stat-card:last-child {
+                grid-column: span 2;
+            }
+
+            .merged-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== SCROLLBAR STYLING ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
 
 <body>
     <div class="main-container">
+        <!-- ===== SIDE PANEL ===== -->
         <div class="side-panel">
-
+            <!-- Dropdown -->
             <div class="modern-dropdown">
                 <button class="dropdown-btn" id="dropdownBtn">
-                    <span>🚀 اختر وجهتك للانتقال</span>
-                    <span id="arrow">▾</span>
+                    <span class="icon-text">🚀 <span>اختر وجهتك للانتقال</span></span>
+                    <span class="arrow" id="arrow">▾</span>
                 </button>
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <div class="dropdown-item" data-page="MD.html">📊 بيانات كبار المشتركين</div>
-                    <div class="dropdown-item" data-page="MD_Add.html">➕ إضافة مشترك جديد</div>
-                    <div class="dropdown-item" data-page="MD_Pass.html">🔍 تسجيل مرور ميداني</div>
-                    <div class="dropdown-item" data-page="MD_Pass_Dashboard.html">📅 تقرير المرور العام</div>
-                    <div class="dropdown-item" data-page="index.html">📅 الصفحة الرئيسية</div>
+                    <div class="dropdown-item" data-page="MD.html">
+                        <span class="item-icon">📊</span>
+                        <span class="item-label">بيانات كبار المشتركين</span>
+                        <span class="item-badge">الحالية</span>
+                    </div>
+                    <div class="dropdown-item" data-page="MD_Add.html">
+                        <span class="item-icon">➕</span>
+                        <span class="item-label">إضافة مشترك جديد</span>
+                    </div>
+                    <div class="dropdown-item" data-page="MD_Pass.html">
+                        <span class="item-icon">🔍</span>
+                        <span class="item-label">تسجيل مرور ميداني</span>
+                    </div>
+                    <div class="dropdown-item" data-page="MD_Pass_Dashboard.html">
+                        <span class="item-icon">📅</span>
+                        <span class="item-label">تقرير المرور العام</span>
+                    </div>
+                    <div class="dropdown-item" data-page="index.html">
+                        <span class="item-icon">🏠</span>
+                        <span class="item-label">الصفحة الرئيسية</span>
+                    </div>
+                    <div class="dropdown-item" data-page="M_D_PF.html">
+                        <span class="item-icon">⚡</span>
+                        <span class="item-label">تقرير معامل القدرة</span>
+                    </div>
                 </div>
             </div>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const btn = document.getElementById('dropdownBtn');
-                    const menu = document.getElementById('dropdownMenu');
-
-                    btn.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        menu.classList.toggle('show');
-                    });
-
-                    const items = document.querySelectorAll('.dropdown-item');
-                    items.forEach(item => {
-                        item.addEventListener('click', function () {
-                            const page = this.getAttribute('data-page');
-                            if (page) {
-                                window.location.href = page;
-                            }
-                        });
-                    });
-
-                    window.addEventListener('click', function () {
-                        if (menu.classList.contains('show')) {
-                            menu.classList.remove('show');
-                        }
-                    });
-                });
-            </script>
-
             <h2>⚡ إدارة قاعدة البيانات</h2>
+
             <div id="customerModeTag" class="mode-tag customer-edit-mode">تعديل البيانات العامة للمشترك</div>
             <div id="meterModeTag" class="mode-tag meter-edit-mode">تعديل بيانات العداد المحدّد</div>
 
@@ -84,55 +823,176 @@
                 <input type="file" id="excelFile" accept=".xlsx, .xls" style="display: none;">
                 <button class="btn-excel" onclick="protectedAction('upload')">📤 رفع ملف الإكسيل</button>
             </div>
+
             <hr>
 
+            <!-- Fixed Section (Customer Data) -->
             <div id="fixedSection">
-                <div class="input-group"><label>اسم المشترك</label><input id="mname"></div>
-                <div class="row-flex">
-                    <div class="input-group"><label>القطاع</label><input id="keta3"></div>
-                    <div class="input-group"><label>الهندسة</label><input id="handsa"></div>
+                <div class="input-group">
+                    <label>اسم المشترك</label>
+                    <input id="mname">
                 </div>
                 <div class="row-flex">
-                    <div class="input-group"><label>معامل القدرة (PF)</label><input id="power_factor" readonly></div>
-                    <div class="input-group"><label>أقصى حمل</label><input id="max_load"></div>
+                    <div class="input-group">
+                        <select id="keta3">
+                            <option value="">القطاع</option>
+                            <option>دمياط</option>
+                            <option>شمال الدقهلية</option>
+                            <option>جنوب الدقهلية</option>
+                            <option>كفر الشيخ</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <select id="handsa">
+                            <option value="">الهندسة</option>
+                            <option>هندسة شمال دمياط</option>
+                            <option>هندسة جنوب دمياط</option>
+                            <option>هندسة عزبة البرج</option>
+                            <option>هندسة كفر سعد</option>
+                            <option>هندسة كفر البطيخ</option>
+                            <option>هندسة راس البر</option>
+                            <option>هندسة دمياط الجديدة</option>
+                            <option>هندسة الزرقا</option>
+                            <option>هندسة فارسكور</option>
+                            <option>هندسة الروضة</option>
+                            <option>هندسة الشعراء</option>
+                            <option>هندسة مدينة شربين</option>
+                            <option>هندسة قري شربين</option>
+                            <option>هندسة دكرنس</option>
+                            <option>هندسة جمصة</option>
+                            <option>هندسة قري بلقاس</option>
+                            <option>هندسة مدينة بلقاس</option>
+                            <option>هندسة الستاموني</option>
+                            <option>هندسة بني عبيد</option>
+                            <option>هندسة منية النصر</option>
+                            <option>هندسة ميت سلسيل</option>
+                            <option>هندسة الجمالية</option>
+                            <option>هندسة قري المنزلة</option>
+                            <option>هندسة مدينة المنزلة</option>
+                            <option>هندسة المطرية</option>
+                            <option>هندسة شرق المنصورة</option>
+                            <option>هندسة غرب المنصورة</option>
+                            <option>هندسة طلخا</option>
+                            <option>هندسة نبروه</option>
+                            <option>هندسة قري المنصورة 1</option>
+                            <option>هندسة قري المنصورة 2</option>
+                            <option>هندسة اجا</option>
+                            <option>هندسة مدينة السنبلاوين</option>
+                            <option>هندسة قري السنبلاوين</option>
+                            <option>هندسة تمي الامديد</option>
+                            <option>هندسة مدينة ميت غمر</option>
+                            <option>هندسة قري ميت غمر</option>
+                            <option>هندسة كوم النور</option>
+                            <option>هندسة مدينة كفر الشيخ</option>
+                            <option>هندسة غرب كفر الشيخ</option>
+                            <option>هندسة شرق كفر الشيخ</option>
+                            <option>هندسة قلين</option>
+                            <option>هندسة قرى سيدي سالم</option>
+                            <option>هندسة مدينة سيدي سالم</option>
+                            <option>هندسة الرياض</option>
+                            <option>هندسة مدينة دسوق</option>
+                            <option>هندسة قرى شمال دسوق</option>
+                            <option>هندسة قرى جنوب دسوق</option>
+                            <option>هندسة فوه</option>
+                            <option>هندسة مطوبس</option>
+                            <option>هندسة مدينة الحامول</option>
+                            <option>هندسة قرى الحامول</option>
+                            <option>هندسة بيلا</option>
+                            <option>هندسة بلطيم</option>
+                            <option>هندسة برج البرلس</option>
+                        </select>
+                    </div>
                 </div>
-
-                <div class="input-group"><label>تاريخ اخر المرور</label><input type="date" id="passing_date"></div>
+                <div class="row-flex">
+                    <div class="input-group">
+                        <label>معامل القدرة (PF)</label>
+                        <input id="power_factor" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label>أقصى حمل</label>
+                        <input id="max_load">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>تاريخ اخر المرور</label>
+                    <input type="date" id="passing_date">
+                </div>
             </div>
 
+            <!-- Variable Section (Meter Data) -->
             <div id="variableSection">
                 <hr>
-                <div class="input-group"><label>رقم العداد (Key)</label><input id="mno"></div>
-                <div class="row-flex">
-                    <div class="input-group"><label>تاريخ الرفع</label><input type="date" id="inspection_date"></div>
-                    <div class="input-group"><label>تاريخ التركيب</label><input type="date" id="fix_date"></div>
-                </div>
-                <div class="input-group"><label>تاريخ الإطلاق</label><input type="date" id="power_date"></div>
-                <div class="row-flex">
-                    <div class="input-group"><label>kWh</label><input id="kwh_reading"></div>
-                    <div class="input-group"><label>kVARh</label><input id="kvarh_reading"></div>
+                <div class="input-group">
+                    <label>رقم العداد (Key)</label>
+                    <input id="mno">
                 </div>
                 <div class="row-flex">
-                    <div class="input-group"><label>VT Ratio</label><input id="vt_ratio"></div>
-                    <div class="input-group"><label>CT Ratio</label><input id="ct_ratio"></div>
+                    <div class="input-group">
+                        <label>تاريخ الرفع</label>
+                        <input type="date" id="inspection_date">
+                    </div>
+                    <div class="input-group">
+                        <label>تاريخ التركيب</label>
+                        <input type="date" id="fix_date">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>تاريخ الإطلاق</label>
+                    <input type="date" id="power_date">
                 </div>
                 <div class="row-flex">
-                    <div class="input-group"><label>الثابت</label><input id="constant"></div>
-                    <div class="input-group"><label>المكان</label><input id="location"></div>
+                    <div class="input-group">
+                        <label>kWh</label>
+                        <input id="kwh_reading">
+                    </div>
+                    <div class="input-group">
+                        <label>kVARh</label>
+                        <input id="kvarh_reading">
+                    </div>
                 </div>
-                <div class="input-group"><label>نوع العداد</label><input id="mtype"></div>
-                <div class="input-group"><label>الملاحظات</label><textarea id="notes" rows="2"></textarea></div>
+                <div class="row-flex">
+                    <div class="input-group">
+                        <label>VT Ratio</label>
+                        <input id="vt_ratio">
+                    </div>
+                    <div class="input-group">
+                        <label>CT Ratio</label>
+                        <input id="ct_ratio">
+                    </div>
+                </div>
+                <div class="row-flex">
+                    <div class="input-group">
+                        <label>الثابت</label>
+                        <input id="constant">
+                    </div>
+                    <div class="input-group">
+                        <label>المكان</label>
+                        <input id="location">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>نوع العداد</label>
+                    <input id="mtype">
+                </div>
+                <div class="input-group">
+                    <label>الملاحظات</label>
+                    <textarea id="notes" rows="2"></textarea>
+                </div>
             </div>
 
+            <!-- Action Buttons -->
             <div class="action-btns">
                 <button id="saveBtn" class="btn-save" onclick="quickSave()">💾 حفظ/تحديث العداد</button>
                 <button id="addMeterBtn" class="btn-add-meter" onclick="addNewMeter()">➕ حفظ عداد جديد</button>
-                <button id="updateAllBtn" class="btn-update-all" onclick="updateCustomerData()">🔄 تحديث البيانات العامة</button>
+                <button id="updateAllBtn" class="btn-update-all" onclick="updateCustomerData()">🔄 تحديث البيانات
+                    العامة</button>
                 <button class="btn-clear" onclick="clearForm()">🧹 تفريغ الحقول</button>
-                <button class="btn-delete-db" onclick="protectedAction('deleteAll')">🗑️ مسح قاعدة البيانات بالكامل</button>
+                <button class="btn-delete-db" onclick="protectedAction('deleteAll')">🗑️ مسح قاعدة البيانات
+                    بالكامل</button>
             </div>
         </div>
 
+        <!-- ===== DISPLAY PANEL ===== -->
         <div class="display-panel">
             <div class="stats-dashboard">
                 <div class="stat-card">
@@ -145,16 +1005,16 @@
                 </div>
                 <div class="stat-card" style="border-top-color: var(--warning);">
                     <h4>آخر تحديث</h4>
-                    <span id="last-update" style="font-size: 0.9rem;">--:--</span>
+                    <span id="last-update" style="font-size: 0.8rem;">--:--</span>
                 </div>
             </div>
 
             <div class="top-bar">
-                <h3 style="margin:0;">📋 سجل المشتركين </h3>
+                <h3>📋 سجل المشتركين</h3>
                 <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو رقم العداد...">
-                <button onclick="loadDataFromFirebase()"
-                    style="background:var(--accent); color:white; border-radius:50%; width:40px; height:40px; border:none; cursor:pointer;">🔄</button>
+                <button onclick="loadDataFromFirebase()">🔄</button>
             </div>
+
             <div id="cardsGrid"></div>
         </div>
     </div>
@@ -188,6 +1048,37 @@
         let allCustomers = {};
         const ADMIN_PASS = "1";
 
+        // ===== DROPDOWN =====
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('dropdownBtn');
+            const menu = document.getElementById('dropdownMenu');
+            const arrow = document.getElementById('arrow');
+
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                menu.classList.toggle('show');
+                arrow.classList.toggle('open');
+            });
+
+            const items = document.querySelectorAll('.dropdown-item');
+            items.forEach(item => {
+                item.addEventListener('click', function () {
+                    const page = this.getAttribute('data-page');
+                    if (page) {
+                        window.location.href = page;
+                    }
+                });
+            });
+
+            window.addEventListener('click', function () {
+                if (menu.classList.contains('show')) {
+                    menu.classList.remove('show');
+                    arrow.classList.remove('open');
+                }
+            });
+        });
+
+        // ===== PROTECTED ACTION =====
         window.protectedAction = async function (type) {
             const { value: password } = await Swal.fire({
                 title: 'كلمة المرور مطلوبة',
@@ -204,6 +1095,7 @@
             }
         };
 
+        // ===== UTILITY FUNCTIONS =====
         function sanitizeKey(key) {
             if (!key) return "unknown";
             return String(key).replace(/[.#$\[\]\(\)\/\s]/g, "").trim();
@@ -230,6 +1122,7 @@
             return "";
         }
 
+        // ===== EXCEL UPLOAD =====
         document.getElementById("excelFile").addEventListener("change", function (e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -238,7 +1131,10 @@
                 const data = new Uint8Array(evt.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                Swal.fire({ title: 'جاري المعالجة...', text: `تحليل ${json.length} سجل`, didOpen: () => Swal.showLoading() });
+                Swal.fire({
+                    title: 'جاري المعالجة...', text: `تحليل ${json.length} سجل`, didOpen: () => Swal
+                        .showLoading()
+                });
 
                 const grouped = {};
                 json.forEach((row) => {
@@ -291,6 +1187,7 @@
             reader.readAsArrayBuffer(file);
         });
 
+        // ===== LOAD DATA =====
         window.loadDataFromFirebase = async function () {
             const grid = document.getElementById("cardsGrid");
             grid.innerHTML = "جاري جلب البيانات...";
@@ -333,6 +1230,7 @@
             document.getElementById("last-update").innerText = new Date().toLocaleTimeString('ar-EG');
         }
 
+        // ===== DELETE ALL =====
         window.deleteAllData = async function () {
             const result = await Swal.fire({
                 title: 'حذف كلي؟',
@@ -351,6 +1249,7 @@
             }
         };
 
+        // ===== DELETE CUSTOMER =====
         window.deleteCustomer = async function (cID) {
             const result = await Swal.fire({
                 title: 'حذف مشترك؟',
@@ -369,6 +1268,25 @@
             }
         };
 
+        // ===== DELETE METER =====
+        window.deleteMeter = async function (cID, mKey) {
+            const result = await Swal.fire({
+                title: 'حذف العداد؟',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'نعم، احذف'
+            });
+            if (result.isConfirmed) {
+                await Promise.all([
+                    remove(ref(dbMD, `MD/customers/${cID}/meters/${mKey}`)),
+                    remove(ref(dbPass, `MD_Pass/customers/${cID}/meters/${mKey}`))
+                ]);
+                loadDataFromFirebase();
+            }
+        };
+
+        // ===== RENDER CARDS =====
         function renderCards() {
             const grid = document.getElementById("cardsGrid");
             grid.innerHTML = "";
@@ -378,50 +1296,52 @@
                 const card = document.createElement("div");
                 card.className = "grouped-card";
                 card.innerHTML = `
-            <div class="card-header-main" onclick="fillCustomerEdit('${id}')">
-                <div>
-                    <span class="customer-title">👤 ${c.metername}</span>
-                    <div class="merged-info-grid">
-                        <div class="info-item">🏗️ القطاع: ${c.keta3}</div>
-                        <div class="info-item">📐 الهندسة: ${c.handsa}</div>
-                        <div class="info-item">📊 معامل القدرة: ${c.power_factor}</div>
-                        <div class="info-item">⚖️ أقصى حمل: ${c.max_load}</div>
-                        <div class="info-item">📅 تاريخ اخر مرور: ${c.passing_date}</div>
-                        <div class="info-item">🔢 عدد العدادات: ${Object.keys(meters).length}</div>
+                    <div class="card-header-main" onclick="fillCustomerEdit('${id}')">
+                        <div>
+                            <span class="customer-title">👤 ${c.metername}</span>
+                            <div class="merged-info-grid">
+                                <div class="info-item">🏗️ القطاع: ${c.keta3}</div>
+                                <div class="info-item">📐 الهندسة: ${c.handsa}</div>
+                                <div class="info-item">📊 معامل القدرة: ${c.power_factor}</div>
+                                <div class="info-item">⚖️ أقصى حمل: ${c.max_load}</div>
+                                <div class="info-item">📅 تاريخ اخر مرور: ${c.passing_date}</div>
+                                <div class="info-item">🔢 عدد العدادات: ${Object.keys(meters).length}</div>
+                            </div>
+                        </div>
+                        <button class="delete-customer-btn" onclick="event.stopPropagation(); deleteCustomer('${id}')">🗑️ حذف المشترك</button>
                     </div>
-                </div>
-                <button class="delete-customer-btn" onclick="event.stopPropagation(); deleteCustomer('${id}')">🗑️ حذف المشترك</button>
-            </div>
-            <div class="table-wrapper">
-                <table class="sub-records-table">
-                    <thead><tr>
-                        <th>رقم العداد</th><th>ك وات</th><th>ك فار</th><th>محول جهد</th><th>محول تيار</th><th>الثابت</th><th>المكان</th><th>النوع</th><th>الرفع</th><th>التركيب</th><th>الأطلاق</th><th>ملاحظات</th><th>حذف</th>
-                    </tr></thead>
-                    <tbody>
-                        ${Object.keys(meters).map(mKey => `
-                                <tr onclick="fillMeterEdit('${id}', '${mKey}')">
-                                    <td><b>${meters[mKey].meternumber}</b></td>
-                                    <td>${meters[mKey].kwh_reading}</td>
-                                    <td>${meters[mKey].kvarh_reading}</td>
-                                    <td>${meters[mKey].vt_ratio}</td>
-                                    <td>${meters[mKey].ct_ratio}</td>
-                                    <td>${meters[mKey].constant}</td>
-                                    <td>${meters[mKey].location}</td>
-                                    <td>${meters[mKey].metertype}</td>
-                                    <td>${meters[mKey].inspection_date}</td>
-                                    <td>${meters[mKey].fix_date}</td>
-                                    <td>${meters[mKey].power_date}</td>
-                                    <td>${meters[mKey].meternotes}</td>
-                                    <td class="delete-btn" onclick="event.stopPropagation(); deleteMeter('${id}', '${mKey}')">🗑️</td>
-                                </tr>
-                            `).join('')}
-                    </tbody>
-                </table>
-            </div>`;
+                    <div class="table-wrapper">
+                        <table class="sub-records-table">
+                            <thead><tr>
+                                <th>رقم العداد</th><th>ك وات</th><th>ك فار</th><th>محول جهد</th><th>محول تيار</th><th>الثابت</th><th>المكان</th><th>النوع</th><th>الرفع</th><th>التركيب</th><th>الأطلاق</th><th>ملاحظات</th><th>حذف</th>
+                            </tr></thead>
+                            <tbody>
+                                ${Object.keys(meters).map(mKey => `
+                                    <tr onclick="fillMeterEdit('${id}', '${mKey}')">
+                                        <td><b>${meters[mKey].meternumber}</b></td>
+                                        <td>${meters[mKey].kwh_reading}</td>
+                                        <td>${meters[mKey].kvarh_reading}</td>
+                                        <td>${meters[mKey].vt_ratio}</td>
+                                        <td>${meters[mKey].ct_ratio}</td>
+                                        <td>${meters[mKey].constant}</td>
+                                        <td>${meters[mKey].location}</td>
+                                        <td>${meters[mKey].metertype}</td>
+                                        <td>${meters[mKey].inspection_date}</td>
+                                        <td>${meters[mKey].fix_date}</td>
+                                        <td>${meters[mKey].power_date}</td>
+                                        <td>${meters[mKey].meternotes}</td>
+                                        <td class="delete-btn" onclick="event.stopPropagation(); deleteMeter('${id}', '${mKey}')">🗑️</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
                 grid.appendChild(card);
             }
         }
 
+        // ===== EDIT FUNCTIONS =====
         let editIDs = { cID: null, mKey: null };
 
         window.fillCustomerEdit = function (id) {
@@ -461,7 +1381,6 @@
                 return;
             }
 
-            // Fill general customer fields
             document.getElementById("mname").value = c.metername || "";
             document.getElementById("keta3").value = c.keta3 || "";
             document.getElementById("handsa").value = c.handsa || "";
@@ -469,7 +1388,6 @@
             document.getElementById("max_load").value = c.max_load || "";
             document.getElementById("passing_date").value = c.passing_date || "";
 
-            // Fill meter fields
             document.getElementById("mno").value = m.meternumber || "";
             document.getElementById("kwh_reading").value = m.kwh_reading || "";
             document.getElementById("kvarh_reading").value = m.kvarh_reading || "";
@@ -483,9 +1401,9 @@
             document.getElementById("power_date").value = m.power_date || "";
             document.getElementById("notes").value = m.meternotes || "";
 
-            // Disable general customer input fields to avoid unintended edits during meter modification
             document.querySelectorAll("#fixedSection input, #fixedSection textarea").forEach(i => i.disabled = true);
-            document.querySelectorAll("#variableSection input, #variableSection textarea").forEach(i => i.disabled = false);
+            document.querySelectorAll("#variableSection input, #variableSection textarea").forEach(i => i.disabled =
+                false);
             document.getElementById("variableSection").style.display = "block";
             document.getElementById("saveBtn").disabled = false;
             document.getElementById("meterModeTag").style.display = "block";
@@ -493,7 +1411,7 @@
             document.getElementById("addMeterBtn").style.display = "block";
         };
 
-        // Quick save / Update existing meter data
+        // ===== QUICK SAVE =====
         window.quickSave = async function () {
             const mNoRaw = document.getElementById("mno").value.trim();
             if (!mNoRaw || !editIDs.cID) return Swal.fire("تنبيه", "يجب اختيار مشترك وتحديد رقم العداد", "warning");
@@ -526,7 +1444,7 @@
             }
         };
 
-        // Add brand new meter under the currently selected customer
+        // ===== ADD NEW METER =====
         window.addNewMeter = async function () {
             if (!editIDs.cID) {
                 return Swal.fire("تنبيه", "يرجى اختيار مشترك أولاً من القائمة لإضافة عداد جديد له", "warning");
@@ -539,9 +1457,9 @@
 
             const newMKey = sanitizeKey(mNoRaw);
 
-            // Check if meter already exists under customer
             if (allCustomers[editIDs.cID]?.meters?.[newMKey]) {
-                return Swal.fire("تنبيه", "هذا العداد موجود بالفعل للمشترك المصرّح له. استخدم 'حفظ/تحديث العداد' للتعديل عليه.", "warning");
+                return Swal.fire("تنبيه", "هذا العداد موجود بالفعل للمشترك المصرّح له. استخدم 'حفظ/تحديث العداد' للتعديل عليه.",
+                    "warning");
             }
 
             const meterData = {
@@ -573,23 +1491,7 @@
             }
         };
 
-        window.deleteMeter = async function (cID, mKey) {
-            const result = await Swal.fire({
-                title: 'حذف العداد؟',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'نعم، احذف'
-            });
-            if (result.isConfirmed) {
-                await Promise.all([
-                    remove(ref(dbMD, `MD/customers/${cID}/meters/${mKey}`)),
-                    remove(ref(dbPass, `MD_Pass/customers/${cID}/meters/${mKey}`))
-                ]);
-                loadDataFromFirebase();
-            }
-        };
-
+        // ===== UPDATE CUSTOMER =====
         window.updateCustomerData = async function () {
             if (!editIDs.cID) {
                 Swal.fire("تنبيه", "لم يتم تحديد مشترك", "warning");
@@ -659,6 +1561,7 @@
             }
         };
 
+        // ===== CLEAR FORM =====
         window.clearForm = function () {
             editIDs = { cID: null, mKey: null };
             document.querySelectorAll("input, textarea").forEach(i => { i.value = ""; i.disabled = false; });
@@ -672,6 +1575,7 @@
             document.getElementById("saveBtn").disabled = false;
         };
 
+        // ===== SEARCH =====
         document.getElementById("searchInput").addEventListener("input", function (e) {
             const term = e.target.value.toLowerCase();
             const cards = document.querySelectorAll(".grouped-card");
@@ -680,6 +1584,7 @@
             });
         });
 
+        // ===== INIT =====
         loadDataFromFirebase();
     </script>
 </body>
