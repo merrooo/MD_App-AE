@@ -1,0 +1,21 @@
+{
+  "name": "md_app-ae",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/merrooo/MD_App-AE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/merrooo/MD_App-AE/issues"
+  },
+  "homepage": "https://github.com/merrooo/MD_App-AE#readme"
+}

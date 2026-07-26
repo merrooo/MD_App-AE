@@ -1,0 +1,9 @@
+{
+    "appId": "com.md.app",
+    "appName": "MD App AE",
+    "webDir": "MD",
+    "bundledWebRuntime": false,
+    "server": {
+        "androidScheme": "https"
+    }
+}
