@@ -2,28 +2,20 @@
   "name": "md_app-ae",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "cap:sync": "node ./scripts/run-cap-sync.js",
-    "build:android:ci": "npm run cap:sync",
-    "postinstall": "node ./scripts/run-cap-sync.js"
+  "main": "index.html",
+ "scripts": {
+    "build": "echo 'No web compilation needed'",
+    "ionic:build": "npm run build",
+    "fix:cap": "node ./scripts/fix-cap-bin.js",
+    "cap": "node ./node_modules/@capacitor/cli/bin/capacitor",
+    "sync": "node ./node_modules/@capacitor/cli/bin/capacitor sync",
+    "sync:android": "node ./node_modules/@capacitor/cli/bin/capacitor sync android",
+    "postinstall": "node ./scripts/fix-cap-bin.js && node ./node_modules/@capacitor/cli/bin/capacitor sync android"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/merrooo/MD_App-AE.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/merrooo/MD_App-AE/issues"
-  },
-  "homepage": "https://github.com/merrooo/MD_App-AE#readme",
   "dependencies": {
     "@capacitor/android": "^8.4.2",
     "@capacitor/cli": "^8.4.2",
-    "@capacitor/core": "^8.4.2"
+    "@capacitor/core": "^8.4.2",
+    "@capacitor/ios": "^6.0.0"
   }
 }
