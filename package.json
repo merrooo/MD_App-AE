@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "cap:sync": "node ./node_modules/@capacitor/cli/bin/capacitor sync android",
+    "cap:sync": "node ./scripts/run-cap-sync.js",
     "build:android:ci": "npm run cap:sync",
-    "postinstall": "node ./node_modules/@capacitor/cli/bin/capacitor sync android"
+    "postinstall": "node ./scripts/run-cap-sync.js"
   },
   "repository": {
     "type": "git",
