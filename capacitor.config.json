@@ -1,9 +1,15 @@
 {
-    "appId": "com.md.app",
+    "appId": "com.yourcompany.labapp",
     "appName": "MD App AE",
     "webDir": "MD",
     "bundledWebRuntime": false,
-    "server": {
-        "androidScheme": "https"
+    "npmClient": "npm",
+   "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
     }
+  },
+  "android": {
+    "allowMixedContent": true
+  }
 }
