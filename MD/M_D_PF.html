@@ -182,6 +182,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .total-badge-m {
@@ -273,7 +275,6 @@
             font-size: 0.85rem;
         }
 
-        /* جدول الأسماء المصغر بداخل الكارت المفتوح */
         .unpassed-table-container {
             margin-top: 6px;
             max-height: 150px;
@@ -452,6 +453,15 @@
             font-weight: 700;
         }
 
+        .diff-badge {
+            background: #f3e8ff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            color: var(--pf-color);
+            font-weight: 700;
+        }
+
         .m-notes {
             font-size: 0.7rem;
             color: var(--text-muted);
@@ -571,6 +581,11 @@
 
         #masterTable {
             display: none;
+        }
+
+        .text-sm {
+            font-size: 0.65rem;
+            color: var(--text-muted);
         }
     </style>
 </head>
@@ -759,7 +774,7 @@
                 return;
             }
             const wb = XLSX.utils.table_to_book(document.getElementById("masterTable"));
-            XLSX.writeFile(wb, `Report_PF_Unpassed_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            XLSX.writeFile(wb, `Report_PF_${new Date().toISOString().slice(0, 10)}.xlsx`);
         };
 
         function parseDateFlexible(raw) {
@@ -777,40 +792,85 @@
             return isNaN(dt) ? null : dt;
         }
 
-        function calculateCustomerPF(records) {
-            let totalKwhDiff = 0;
-            let totalKvarhDiff = 0;
-            let hasValidReadings = false;
+        function calculatePFFromDiff(kwhDiff, kvarhDiff) {
+            if (kwhDiff <= 0) return 0;
+            const ratio = Math.abs(kvarhDiff) / kwhDiff;
+            const angle = Math.atan(ratio);
+            return Math.round(Math.cos(angle) * 100) / 100;
+        }
 
-            records.forEach(record => {
-                if (record.readings && record.readings.length > 0) {
-                    record.readings.forEach(reading => {
-                        const kwh = parseFloat(reading.kwh) || 0;
-                        const kvarh = parseFloat(reading.kvarh) || 0;
-
-                        if (kwh > 0 || kvarh > 0) {
-                            totalKwhDiff += kwh;
-                            totalKvarhDiff += kvarh;
-                            hasValidReadings = true;
-                        }
-                    });
-                }
-            });
-
-            let avgPf = 0;
-            if (hasValidReadings && totalKwhDiff > 0) {
-                const ratio = Math.abs(totalKvarhDiff) / totalKwhDiff;
-                const angle = Math.atan(ratio);
-                avgPf = Math.cos(angle);
+        function calculateCustomerPFWithDateRange(records, startDateObj, endDateObj) {
+            if (!records || records.length === 0) {
+                return { pf: 0, totalKwhDiff: 0, totalKvarhDiff: 0, hasData: false, oldestReading: null, newestReading: null };
             }
 
-            const roundedPf = Math.round(avgPf * 100) / 100;
+            // Filter records within date range
+            let filteredRecords = records.filter(rec => {
+                const recDate = parseDateFlexible(rec.dateKey);
+                if (!recDate) return false;
+                if (startDateObj && recDate < startDateObj) return false;
+                if (endDateObj && recDate > endDateObj) return false;
+                return true;
+            });
+
+            if (filteredRecords.length === 0) {
+                return { pf: 0, totalKwhDiff: 0, totalKvarhDiff: 0, hasData: false, oldestReading: null, newestReading: null };
+            }
+
+            // Sort by date
+            filteredRecords.sort((a, b) => {
+                const dateA = parseDateFlexible(a.dateKey);
+                const dateB = parseDateFlexible(b.dateKey);
+                return dateA - dateB;
+            });
+
+            // Get oldest and newest readings
+            const oldest = filteredRecords[0];
+            const newest = filteredRecords[filteredRecords.length - 1];
+
+            // Find the meter readings - use the first meter from each record
+            const oldestReadings = oldest.readings || [];
+            const newestReadings = newest.readings || [];
+
+            // Calculate total differences across all meters
+            let totalKwhDiff = 0;
+            let totalKvarhDiff = 0;
+            let hasData = false;
+
+            // Match readings by meter number or index
+            const maxLen = Math.max(oldestReadings.length, newestReadings.length);
+            for (let i = 0; i < maxLen; i++) {
+                const oldR = oldestReadings[i] || {};
+                const newR = newestReadings[i] || {};
+
+                // If meter numbers match or we're using index
+                const oldKwh = parseFloat(oldR.kwh) || 0;
+                const newKwh = parseFloat(newR.kwh) || 0;
+                const oldKvarh = parseFloat(oldR.kvarh) || 0;
+                const newKvarh = parseFloat(newR.kvarh) || 0;
+
+                if (newKwh > 0 || newKvarh > 0 || oldKwh > 0 || oldKvarh > 0) {
+                    const kwhDiff = newKwh - oldKwh;
+                    const kvarhDiff = newKvarh - oldKvarh;
+                    if (kwhDiff > 0) {
+                        totalKwhDiff += kwhDiff;
+                        totalKvarhDiff += kvarhDiff;
+                        hasData = true;
+                    }
+                }
+            }
+
+            const pf = calculatePFFromDiff(totalKwhDiff, totalKvarhDiff);
 
             return {
-                pf: roundedPf,
-                totalKwh: totalKwhDiff,
-                totalKvarh: totalKvarhDiff,
-                hasData: hasValidReadings
+                pf: pf,
+                totalKwhDiff: totalKwhDiff,
+                totalKvarhDiff: totalKvarhDiff,
+                hasData: hasData,
+                oldestReading: oldest,
+                newestReading: newest,
+                oldestDate: oldest.dateKey,
+                newestDate: newest.dateKey
             };
         }
 
@@ -888,7 +948,16 @@
             return { unpassedKeta3 };
         }
 
-        // إتاحة الضغط على كارت القطاع لفتح جدول داخل الكارت وتطبيق الفلترة في نفس الوقت
+        window.toggleKeta3Filter = function (keta3Name) {
+            const kSel = document.getElementById('filter_keta3');
+            if (kSel.value === keta3Name) {
+                kSel.value = "";
+            } else {
+                kSel.value = keta3Name;
+            }
+            runReport();
+        };
+
         function updateHeaderStats(unpassedKeta3) {
             const chipGroup = document.getElementById('headerChipGroup');
             let chipsHtml = '';
@@ -900,7 +969,6 @@
                     const isSelected = currentKeta3Filter === name;
                     const selectedClass = isSelected ? 'selected-chip' : '';
 
-                    // بناء جدول الأسماء إذا كان الكارت مفعلاً
                     let miniTableHtml = '';
                     if (isSelected && data.names.length > 0) {
                         let rows = data.names.map((n, idx) => `<tr><td>${idx + 1}</td><td>${n}</td></tr>`).join('');
@@ -934,16 +1002,6 @@
             chipGroup.innerHTML = chipsHtml || `<span style="font-size:0.75rem;color:var(--text-muted);">جميع المشتركين تم المرور عليهم قبل هذا التاريخ</span>`;
         }
 
-        window.toggleKeta3Filter = function (keta3Name) {
-            const kSel = document.getElementById('filter_keta3');
-            if (kSel.value === keta3Name) {
-                kSel.value = "";
-            } else {
-                kSel.value = keta3Name;
-            }
-            runReport();
-        };
-
         async function runReport() {
             const start = document.getElementById('date_from').value;
             const end = document.getElementById('date_to').value;
@@ -956,7 +1014,8 @@
             const endDateObj = end ? parseDateFlexible(end) : null;
             if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
 
-            let customerGroups = {};
+            // Build customer records from passing data
+            let customerRecords = {};
 
             for (let subID in passingData) {
                 if (subID === 'customers') continue;
@@ -992,36 +1051,46 @@
 
                     if (v.readings) {
                         const readingsArray = Object.values(v.readings);
-
-                        if (!customerGroups[subID]) {
-                            customerGroups[subID] = {
+                        if (!customerRecords[subID]) {
+                            customerRecords[subID] = {
                                 customerId: subID,
                                 metername: v.metername || subID,
                                 keta3: v.keta3 || '-',
                                 handsa: v.handsa || '-',
-                                power_factor: v.power_factor || '-',
                                 max_load: v.max_load || '-',
                                 records: []
                             };
                         }
-                        customerGroups[subID].records.push({
-                            dateKey,
-                            readings: readingsArray
+                        customerRecords[subID].records.push({
+                            dateKey: dateKey,
+                            readings: readingsArray,
+                            raw: v
                         });
                     }
                 }
             }
 
+            // Calculate PF for each customer using the date range
             let filteredGroups = {};
-            Object.keys(customerGroups).forEach(id => {
-                const c = customerGroups[id];
-                const pfResult = calculateCustomerPF(c.records);
-                const avgPf = pfResult.pf > 0 ? pfResult.pf : parseFloat(c.power_factor) || 0;
+            Object.keys(customerRecords).forEach(id => {
+                const c = customerRecords[id];
+                const pfResult = calculateCustomerPFWithDateRange(c.records, startDateObj, endDateObj);
+                const avgPf = pfResult.pf;
 
+                // Apply PF filter
                 if (fPF === 'less_092' && avgPf >= 0.92) return;
                 if (fPF === 'more_092' && avgPf < 0.92) return;
 
-                filteredGroups[id] = c;
+                filteredGroups[id] = {
+                    ...c,
+                    pfResult: pfResult,
+                    pfDisplay: pfResult.hasData ? pfResult.pf.toFixed(2) : (c.raw?.power_factor || '-'),
+                    totalKwhDiff: pfResult.totalKwhDiff,
+                    totalKvarhDiff: pfResult.totalKvarhDiff,
+                    oldestDate: pfResult.oldestDate,
+                    newestDate: pfResult.newestDate,
+                    hasPfData: pfResult.hasData
+                };
             });
 
             currentRenderedGroups = filteredGroups;
@@ -1043,11 +1112,9 @@
 
                 customerKeys.forEach(id => {
                     const c = customerGroups[id];
-                    const pfResult = calculateCustomerPF(c.records);
-                    const avgPf = pfResult.pf;
-                    const pfDisplay = avgPf > 0 ? avgPf.toFixed(2) : (c.power_factor || '-');
-
-                    const pfBadgeClass = avgPf > 0 ? (avgPf < 0.92 ? 'pf-danger' : 'pf-success') : '';
+                    const pfDisplay = c.pfDisplay;
+                    const pfValue = typeof pfDisplay === 'string' ? parseFloat(pfDisplay) : pfDisplay;
+                    const pfBadgeClass = pfValue > 0 ? (pfValue < 0.92 ? 'pf-danger' : 'pf-success') : '';
 
                     let metersHtml = '';
                     c.records.forEach(rec => {
@@ -1078,6 +1145,15 @@
                         });
                     });
 
+                    // Show calculation details
+                    const calcInfo = c.hasPfData ? `
+                        <div class="text-sm" style="margin-top:4px; padding:4px 8px; background:#f3e8ff; border-radius:4px;">
+                            <i class="fas fa-calculator"></i> 
+                            ΔkWh: ${c.totalKwhDiff.toFixed(1)} | ΔkVARh: ${c.totalKvarhDiff.toFixed(1)} 
+                            | الفترة: ${c.oldestDate || '?'} → ${c.newestDate || '?'}
+                        </div>
+                    ` : '';
+
                     cardsHtml += `
                     <div class="m-card ${selectAllVal ? 'selected' : ''}" id="card_${c.customerId}">
                         <div class="m-card-header">
@@ -1095,6 +1171,7 @@
                             <div class="m-info-item">معامل القدرة: <b class="pf-value-tag ${pfBadgeClass}">${pfDisplay}</b></div>
                             <div class="m-info-item">أقصى حمل: <b>${c.max_load}</b></div>
                         </div>
+                        ${calcInfo}
                         ${metersHtml}
                     </div>
                 `;
@@ -1161,7 +1238,7 @@
 
             const confirmResult = await Swal.fire({
                 title: 'تأكيد التحديث',
-                text: `هل تريد تحديث معامل القدرة ${selectedCustIds.length} `,
+                text: `هل تريد تحديث معامل القدرة لـ ${selectedCustIds.length} مشترك محدد؟`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'نعم، تحديث المحدد',
@@ -1180,22 +1257,27 @@
             let updatePromises = [];
             let updatedCount = 0;
 
+            const start = document.getElementById('date_from').value;
+            const end = document.getElementById('date_to').value;
+            const startDateObj = start ? parseDateFlexible(start) : null;
+            const endDateObj = end ? parseDateFlexible(end) : null;
+            if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
+
             selectedCustIds.forEach(subID => {
                 const customer = currentRenderedGroups[subID];
-                if (customer) {
-                    const pfResult = calculateCustomerPF(customer.records);
-                    const newPf = pfResult.pf;
-                    const latestDate = customer.records.length > 0 ? customer.records[customer.records.length - 1].dateKey : '';
-
-                    if (pfResult.hasData && newPf > 0) {
+                if (customer && customer.hasPfData) {
+                    const newPf = customer.pfResult.pf;
+                    
+                    if (newPf > 0) {
                         updatePromises.push(set(ref(db, `MD/customers/${subID}/power_factor`), newPf));
-                        updatePromises.push(set(ref(db, `MD/customers/${subID}/pf_calculated_date`), latestDate));
+                        updatePromises.push(set(ref(db, `MD/customers/${subID}/pf_calculated_date`), customer.newestDate));
                         updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/power_factor`), newPf));
-                        updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/pf_calculated_date`), latestDate));
+                        updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/pf_calculated_date`), customer.newestDate));
 
-                        for (let record of customer.records) {
-                            updatePromises.push(set(ref(db, `MD_Pass/${subID}/${record.dateKey}/power_factor`), newPf));
-                        }
+                        // Update each record in the range with the PF
+                        customer.records.forEach(rec => {
+                            updatePromises.push(set(ref(db, `MD_Pass/${subID}/${rec.dateKey}/power_factor`), newPf));
+                        });
                         updatedCount++;
                     }
                 }

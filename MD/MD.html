@@ -27,6 +27,7 @@
             --radius-sm: 8px;
             --shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
             --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.06);
+            --readonly-bg: #f1f5f9;
         }
 
         * {
@@ -203,8 +204,25 @@
             color: var(--text-muted);
         }
 
+        .form-group input.readonly-field {
+            background: var(--readonly-bg);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            border-color: #d1d5db;
+        }
+
         .form-group.full {
             grid-column: 1 / -1;
+        }
+
+        .readonly-hint {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            padding: 2px 4px;
+            background: var(--readonly-bg);
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 2px;
         }
 
         /* ===== SEARCH BAR ===== */
@@ -790,12 +808,12 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-bolt"></i> معامل القدرة (PF)</label>
-                    <input id="power_factor" readonly>
+                    <label><i class="fas fa-bolt"></i> معامل القدرة  <span class="readonly-hint"></span></label>
+                    <input id="power_factor" class="readonly-field" readonly>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-weight-hanging"></i> أقصى حمل</label>
-                    <input id="max_load">
+                    <label><i class="fas fa-weight-hanging"></i> أقصى حمل <span class="readonly-hint"></span></label>
+                    <input id="max_load" class="readonly-field" readonly>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-calendar-alt"></i> تاريخ المرور</label>
@@ -820,12 +838,12 @@
                     <input type="date" id="power_date">
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-bolt"></i> kWh</label>
-                    <input id="kwh_reading" type="number" step="any">
+                    <label><i class="fas fa-bolt"></i> kWh <span class="readonly-hint"></span></label>
+                    <input id="kwh_reading" type="number" step="any" class="readonly-field" readonly>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-bolt"></i> kVARh</label>
-                    <input id="kvarh_reading" type="number" step="any">
+                    <label><i class="fas fa-bolt"></i> kVARh <span class="readonly-hint"></span></label>
+                    <input id="kvarh_reading" type="number" step="any" class="readonly-field" readonly>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-arrows-alt-h"></i> VT Ratio</label>
@@ -921,7 +939,7 @@
         try { getAnalytics(app); } catch (_) { }
 
         let allCustomers = {};
-        let allCustomerIds = []; // cache for fast search
+        let allCustomerIds = [];
         const ADMIN_PASS = "1";
 
         // ===== SHEET MENU =====
@@ -1054,7 +1072,7 @@
                 const mdData = snapMD.exists() ? snapMD.val() : {};
                 const passData = snapPass.exists() ? snapPass.val() : {};
                 allCustomers = { ...passData, ...mdData };
-                allCustomerIds = Object.keys(allCustomers); // cache IDs for fast search
+                allCustomerIds = Object.keys(allCustomers);
                 
                 if (allCustomerIds.length > 0) {
                     renderCards(allCustomerIds);
@@ -1131,7 +1149,6 @@
             for (const id of ids) {
                 const c = allCustomers[id];
                 if (!c) continue;
-                // Build searchable text
                 const meterNumbers = Object.values(c.meters || {})
                     .map(m => m.meternumber || '')
                     .join(' ');
@@ -1148,7 +1165,6 @@
             const grid = document.getElementById("cardsGrid");
             grid.innerHTML = "";
             
-            // Build search index for fast searching
             searchIndex = buildSearchIndex(ids);
 
             if (ids.length === 0) {
@@ -1156,7 +1172,6 @@
                 return;
             }
 
-            // Render only first batch for performance, but we'll show all
             renderCardBatch(ids, grid);
         }
 
@@ -1169,7 +1184,6 @@
                 const meterKeys = Object.keys(meters);
                 const meterCount = meterKeys.length;
 
-                // Build meter table rows
                 let metersHtml = '';
                 meterKeys.forEach((mKey) => {
                     const m = meters[mKey];
@@ -1191,7 +1205,6 @@
                     `;
                 });
 
-                // Build meter detail cards (one per meter, hidden by default)
                 let meterCardsHtml = '';
                 meterKeys.forEach((mKey) => {
                     const m = meters[mKey];
@@ -1224,14 +1237,12 @@
                     `;
                 });
 
-                // ===== WRAPPER CARD =====
                 const wrapper = document.createElement("div");
                 wrapper.className = "card-wrapper";
                 wrapper.dataset.customerId = id;
                 wrapper.dataset.searchText = `${c.metername || ''} ${c.keta3 || ''} ${c.handsa || ''}`.toLowerCase();
 
                 wrapper.innerHTML = `
-                    <!-- MAIN CUSTOMER CARD -->
                     <div class="main-card" id="mainCard_${id}" onclick="showMainCard('${id}')">
                         <div class="main-card-header">
                             <div class="main-card-name">
@@ -1267,7 +1278,6 @@
                         `}
                     </div>
 
-                    <!-- METER DETAIL CARDS (hidden by default) -->
                     ${meterCardsHtml}
                 `;
 
@@ -1277,17 +1287,13 @@
 
         // ===== FAST SEARCH =====
         function performSearch(query) {
-            const grid = document.getElementById("cardsGrid");
             const term = query.toLowerCase().trim();
             
             if (!term) {
-                // Show all
-                const wrappers = document.querySelectorAll(".card-wrapper");
-                wrappers.forEach(w => w.style.display = "");
+                document.querySelectorAll(".card-wrapper").forEach(w => w.style.display = "");
                 return;
             }
 
-            // Search using the pre-built index
             const results = [];
             for (const item of searchIndex) {
                 if (item.searchText.includes(term)) {
@@ -1295,34 +1301,26 @@
                 }
             }
 
-            // Hide all cards first
-            const wrappers = document.querySelectorAll(".card-wrapper");
-            wrappers.forEach(w => w.style.display = "none");
+            document.querySelectorAll(".card-wrapper").forEach(w => w.style.display = "none");
 
-            // Show only matching cards
             for (const id of results) {
                 const wrapper = document.querySelector(`.card-wrapper[data-customer-id="${id}"]`);
                 if (wrapper) wrapper.style.display = "";
             }
 
-            // Show empty state if no results
-            const visible = document.querySelectorAll('.card-wrapper[style*="display: block"], .card-wrapper:not([style*="display: none"])');
-            // Actually we need to check if any are visible
             let hasVisible = false;
             document.querySelectorAll(".card-wrapper").forEach(w => {
                 if (w.style.display !== "none") hasVisible = true;
             });
             
-            // If no results and there was a search term
+            const emptyMsg = document.querySelector('.empty-state');
             if (!hasVisible && term) {
-                const emptyMsg = document.querySelector('.empty-state');
                 if (emptyMsg) {
                     emptyMsg.style.display = "block";
                     emptyMsg.querySelector('p').textContent = `لا توجد نتائج تطابق "${query}"`;
                 }
-            } else {
-                const emptyMsg = document.querySelector('.empty-state');
-                if (emptyMsg) emptyMsg.style.display = "none";
+            } else if (emptyMsg) {
+                emptyMsg.style.display = "none";
             }
         }
 
@@ -1354,6 +1352,7 @@
                 document.getElementById("passing_date").value = c.passing_date || "";
 
                 document.querySelectorAll("#formGrid input, #formGrid select, #formGrid textarea").forEach(i => i.disabled = false);
+                document.querySelectorAll(".readonly-field").forEach(i => i.disabled = true);
                 document.getElementById("updateAllBtn").style.display = "inline-flex";
                 document.getElementById("saveBtn").style.display = "none";
                 document.getElementById("addMeterBtn").style.display = "none";
@@ -1409,6 +1408,7 @@
                 document.getElementById("notes").value = m.meternotes || "";
 
                 document.querySelectorAll("#formGrid input, #formGrid select, #formGrid textarea").forEach(i => i.disabled = false);
+                document.querySelectorAll(".readonly-field").forEach(i => i.disabled = true);
                 document.getElementById("updateAllBtn").style.display = "none";
                 document.getElementById("saveBtn").style.display = "inline-flex";
                 document.getElementById("addMeterBtn").style.display = "inline-flex";
@@ -1424,15 +1424,19 @@
             showMainCard(id);
         };
 
-        // ===== SAVE / UPDATE =====
+        // ===== SAVE / UPDATE - ONLY UPDATES EDITABLE FIELDS, PRESERVES kWh, kVARh, PF, MD =====
         window.quickSave = async function() {
             const mNoRaw = document.getElementById("mno").value.trim();
             if (!mNoRaw || !editIDs.cID) return Swal.fire("تنبيه", "يجب اختيار مشترك وتحديد رقم العداد", "warning");
             const finalMKey = editIDs.mKey || sanitizeKey(mNoRaw);
-            const meterData = {
+            
+            // Get existing data to preserve kWh, kVARh, PF, MD
+            const existingCustomer = allCustomers[editIDs.cID] || {};
+            const existingMeter = existingCustomer.meters?.[finalMKey] || {};
+            
+            // Only update editable fields (exclude kwh_reading, kvarh_reading, power_factor, max_load)
+            const meterEditableData = {
                 meternumber: mNoRaw,
-                kwh_reading: document.getElementById("kwh_reading").value || 0,
-                kvarh_reading: document.getElementById("kvarh_reading").value || 0,
                 vt_ratio: document.getElementById("vt_ratio").value || "",
                 ct_ratio: document.getElementById("ct_ratio").value || "",
                 constant: document.getElementById("constant").value || 1,
@@ -1443,12 +1447,49 @@
                 power_date: document.getElementById("power_date").value || "",
                 meternotes: document.getElementById("notes").value || ""
             };
+            
+            // Preserve kWh and kVARh from existing data
+            const finalMeterData = {
+                ...existingMeter,
+                ...meterEditableData,
+                // Explicitly preserve these values from existing data
+                kwh_reading: existingMeter.kwh_reading || 0,
+                kvarh_reading: existingMeter.kvarh_reading || 0
+            };
+            
+            // Customer editable data (exclude power_factor and max_load)
+            const customerEditableData = {
+                metername: document.getElementById("mname").value,
+                name: document.getElementById("mname").value,
+                keta3: document.getElementById("keta3").value,
+                handsa: document.getElementById("handsa").value,
+                passing_date: document.getElementById("passing_date").value
+            };
+            
+            // Preserve PF and MD from existing customer data
+            const finalCustomerData = {
+                ...existingCustomer,
+                ...customerEditableData,
+                // Explicitly preserve these values from existing data
+                power_factor: existingCustomer.power_factor || 0,
+                max_load: existingCustomer.max_load || 0
+            };
+            
             try {
+                // Update both databases with preserved values
                 await Promise.all([
-                    update(ref(dbMD, `MD/customers/${editIDs.cID}/meters/${finalMKey}`), meterData),
-                    update(ref(dbPass, `MD_Pass/customers/${editIDs.cID}/meters/${finalMKey}`), meterData)
+                    update(ref(dbMD, `MD/customers/${editIDs.cID}`), finalCustomerData),
+                    update(ref(dbPass, `MD_Pass/customers/${editIDs.cID}`), finalCustomerData),
+                    update(ref(dbMD, `MD/customers/${editIDs.cID}/meters/${finalMKey}`), finalMeterData),
+                    update(ref(dbPass, `MD_Pass/customers/${editIDs.cID}/meters/${finalMKey}`), finalMeterData)
                 ]);
-                Swal.fire("تم", "تم الحفظ بنجاح", "success");
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم الحفظ بنجاح',
+                    text: 'تم تحديث البيانات (تم الحفاظ على قراءات kWh, kVARh, PF, وأقصى حمل)',
+                    confirmButtonText: 'حسناً'
+                });
                 loadDataFromFirebase();
                 clearForm();
             } catch (error) {
@@ -1464,10 +1505,12 @@
             if (allCustomers[editIDs.cID]?.meters?.[newMKey]) {
                 return Swal.fire("تنبيه", "هذا العداد موجود بالفعل", "warning");
             }
+            
+            // New meter - kWh and kVARh default to 0
             const meterData = {
                 meternumber: mNoRaw,
-                kwh_reading: document.getElementById("kwh_reading").value || 0,
-                kvarh_reading: document.getElementById("kvarh_reading").value || 0,
+                kwh_reading: 0,
+                kvarh_reading: 0,
                 vt_ratio: document.getElementById("vt_ratio").value || "",
                 ct_ratio: document.getElementById("ct_ratio").value || "",
                 constant: document.getElementById("constant").value || 1,
@@ -1478,6 +1521,7 @@
                 power_date: document.getElementById("power_date").value || "",
                 meternotes: document.getElementById("notes").value || ""
             };
+            
             try {
                 await Promise.all([
                     set(ref(dbMD, `MD/customers/${editIDs.cID}/meters/${newMKey}`), meterData),
@@ -1496,15 +1540,21 @@
             const mname = document.getElementById("mname").value;
             const oldCID = editIDs.cID;
             const newCID = sanitizeKey(mname);
+            
+            // Get existing customer data to preserve PF and MD
+            const existingCustomer = allCustomers[oldCID] || {};
+            
             const updatedInfo = {
                 metername: mname,
                 name: mname,
                 keta3: document.getElementById("keta3").value,
                 handsa: document.getElementById("handsa").value,
-                power_factor: document.getElementById("power_factor").value,
-                max_load: document.getElementById("max_load").value,
-                passing_date: document.getElementById("passing_date").value
+                passing_date: document.getElementById("passing_date").value,
+                // Preserve these values
+                power_factor: existingCustomer.power_factor || 0,
+                max_load: existingCustomer.max_load || 0
             };
+            
             try {
                 if (oldCID !== newCID) {
                     const [oldPassData, oldMDData] = await Promise.all([
@@ -1532,7 +1582,7 @@
                         update(ref(dbMD, `MD/customers/${oldCID}`), updatedInfo)
                     ]);
                 }
-                Swal.fire("تم", "تم تحديث البيانات بنجاح", "success");
+                Swal.fire("تم", "تم تحديث البيانات بنجاح (تم الحفاظ على PF وأقصى حمل)", "success");
                 clearForm();
                 loadDataFromFirebase();
             } catch (error) {
@@ -1546,6 +1596,7 @@
                 if (i.type !== 'file') { i.value = "";
                     i.disabled = false; }
             });
+            document.querySelectorAll(".readonly-field").forEach(i => i.disabled = true);
             document.getElementById("customerModeTag").style.display = "none";
             document.getElementById("meterModeTag").style.display = "none";
             document.getElementById("updateAllBtn").style.display = "none";
@@ -1556,7 +1607,6 @@
             document.querySelectorAll('.meter-card').forEach(el => el.classList.remove('visible'));
             document.querySelectorAll('.meter-row-active').forEach(el => el.classList.remove('meter-row-active'));
             
-            // Reset search
             document.getElementById('searchInput').value = '';
             performSearch('');
         };

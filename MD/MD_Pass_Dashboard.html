@@ -673,13 +673,25 @@
 
         async function init() {
             try {
-                let snap = await get(ref(db, 'MD_Pass/visits'));
-                if (!snap.exists()) snap = await get(ref(db, 'MD_Pass'));
+                // Get visits data from MD (not MD_Pass)
+                // Try MD/visits first, then MD
+                let snap = await get(ref(db, 'MD/visits'));
+                if (!snap.exists()) snap = await get(ref(db, 'MD'));
                 if (snap.exists()) passingData = snap.val();
 
+                // Get customer data from MD/customers (primary source)
                 const customerSnap = await get(ref(db, 'MD/customers'));
                 if (customerSnap.exists()) {
                     allCustomersData = customerSnap.val();
+                    
+                    // If MD/customers is empty, try MD_Pass/customers as fallback
+                    if (Object.keys(allCustomersData).length === 0) {
+                        const fallbackSnap = await get(ref(db, 'MD_Pass/customers'));
+                        if (fallbackSnap.exists()) {
+                            allCustomersData = fallbackSnap.val();
+                        }
+                    }
+                    
                     const kSet = new Set(), hSet = new Set();
 
                     for (let custId in allCustomersData) {
