@@ -3,942 +3,690 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
-    <title>تقرير معامل القدرة · نظام الإدارة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>تقرير حالة المرور والقطاعات · نظام الإدارة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --primary: #1e293b;
-            --primary-light: #334155;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-card: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.95);
+            --border: #cbd5e1;
+            --border-focus: #0284c7;
+            --primary: #0284c7;
             --accent: #2563eb;
-            --accent-hover: #1d4ed8;
             --success: #16a34a;
             --danger: #dc2626;
-            --warning: #f59e0b;
-            --bg: #f1f5f9;
-            --white: #ffffff;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --radius: 12px;
-            --border: #e2e8f0;
-            --text: #1e293b;
+            --warning: #d97706;
+            --text: #0f172a;
             --text-muted: #64748b;
             --pf-color: #7c3aed;
+            --radius: 16px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Cairo', sans-serif;
-            background: var(--bg);
+            background-color: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            padding: 20px;
+            padding-bottom: 90px;
+            overflow-x: hidden;
         }
 
-        .main-layout {
-            max-width: 1400px;
+        .app-container {
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 16px;
             display: flex;
-            gap: 20px;
-            align-items: flex-start;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        /* ===== SIDE PANEL ===== */
-        .side-panel {
-            flex: 0 0 320px;
-            max-width: 320px;
-            background: var(--white);
+        .app-header {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
             border-radius: var(--radius);
-            padding: 20px 18px;
-            box-shadow: var(--shadow);
+            padding: 16px;
             position: sticky;
-            top: 20px;
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
-        }
-
-        .side-panel::-webkit-scrollbar {
-            width: 4px;
-        }
-        .side-panel::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        /* ===== DROPDOWN ===== */
-        .modern-dropdown {
-            position: relative;
-            width: 100%;
-            margin-bottom: 16px;
-        }
-
-        .dropdown-btn {
-            background: var(--primary);
-            color: var(--white);
-            padding: 10px 18px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-family: 'Cairo', sans-serif;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            transition: all 0.3s ease;
-            gap: 10px;
-        }
-
-        .dropdown-btn:hover {
-            background: var(--primary-light);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
-        }
-
-        .dropdown-btn .arrow {
-            font-size: 0.7rem;
-            transition: transform 0.3s ease;
-            opacity: 0.8;
-        }
-
-        .dropdown-btn .arrow.open {
-            transform: rotate(180deg);
-        }
-
-        .dropdown-btn .icon-text {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-radius: var(--radius);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-            display: none;
-            z-index: 2000;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            animation: dropdownFade 0.25s ease;
-        }
-
-        @keyframes dropdownFade {
-            from {
-                opacity: 0;
-                transform: translateY(-8px) scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .dropdown-menu.show {
-            display: block;
-        }
-
-        .dropdown-item {
-            padding: 14px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #f1f5f9;
-            transition: all 0.2s ease;
-            color: var(--primary);
-            font-size: 0.9rem;
-            font-family: 'Cairo', sans-serif;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background: #f1f5f9;
-            color: var(--accent);
-            padding-right: 28px;
-        }
-
-        .dropdown-item .item-icon {
-            font-size: 1.1rem;
-            width: 28px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .dropdown-item .item-label {
-            flex: 1;
-        }
-
-        .dropdown-item .item-badge {
-            background: var(--accent);
-            color: white;
-            font-size: 0.6rem;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            opacity: 0.8;
-        }
-
-        .panel-header {
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        .panel-header i {
-            background: linear-gradient(135deg, var(--accent), var(--primary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 2rem;
-        }
-
-        .panel-header h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 6px 0 2px;
-        }
-
-        /* ===== FILTERS ===== */
-        .filter-group {
-            background: #f8fafc;
-            padding: 12px 12px;
-            border-radius: var(--radius);
-            margin-bottom: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .form-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            display: block;
-            color: var(--text-muted);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: 'Cairo', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 500;
-            background: var(--white);
-            transition: all 0.2s;
-            margin-bottom: 8px;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        /* ===== BUTTONS ===== */
-        .btn {
-            padding: 10px 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            width: 100%;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-            font-family: 'Cairo', sans-serif;
-        }
-
-        .btn-search {
-            background: var(--accent);
-            color: white;
-            margin-bottom: 8px;
-        }
-
-        .btn-search:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-update-pf {
-            background: var(--pf-color);
-            color: white;
-            margin-bottom: 8px;
-        }
-
-        .btn-update-pf:hover {
-            background: #6d28d9;
-            transform: translateY(-1px);
-        }
-
-        .btn-excel {
-            background: #ecfdf5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-        }
-
-        .btn-excel:hover {
-            background: #d1fae5;
-            transform: translateY(-1px);
-        }
-
-        .btn-print {
-            background: #fffbeb;
-            color: #92400e;
-            border: 1px solid #fde68a;
-            margin-bottom: 8px;
-        }
-
-        .btn-print:hover {
-            background: #fef3c7;
-            transform: translateY(-1px);
-        }
-
-        #exportBtn {
-            display: none;
-        }
-
-        /* ===== CONTENT PANEL ===== */
-        .content-panel {
-            flex: 1;
-            min-width: 0;
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 20px 22px;
+            top: 10px;
+            z-index: 100;
             box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
-            min-height: 500px;
+            gap: 14px;
         }
 
-        .report-header {
-            color: var(--primary);
-            margin: 0 0 16px 0;
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
             font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .brand i {
+            color: var(--pf-color);
+            font-size: 1.4rem;
+        }
+
+        .nav-menu-btn {
+            background: var(--surface-card);
+            border: 1px solid #e2e8f0;
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group-m {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+        }
+
+        .form-label-m {
+            font-size: 0.75rem;
+            color: var(--text);
             font-weight: 700;
             display: flex;
             align-items: center;
+            gap: 6px;
+        }
+
+        .form-label-m i {
+            color: var(--primary);
+            font-size: 0.85rem;
+        }
+
+        .form-input-m {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            padding: 0 12px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        select.form-input-m {
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: left 10px center;
+            padding-left: 30px;
+        }
+
+        .form-input-m:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .stats-bar {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
             gap: 12px;
-            flex-shrink: 0;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--border);
         }
 
-        .report-header i {
-            color: var(--accent);
-            background: #eff6ff;
-            padding: 8px 10px;
-            border-radius: var(--radius);
-        }
-
-        /* ===== RESULTS ===== */
-        .table-container {
-            flex: 1;
-            overflow: auto;
-            border-radius: var(--radius);
-            background: #fafcff;
-            border: 1px solid var(--border);
-            padding: 12px;
-            min-height: 300px;
-        }
-
-        .table-container::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .table-container::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #94a3b8;
-        }
-
-        .empty-state i {
-            font-size: 3.5rem;
-            color: #cbd5e1;
-            margin-bottom: 12px;
-        }
-
-        /* ===== GROUPED CARDS ===== */
-        .grouped-card {
-            background: var(--white);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            transition: 0.2s;
-            margin-bottom: 12px;
-        }
-
-        .grouped-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .card-header-main {
-            padding: 12px 14px 10px 14px;
-            border-bottom: 1px solid var(--border);
+        .stats-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            cursor: default;
         }
 
-        .customer-title {
-            font-size: 0.95rem;
+        .total-badge-m {
+            font-size: 0.85rem;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--text-muted);
         }
 
-        .btn-detail-sm {
-            background: #eff6ff;
-            border: none;
-            border-radius: 40px;
-            padding: 4px 14px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--accent);
-            display: inline-flex;
+        .total-badge-m span {
+            color: var(--pf-color);
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-right: 4px;
+        }
+
+        .select-all-wrapper {
+            display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--pf-color);
             cursor: pointer;
-            transition: 0.2s;
+            user-select: none;
+        }
+
+        .select-all-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--pf-color);
+            cursor: pointer;
+        }
+
+        .stat-chips-wrapper {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+            align-items: flex-start;
+        }
+
+        .stat-chip-m {
+            background: var(--surface-card);
+            border: 1px solid #cbd5e1;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-weight: 700;
+            min-width: 240px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: right;
             font-family: 'Cairo', sans-serif;
         }
 
-        .btn-detail-sm:hover {
-            background: #dbeafe;
-            transform: scale(1.02);
+        .stat-chip-m:hover {
+            border-color: var(--pf-color);
+            transform: translateY(-1px);
         }
 
-        .merged-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 4px 12px;
-            margin-top: 4px;
-            width: 100%;
+        .stat-chip-m.selected-chip {
+            background: #f3e8ff;
+            border-color: var(--pf-color);
+            box-shadow: 0 0 0 2px var(--pf-color);
         }
 
-        .info-item {
-            font-size: 0.7rem;
+        .stat-chip-m .title {
             color: var(--text-muted);
-            padding: 2px 6px;
-            background: #f8fafc;
-            border-radius: 4px;
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .pf-highlight {
-            color: var(--pf-color) !important;
-            font-weight: 700;
+        .stat-chip-m .val-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
         }
 
-        .table-wrapper {
-            overflow-x: auto;
-            padding: 0 4px 4px 4px;
+        .stat-chip-m .val {
+            color: var(--text);
+            font-weight: 800;
+            font-size: 0.85rem;
         }
 
-        .sub-records-table {
+        /* جدول الأسماء المصغر بداخل الكارت المفتوح */
+        .unpassed-table-container {
+            margin-top: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #ffffff;
+        }
+
+        .unpassed-mini-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.7rem;
-            min-width: 700px;
         }
 
-        .sub-records-table thead {
-            background: #f1f5f9;
+        .unpassed-mini-table th {
+            background: #e2e8f0;
+            color: var(--text);
+            padding: 4px 8px;
+            text-align: right;
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
 
-        .sub-records-table th {
-            padding: 6px 6px;
-            text-align: center;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.65rem;
-            border-bottom: 2px solid var(--border);
+        .unpassed-mini-table td {
+            padding: 4px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text);
             white-space: nowrap;
         }
 
-        .sub-records-table td {
-            padding: 5px 6px;
-            text-align: center;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 0.7rem;
+        .results-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
         }
 
-        .sub-records-table tbody tr:hover td {
-            background: #f8fafc;
-        }
-
-        .date-group-header td {
-            background: #f0f4fa !important;
-            font-weight: 700;
-            padding: 6px 10px;
-            color: var(--primary);
-        }
-
-        .meter-badge {
-            background: #e9f0fc;
-            padding: 2px 8px;
-            border-radius: 40px;
-            font-family: monospace;
-            font-size: 0.7rem;
-        }
-
-        .kwh-cell {
-            color: var(--success);
-            font-weight: 700;
-        }
-
-        .kvarh-cell {
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        .date-cell {
-            font-weight: 500;
-        }
-
-        .customer-cell {
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        /* ===== DASHBOARD BOTTOM ===== */
-        .dashboard-bottom {
+        .m-card {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 16px;
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: var(--shadow);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .m-card.selected {
+            border-color: var(--pf-color);
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.12);
+        }
+
+        .m-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .m-cust-header-left {
+            display: flex;
+            align-items: center;
             gap: 10px;
-            padding: 12px 0 0 0;
-            border-top: 1px solid var(--border);
-            margin-top: 12px;
-            flex-shrink: 0;
         }
 
-        .stat-card {
-            background: #f8fafc;
-            padding: 6px 14px;
-            border-radius: 8px;
-            text-align: center;
-            border-top: 3px solid var(--accent);
-            min-width: 80px;
-            flex: 0 0 auto;
+        .cust-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--pf-color);
+            cursor: pointer;
         }
 
-        .stat-card small {
-            display: block;
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .stat-card strong {
-            display: block;
-            font-size: 1.1rem;
+        .m-cust-name {
+            font-size: 1rem;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .stat-card-success {
-            border-top-color: var(--success);
-            background: #f0fdf4;
-        }
-
-        .stat-card-success strong {
-            color: var(--success);
-        }
-
-        .stat-card-warning {
-            border-top-color: var(--warning);
-            background: #fffbeb;
-        }
-
-        .stat-card-warning strong {
-            color: #92400e;
-        }
-
-        .stat-card-primary {
-            border-top-color: var(--accent);
+        .btn-print-m {
             background: #eff6ff;
-        }
-
-        .stat-card-primary strong {
             color: var(--accent);
+            border: 1px solid #bfdbfe;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
         }
 
-        .stat-card-pf {
-            border-top-color: var(--pf-color);
-            background: #f5f3ff;
+        .m-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 12px;
+            background: var(--surface-card);
+            padding: 10px;
+            border-radius: var(--radius-sm);
         }
 
-        .stat-card-pf strong {
+        .m-info-item {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .m-info-item b {
+            color: var(--text);
+        }
+
+        .pf-value-tag {
+            color: var(--pf-color) !important;
+            font-weight: 800;
+        }
+
+        .pf-danger {
+            color: var(--danger) !important;
+        }
+
+        .pf-success {
+            color: var(--success) !important;
+        }
+
+        .m-meter-card {
+            background: #f8fafc;
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            margin-top: 4px;
+            border-right: 4px solid var(--pf-color);
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            border-left: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .m-meter-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .meter-tag {
+            background: #f3e8ff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-family: monospace;
             color: var(--pf-color);
         }
 
-        /* ===== MASTER TABLE (hidden) ===== */
-        #masterTable {
+        .m-readings-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.75rem;
+            background: #ffffff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .kwh-val {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .kvarh-val {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .m-notes {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .sheet-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: 1999;
             display: none;
         }
 
-        .separator-divider {
-            border-bottom: 2px solid var(--border);
+        .sheet-overlay.show {
+            display: block;
         }
 
-        .customer-header-export {
-            background: #f1f5f9;
+        .bottom-sheet {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-radius: 24px 24px 0 0;
+            border-top: 1px solid #e2e8f0;
+            padding: 20px;
+            z-index: 2000;
+            transition: bottom 0.3s ease;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .bottom-sheet.show {
+            bottom: 0;
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sheet-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sheet-item {
+            padding: 12px;
+            background: var(--surface-card);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: var(--text);
+            text-decoration: none;
             font-weight: 600;
         }
 
-        .customer-header-export-name {
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 999;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 0.72rem;
             font-weight: 700;
-            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.2s;
         }
 
-        .customer-header-export-value {
-            color: var(--accent);
+        .nav-item.active {
+            color: var(--pf-color);
         }
 
-        /* ===== PRINT STYLES ===== */
-        @media print {
-            .side-panel {
-                display: none !important;
-            }
-            .content-panel {
-                box-shadow: none !important;
-                border: 1px solid #ddd !important;
-                padding: 15px !important;
-            }
-            .dashboard-bottom {
-                display: none !important;
-            }
-            .grouped-card {
-                break-inside: avoid;
-                page-break-inside: avoid;
-                border: 1px solid #ddd !important;
-                margin-bottom: 15px !important;
-            }
-            .sub-records-table {
-                font-size: 0.65rem !important;
-            }
-            .sub-records-table th {
-                font-size: 0.6rem !important;
-                padding: 4px !important;
-            }
-            .sub-records-table td {
-                font-size: 0.6rem !important;
-                padding: 4px !important;
-            }
-            body {
-                padding: 10px !important;
-                background: white !important;
-            }
-            .main-layout {
-                gap: 0 !important;
-            }
-            .stat-card {
-                display: none !important;
-            }
+        .nav-item i {
+            font-size: 1.25rem;
         }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            body {
-                padding: 12px;
-            }
-
-            .main-layout {
-                flex-direction: column;
-            }
-
-            .side-panel {
-                flex: 1;
-                max-width: 100%;
-                position: static;
-                max-height: none;
-                padding: 16px 18px;
-            }
-
-            .content-panel {
-                padding: 16px 18px;
-            }
+        .empty-state-m {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid #e2e8f0;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 8px;
-            }
-
-            .side-panel {
-                padding: 12px 14px;
-            }
-
-            .content-panel {
-                padding: 12px 14px;
-            }
-
-            .panel-header h3 {
-                font-size: 0.85rem;
-            }
-
-            .report-header {
-                font-size: 0.95rem;
-                gap: 8px;
-            }
-
-            .report-header i {
-                padding: 6px 8px;
-                font-size: 0.9rem;
-            }
-
-            .form-input {
-                font-size: 0.8rem;
-                padding: 6px 10px;
-            }
-
-            .btn {
-                font-size: 0.8rem;
-                padding: 8px 10px;
-            }
-
-            .merged-info-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 4px 8px;
-            }
-
-            .sub-records-table {
-                font-size: 0.65rem;
-                min-width: 600px;
-            }
-
-            .sub-records-table th {
-                font-size: 0.6rem;
-                padding: 4px 4px;
-            }
-
-            .sub-records-table td {
-                font-size: 0.65rem;
-                padding: 4px 4px;
-            }
-
-            .stat-card {
-                padding: 4px 10px;
-                min-width: 60px;
-            }
-
-            .stat-card strong {
-                font-size: 0.95rem;
-            }
-
-            .table-container {
-                padding: 8px;
-                min-height: 200px;
-            }
-
-            .dashboard-bottom {
-                gap: 6px;
-                padding-top: 8px;
-            }
-
-            /* Mobile dropdown - slides from bottom */
-            .dropdown-menu {
-                position: fixed;
-                top: auto;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                border-radius: var(--radius) var(--radius) 0 0;
-                max-height: 60vh;
-                overflow-y: auto;
-                animation: slideUp 0.3s ease;
-            }
-
-            @keyframes slideUp {
-                from {
-                    transform: translateY(100%);
-                }
-                to {
-                    transform: translateY(0);
-                }
-            }
-
-            .dropdown-item {
-                padding: 14px 18px;
-                font-size: 0.9rem;
-            }
+        .empty-state-m i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #cbd5e1;
         }
 
-        @media (max-width: 480px) {
-            .merged-info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .sub-records-table {
-                min-width: 500px;
-            }
-
-            .sub-records-table th {
-                font-size: 0.55rem;
-                padding: 3px 3px;
-            }
-
-            .sub-records-table td {
-                font-size: 0.6rem;
-                padding: 3px 3px;
-            }
-
-            .customer-title {
-                font-size: 0.85rem;
-            }
-
-            .stat-card {
-                min-width: 50px;
-                padding: 3px 8px;
-            }
-
-            .stat-card small {
-                font-size: 0.55rem;
-            }
-
-            .stat-card strong {
-                font-size: 0.85rem;
-            }
-        }
-
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        #masterTable {
+            display: none;
         }
     </style>
 </head>
 
 <body>
-    <div class="main-layout">
-        <!-- ===== SIDE PANEL ===== -->
-        <aside class="side-panel">
-            <!-- Dropdown -->
-            <div class="modern-dropdown">
-                <button class="dropdown-btn" id="dropdownBtn">
-                    <span class="icon-text">🚀 <span>اختر وجهتك للانتقال</span></span>
-                    <span class="arrow" id="arrow">▾</span>
+
+    <div class="app-container">
+
+        <header class="app-header">
+            <div class="header-top">
+                <div class="brand">
+                    <i class="fas fa-bolt"></i>
+                    <span>تقرير معامل القدرة والمرور</span>
+                </div>
+                <button class="nav-menu-btn" id="openMenuBtn">
+                    <i class="fas fa-compass"></i> التنقل
                 </button>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <div class="dropdown-item" data-page="MD.html">
-                        <span class="item-icon">📊</span>
-                        <span class="item-label">بيانات كبار المشتركين</span>
-                    </div>
-                    <div class="dropdown-item" data-page="MD_Add.html">
-                        <span class="item-icon">➕</span>
-                        <span class="item-label">إضافة مشترك جديد</span>
-                    </div>
-                    <div class="dropdown-item" data-page="MD_Pass.html">
-                        <span class="item-icon">🔍</span>
-                        <span class="item-label">تسجيل مرور ميداني</span>
-                    </div>
-                    <div class="dropdown-item" data-page="MD_Pass_Dashboard.html">
-                        <span class="item-icon">📅</span>
-                        <span class="item-label">تقرير المرور العام</span>
-                    </div>
-                    <div class="dropdown-item" data-page="index.html">
-                        <span class="item-icon">🏠</span>
-                        <span class="item-label">الصفحة الرئيسية</span>
-                    </div>
-                    <div class="dropdown-item" data-page="M_D_PF.html">
-                        <span class="item-icon">⚡</span>
-                        <span class="item-label">تقرير معامل القدرة</span>
-                        <span class="item-badge">الحالية</span>
-                    </div>
+            </div>
+
+            <div class="filters-grid">
+                <div class="form-group-m">
+                    <label class="form-label-m" for="date_from"><i class="far fa-calendar-alt"></i> التاريخ من</label>
+                    <input type="date" id="date_from" class="form-input-m" value="2026-02-01">
+                </div>
+
+                <div class="form-group-m">
+                    <label class="form-label-m" for="date_to"><i class="far fa-calendar-check"></i> التاريخ إلى</label>
+                    <input type="date" id="date_to" class="form-input-m" value="2026-08-01">
+                </div>
+
+                <div class="form-group-m">
+                    <label class="form-label-m" for="filter_keta3"><i class="fas fa-layer-group"></i> القطاع</label>
+                    <select id="filter_keta3" class="form-input-m">
+                        <option value="">جميع القطاعات</option>
+                    </select>
+                </div>
+
+                <div class="form-group-m">
+                    <label class="form-label-m" for="filter_handsa"><i class="fas fa-draw-polygon"></i> الهندسة</label>
+                    <select id="filter_handsa" class="form-input-m">
+                        <option value="">جميع الهندسات</option>
+                    </select>
+                </div>
+
+                <div class="form-group-m">
+                    <label class="form-label-m" for="filter_pf_status"><i class="fas fa-tachometer-alt"></i> فلتر معامل القدرة</label>
+                    <select id="filter_pf_status" class="form-input-m">
+                        <option value="all">جميع قيم PF</option>
+                        <option value="less_092">أقل من 0.92 (&lt; 0.92)</option>
+                        <option value="more_092">أكبر من أو يساوي 0.92 (&ge; 0.92)</option>
+                    </select>
+                </div>
+
+                <div class="form-group-m full-width">
+                    <label class="form-label-m" for="filter_general"><i class="fas fa-search"></i> بحث عام</label>
+                    <input type="text" id="filter_general" class="form-input-m"
+                        placeholder="ابحث باسم المشترك أو رقم العداد...">
                 </div>
             </div>
+        </header>
 
-            <div class="panel-header">
-                <i class="fas fa-chart-pie"></i>
-                <h3>عناصر البحث</h3>
-            </div>
-
-            <div class="filter-group">
-                <label class="form-label"><i class="far fa-calendar-alt"></i> من تاريخ</label>
-                <input type="date" id="date_from" class="form-input" value="2026-02-01">
-
-                <label class="form-label"><i class="far fa-calendar-check"></i> إلى تاريخ</label>
-                <input type="date" id="date_to" class="form-input" value="2026-08-01">
-            </div>
-
-            <label class="form-label"><i class="fas fa-layer-group"></i> القطاع</label>
-            <select id="filter_keta3" class="form-input">
-                <option value="">الكل</option>
-            </select>
-
-            <label class="form-label"><i class="fas fa-draw-polygon"></i> الهندسة</label>
-            <select id="filter_handsa" class="form-input">
-                <option value="">الكل</option>
-            </select>
-
-            <label class="form-label"><i class="fas fa-search"></i> بحث سريع</label>
-            <input type="text" id="filter_general" class="form-input" placeholder="اسم المشترك / كود العداد...">
-
-            <button class="btn btn-search" id="btnSearch"><i class="fas fa-sliders-h"></i> اظهار البيانات</button>
-            <button class="btn btn-update-pf" id="btnUpdatePF"><i class="fas fa-sync-alt"></i> تحديث PF في قاعدة البيانات</button>
-            <button class="btn btn-excel" onclick="exportData()" id="exportBtn"><i class="fas fa-file-excel"></i> تصدير إكسيل</button>
-        </aside>
-
-        <!-- ===== CONTENT PANEL ===== -->
-        <section class="content-panel">
-            <div class="report-header">
-                <i class="fas fa-file-alt"></i>
-                <span>تقرير معامل القدرة (PF) · إحصائيات دقيقة</span>
-            </div>
-
-            <div class="table-container" id="results-container">
-                <div class="empty-state">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>قم بتحديد فترة والضغط على "اظهار البيانات"</p>
+        <div class="stats-bar" id="statsHeaderBar">
+            <div class="stats-top">
+                <div class="total-badge-m">
+                    إجمالي القراءات المعروضة: <span id="headerTotalCount">0</span>
                 </div>
+                <label class="select-all-wrapper" for="selectAllCheck">
+                    <input type="checkbox" id="selectAllCheck" checked>
+                    <span>تحديد الكل للتحديث</span>
+                </label>
             </div>
+            <div class="stat-chips-wrapper" id="headerChipGroup">
+                <span style="font-size: 0.7rem; color: var(--text-muted);">جاري تحميل إحصائيات القطاعات...</span>
+            </div>
+        </div>
 
-            <div class="dashboard-bottom" id="dash-scroll">
-                <div class="stat-card stat-card-primary">
-                    <small>إجمالي القراءات</small>
-                    <strong id="total_val">0</strong>
-                </div>
+        <main class="results-wrapper" id="results-container">
+            <div class="empty-state-m">
+                <i class="fas fa-inbox"></i>
+                <p>قم بتحديد فترة للبحث أو اختيار العملية من الأسفل</p>
             </div>
-        </section>
+        </main>
     </div>
 
-    <!-- Hidden master table for export -->
+    <div class="sheet-overlay" id="sheetOverlay"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="sheet-header">
+            <h4 style="font-size: 0.95rem;">قائمة الصفحات</h4>
+            <i class="fas fa-times" id="closeSheetBtn" style="cursor: pointer; font-size: 1.1rem;"></i>
+        </div>
+        <div class="sheet-menu">
+            <a href="MD.html" class="sheet-item">📊 بيانات كبار المشتركين</a>
+            <a href="MD_Add.html" class="sheet-item">➕ إضافة مشترك جديد</a>
+            <a href="MD_Pass.html" class="sheet-item">🔍 تسجيل مرور ميداني</a>
+            <a href="MD_Pass_Dashboard.html" class="sheet-item">📅 تقرير المرور العام</a>
+            <a href="index.html" class="sheet-item">🏠 الصفحة الرئيسية</a>
+            <a href="M_D_PF.html" class="sheet-item"
+                style="border: 1px solid var(--pf-color); background: #f3e8ff;">⚡ تقرير معامل القدرة (الحالية)</a>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" id="navBtnSearch">
+            <i class="fas fa-sliders-h"></i>
+            <span>عرض التقرير</span>
+        </div>
+        <div class="nav-item" id="navBtnUpdatePF">
+            <i class="fas fa-sync-alt"></i>
+            <span>حساب PF</span>
+        </div>
+        <div class="nav-item" id="navBtnExport" onclick="exportData()">
+            <i class="fas fa-file-excel"></i>
+            <span>تصدير</span>
+        </div>
+    </nav>
+
     <table id="masterTable">
         <thead>
             <tr>
@@ -959,7 +707,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-        import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-analytics.js";
 
         const firebaseConfig = {
@@ -974,46 +722,61 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        try {
-            getAnalytics(app);
-        } catch (err) {
-            console.warn("Analytics disabled:", err);
-        }
+        try { getAnalytics(app); } catch (err) { }
 
         let passingData = {};
-        let allCustomers = {};
+        let allCustomersData = {};
+        let currentRenderedGroups = {};
 
-        // ===== DROPDOWN =====
-        document.addEventListener('DOMContentLoaded', function() {
-            const btn = document.getElementById('dropdownBtn');
-            const menu = document.getElementById('dropdownMenu');
-            const arrow = document.getElementById('arrow');
+        const openBtn = document.getElementById('openMenuBtn');
+        const closeBtn = document.getElementById('closeSheetBtn');
+        const sheet = document.getElementById('bottomSheet');
+        const overlay = document.getElementById('sheetOverlay');
 
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                menu.classList.toggle('show');
-                arrow.classList.toggle('open');
-            });
+        function toggleSheet(show) {
+            if (show) {
+                sheet.classList.add('show');
+                overlay.classList.add('show');
+            } else {
+                sheet.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        }
 
-            const items = document.querySelectorAll('.dropdown-item');
-            items.forEach(item => {
-                item.addEventListener('click', function() {
-                    const page = this.getAttribute('data-page');
-                    if (page) {
-                        window.location.href = page;
-                    }
+        openBtn.addEventListener('click', () => toggleSheet(true));
+        closeBtn.addEventListener('click', () => toggleSheet(false));
+        overlay.addEventListener('click', () => toggleSheet(false));
+
+        window.exportData = function () {
+            const rows = document.querySelectorAll("#masterTable tbody tr");
+            if (rows.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'تنبيه',
+                    text: 'لا توجد بيانات متاحة حالياً لتصديرها، يرجى عرض التقرير أولاً.',
+                    confirmButtonText: 'حسناً'
                 });
-            });
+                return;
+            }
+            const wb = XLSX.utils.table_to_book(document.getElementById("masterTable"));
+            XLSX.writeFile(wb, `Report_PF_Unpassed_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        };
 
-            window.addEventListener('click', function() {
-                if (menu.classList.contains('show')) {
-                    menu.classList.remove('show');
-                    arrow.classList.remove('open');
-                }
-            });
-        });
+        function parseDateFlexible(raw) {
+            if (!raw && raw !== 0) return null;
+            const s = String(raw).trim();
+            if (/^\d+$/.test(s)) {
+                const n = Number(s);
+                return n > 1e12 ? new Date(n) : new Date(n * 1000);
+            }
+            if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(s)) {
+                const parts = s.includes('-') ? s.split('-') : s.split('/');
+                return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            }
+            const dt = new Date(s);
+            return isNaN(dt) ? null : dt;
+        }
 
-        // ===== PF CALCULATION =====
         function calculateCustomerPF(records) {
             let totalKwhDiff = 0;
             let totalKvarhDiff = 0;
@@ -1047,336 +810,153 @@
                 pf: roundedPf,
                 totalKwh: totalKwhDiff,
                 totalKvarh: totalKvarhDiff,
-                hasData: hasValidReadings,
-                recordsCount: records.length
+                hasData: hasValidReadings
             };
         }
 
-        // ===== UPDATE PF IN DATABASE =====
-        async function updatePFInDatabase() {
-            const start = document.getElementById('date_from').value;
-            const end = document.getElementById('date_to').value;
-            const fK = document.getElementById('filter_keta3').value;
-            const fH = document.getElementById('filter_handsa').value;
-            const fG = document.getElementById('filter_general').value.trim().toLowerCase();
-
-            const startDateObj = start ? parseDateFlexible(start) : null;
-            const endDateObj = end ? parseDateFlexible(end) : null;
-            if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
-
-            const customerGroups = {};
-
-            for (let subID in passingData) {
-                if (subID === 'customers') continue;
-                for (let dateKey in passingData[subID]) {
-                    const v = passingData[subID][dateKey];
-                    let recordDateRaw = (v && (v.visit_date || v.passing_date || v.passingDate || v.date)) ?
-                        (v.visit_date || v.passing_date || v.passingDate || v.date) : dateKey;
-                    let recordDate = parseDateFlexible(recordDateRaw) || parseDateFlexible(dateKey);
-                    if (!recordDate) continue;
-
-                    let match = false;
-                    if (!startDateObj && !endDateObj) {
-                        match = true;
-                    } else {
-                        const s = startDateObj || new Date('0000-01-01');
-                        const e = endDateObj || new Date('9999-12-31');
-                        match = recordDate >= s && recordDate <= e;
-                    }
-                    if (!match) continue;
-                    if (fK && v.keta3 !== fK) continue;
-                    if (fH && v.handsa !== fH) continue;
-
-                    let generalMatch = false;
-                    const baseSearchStr = `${v.metername || ''} ${v.keta3 || ''} ${v.handsa || ''}`.toLowerCase();
-                    if (baseSearchStr.includes(fG) || fG === '') generalMatch = true;
-                    else if (v.readings) {
-                        for (let rKey in v.readings) {
-                            const r = v.readings[rKey];
-                            const searchStr = `${baseSearchStr} ${r.meternumber || ''}`.toLowerCase();
-                            if (searchStr.includes(fG)) { generalMatch = true; break; }
-                        }
-                    }
-                    if (fG !== '' && !generalMatch) continue;
-
-                    if (!customerGroups[subID]) {
-                        customerGroups[subID] = {
-                            customerId: subID,
-                            metername: v.metername || subID,
-                            keta3: v.keta3 || '-',
-                            handsa: v.handsa || '-',
-                            power_factor: v.power_factor || 0,
-                            max_load: v.max_load || 0,
-                            records: []
-                        };
-                    }
-                    if (v.readings) {
-                        customerGroups[subID].records.push({
-                            dateKey,
-                            readings: Object.values(v.readings)
-                        });
-                    }
-                }
-            }
-
-            let updatedCount = 0;
-            let totalCustomers = Object.keys(customerGroups).length;
-
-            if (totalCustomers === 0) {
-                Swal.fire('تنبيه', 'لا توجد بيانات لتحديثها في النطاق المحدد', 'info');
-                return;
-            }
-
-            const confirmResult = await Swal.fire({
-                title: 'تأكيد التحديث',
-                text: `سيتم تحديث معامل القدرة (PF) لـ ${totalCustomers} مشترك في كل من MD و MD_Pass. هل تريد المتابعة؟`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'نعم، تحديث',
-                cancelButtonText: 'إلغاء',
-                confirmButtonColor: '#7c3aed'
-            });
-
-            if (!confirmResult.isConfirmed) return;
-
-            Swal.fire({
-                title: 'جاري التحديث...',
-                text: `تحديث ${totalCustomers} مشترك`,
-                didOpen: () => Swal.showLoading()
-            });
-
-            let updatePromises = [];
-
-            for (let subID in customerGroups) {
-                const customer = customerGroups[subID];
-                const pfResult = calculateCustomerPF(customer.records);
-                const newPf = pfResult.pf;
-                const latestDate = customer.records.length > 0 ? customer.records[customer.records.length - 1].dateKey : '';
-
-                if (pfResult.hasData && newPf > 0) {
-                    const mdPath = `MD/customers/${subID}/power_factor`;
-                    const mdPfDatePath = `MD/customers/${subID}/pf_calculated_date`;
-                    updatePromises.push(set(ref(db, mdPath), newPf));
-                    updatePromises.push(set(ref(db, mdPfDatePath), latestDate));
-
-                    const passPath = `MD_Pass/customers/${subID}/power_factor`;
-                    const passPfDatePath = `MD_Pass/customers/${subID}/pf_calculated_date`;
-                    updatePromises.push(set(ref(db, passPath), newPf));
-                    updatePromises.push(set(ref(db, passPfDatePath), latestDate));
-
-                    for (let record of customer.records) {
-                        const visitPath = `MD_Pass/${subID}/${record.dateKey}/power_factor`;
-                        updatePromises.push(set(ref(db, visitPath), newPf));
-                    }
-
-                    updatedCount++;
-                }
-            }
-
-            try {
-                await Promise.all(updatePromises);
-                Swal.fire({
-                    icon: 'success',
-                    title: 'تم التحديث بنجاح',
-                    text: `تم تحديث معامل القدرة لـ ${updatedCount} مشترك (قيم مقربة إلى منزلتين عشريتين)`,
-                    confirmButtonText: 'حسناً'
-                });
-                await init();
-                runReport();
-            } catch (error) {
-                console.error('Error updating PF:', error);
-                Swal.fire('خطأ', 'فشل تحديث البيانات: ' + error.message, 'error');
-            }
-        }
-
-        // ===== EXPORT =====
-        window.exportData = function() {
-            const wb = XLSX.utils.table_to_book(document.getElementById("masterTable"));
-            XLSX.writeFile(wb, `Report_PF_${new Date().toISOString().slice(0, 10)}.xlsx`);
-        };
-
-        // ===== PARSE DATE =====
-        function parseDateFlexible(raw) {
-            if (!raw && raw !== 0) return null;
-            const s = String(raw).trim();
-            if (/^\d+$/.test(s)) {
-                const n = Number(s);
-                return n > 1e12 ? new Date(n) : new Date(n * 1000);
-            }
-            if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(s)) {
-                const parts = s.includes('-') ? s.split('-') : s.split('/');
-                const y = Number(parts[0]),
-                    m = Number(parts[1]) - 1,
-                    d = Number(parts[2]);
-                const dt = new Date(y, m, d);
-                if (!isNaN(dt)) return dt;
-            }
-            const dt = new Date(s);
-            return isNaN(dt) ? null : dt;
-        }
-
-        // ===== INIT =====
         async function init() {
             try {
                 let snap = await get(ref(db, 'MD_Pass/visits'));
                 if (!snap.exists()) snap = await get(ref(db, 'MD_Pass'));
-                if (snap.exists()) {
-                    passingData = snap.val();
-                    const kSet = new Set(),
-                        hSet = new Set();
-                    for (let id in passingData) {
-                        if (id === 'customers') continue;
-                        for (let d in passingData[id]) {
-                            const v = passingData[id][d];
-                            if (v.keta3) kSet.add(v.keta3);
-                            if (v.handsa) hSet.add(v.handsa);
-                        }
+                if (snap.exists()) passingData = snap.val();
+
+                const customerSnap = await get(ref(db, 'MD/customers'));
+                if (customerSnap.exists()) {
+                    allCustomersData = customerSnap.val();
+                    const kSet = new Set(), hSet = new Set();
+
+                    for (let custId in allCustomersData) {
+                        const c = allCustomersData[custId];
+                        if (c.keta3) kSet.add(c.keta3);
+                        if (c.handsa) hSet.add(c.handsa);
                     }
-                    try {
-                        const customerSnap = await get(ref(db, 'MD/customers'));
-                        if (customerSnap.exists()) {
-                            allCustomers = customerSnap.val();
-                            for (let custId in allCustomers) {
-                                const c = allCustomers[custId];
-                                if (c.keta3) kSet.add(c.keta3);
-                                if (c.handsa) hSet.add(c.handsa);
-                            }
-                        }
-                    } catch (e) { console.warn("فشل تحميل بيانات القطاع والهندسة:", e); }
 
                     const kSel = document.getElementById('filter_keta3');
                     const hSel = document.getElementById('filter_handsa');
-                    kSel.innerHTML = '<option value="">الكل</option>';
-                    hSel.innerHTML = '<option value="">الكل</option>';
                     [...kSet].sort().forEach(k => kSel.innerHTML += `<option value="${k}">${k}</option>`);
                     [...hSet].sort().forEach(h => hSel.innerHTML += `<option value="${h}">${h}</option>`);
-                } else {
-                    console.warn("لا توجد بيانات في MD_Pass/visits");
                 }
+
+                runReport();
             } catch (err) {
-                console.error("خطأ أثناء تحميل البيانات:", err);
+                console.error(err);
             }
         }
 
-        // ===== RUN REPORT =====
+        function getUnpassedCustomersReport(startDateObj, fK, fH) {
+            let unpassedKeta3 = {};
+
+            if (!startDateObj) return { unpassedKeta3 };
+
+            const passedCustomerIds = new Set();
+
+            for (let subID in passingData) {
+                if (subID === 'customers') continue;
+
+                for (let dateKey in passingData[subID]) {
+                    const v = passingData[subID][dateKey];
+                    let recordDateRaw = (v && (v.visit_date || v.passing_date || v.passingDate || v.date)) ?
+                        (v.visit_date || v.passing_date || v.passingDate || v.date) : dateKey;
+                    
+                    let recordDate = parseDateFlexible(recordDateRaw) || parseDateFlexible(dateKey);
+                    if (!recordDate) continue;
+
+                    if (recordDate < startDateObj) {
+                        passedCustomerIds.add(subID);
+                    }
+                }
+            }
+
+            for (let custId in allCustomersData) {
+                const cust = allCustomersData[custId];
+                const custName = cust.metername || cust.name || custId;
+                const keta3 = cust.keta3 || 'غير محدد';
+                const handsa = cust.handsa || 'غير محدد';
+
+                if (fK && keta3 !== fK) continue;
+                if (fH && handsa !== fH) continue;
+
+                if (!passedCustomerIds.has(custId)) {
+                    if (!unpassedKeta3[keta3]) {
+                        unpassedKeta3[keta3] = { count: 0, names: [] };
+                    }
+                    unpassedKeta3[keta3].count += 1;
+                    unpassedKeta3[keta3].names.push(custName);
+                }
+            }
+
+            return { unpassedKeta3 };
+        }
+
+        // إتاحة الضغط على كارت القطاع لفتح جدول داخل الكارت وتطبيق الفلترة في نفس الوقت
+        function updateHeaderStats(unpassedKeta3) {
+            const chipGroup = document.getElementById('headerChipGroup');
+            let chipsHtml = '';
+
+            const currentKeta3Filter = document.getElementById('filter_keta3').value;
+
+            if (unpassedKeta3 && Object.keys(unpassedKeta3).length > 0) {
+                Object.entries(unpassedKeta3).forEach(([name, data]) => {
+                    const isSelected = currentKeta3Filter === name;
+                    const selectedClass = isSelected ? 'selected-chip' : '';
+
+                    // بناء جدول الأسماء إذا كان الكارت مفعلاً
+                    let miniTableHtml = '';
+                    if (isSelected && data.names.length > 0) {
+                        let rows = data.names.map((n, idx) => `<tr><td>${idx + 1}</td><td>${n}</td></tr>`).join('');
+                        miniTableHtml = `
+                            <div class="unpassed-table-container">
+                                <table class="unpassed-mini-table">
+                                    <thead><tr><th>#</th><th>اسم المشترك اللم يتم المرور</th></tr></thead>
+                                    <tbody>${rows}</tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+
+                    chipsHtml += `
+                        <div class="stat-chip-m ${selectedClass}" onclick="toggleKeta3Filter('${name}')">
+                            <div class="title">
+                                <span>قطاع ${name}</span> 
+                                <i class="fas ${isSelected ? 'fa-chevron-up' : 'fa-list-ul'}" style="font-size:0.75rem;"></i>
+                            </div>
+                            <div class="val-row">
+                                <span class="val" style="color:var(--danger);">
+                                    لم يتم المرور: ${data.count} مشترك
+                                </span>
+                            </div>
+                            ${miniTableHtml}
+                        </div>
+                    `;
+                });
+            }
+
+            chipGroup.innerHTML = chipsHtml || `<span style="font-size:0.75rem;color:var(--text-muted);">جميع المشتركين تم المرور عليهم قبل هذا التاريخ</span>`;
+        }
+
+        window.toggleKeta3Filter = function (keta3Name) {
+            const kSel = document.getElementById('filter_keta3');
+            if (kSel.value === keta3Name) {
+                kSel.value = "";
+            } else {
+                kSel.value = keta3Name;
+            }
+            runReport();
+        };
+
         async function runReport() {
             const start = document.getElementById('date_from').value;
             const end = document.getElementById('date_to').value;
             const fK = document.getElementById('filter_keta3').value;
             const fH = document.getElementById('filter_handsa').value;
+            const fPF = document.getElementById('filter_pf_status').value;
             const fG = document.getElementById('filter_general').value.trim().toLowerCase();
 
             const startDateObj = start ? parseDateFlexible(start) : null;
             const endDateObj = end ? parseDateFlexible(end) : null;
             if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
 
-            let rows = '';
-            let masterRows = '';
-            let stats = { keta3: {}, handsa: {} };
-            let detailCount = 0;
-            let exportGroups = [];
-
-            for (let subID in passingData) {
-                if (subID === 'customers') continue;
-                for (let dateKey in passingData[subID]) {
-                    const v = passingData[subID][dateKey];
-                    let recordDateRaw = (v && (v.visit_date || v.passing_date || v.passingDate || v.date)) ?
-                        (v.visit_date || v.passing_date || v.passingDate || v.date) : dateKey;
-                    let recordDate = parseDateFlexible(recordDateRaw) || parseDateFlexible(dateKey);
-                    if (!recordDate) continue;
-
-                    let match = false;
-                    if (!startDateObj && !endDateObj) {
-                        match = true;
-                    } else {
-                        const s = startDateObj || new Date('0000-01-01');
-                        const e = endDateObj || new Date('9999-12-31');
-                        match = recordDate >= s && recordDate <= e;
-                    }
-                    if (!match) continue;
-                    if (fK && v.keta3 !== fK) continue;
-                    if (fH && v.handsa !== fH) continue;
-
-                    let generalMatch = false;
-                    const baseSearchStr = `${v.metername || ''} ${v.keta3 || ''} ${v.handsa || ''}`.toLowerCase();
-                    if (baseSearchStr.includes(fG) || fG === '') generalMatch = true;
-                    else if (v.readings) {
-                        for (let rKey in v.readings) {
-                            const r = v.readings[rKey];
-                            const searchStr = `${baseSearchStr} ${r.meternumber || ''}`.toLowerCase();
-                            if (searchStr.includes(fG)) { generalMatch = true; break; }
-                        }
-                    }
-                    if (fG !== '' && !generalMatch) continue;
-
-                    stats.keta3[v.keta3] = (stats.keta3[v.keta3] || 0) + 1;
-                    stats.handsa[v.handsa] = (stats.handsa[v.handsa] || 0) + 1;
-
-                    if (v.readings) {
-                        const readingsArray = Object.values(v.readings);
-                        readingsArray.forEach(r => {
-                            detailCount++;
-                            rows += `<tr>
-                                    <td class="date-cell">${dateKey}</td>
-                                    <td class="customer-cell">${v.metername || subID}</td>
-                                    <td><span class="meter-badge">${r.meternumber || '-'}</span></td>
-                                    <td>${v.keta3 || '-'}</td>
-                                    <td>${v.handsa || '-'}</td>
-                                    <td class="kwh-cell">${r.kwh != null ? r.kwh : '0'}</td>
-                                    <td class="kvarh-cell">${r.kvarh != null ? r.kvarh : '0'}</td>
-                                    <td class="col-notes">${r.note ? r.note.substring(0, 60) : '-'}</td>
-                                </tr>`;
-                        });
-                        exportGroups.push({
-                            date: dateKey,
-                            customerName: v.metername || subID,
-                            customerId: subID,
-                            keta3: v.keta3 || '-',
-                            handsa: v.handsa || '-',
-                            maxLoad: v.max_load != null ? v.max_load : '-',
-                            powerFactor: v.power_factor != null ? v.power_factor : '-',
-                            readings: readingsArray
-                        });
-                    }
-                }
-            }
-
-            exportGroups.forEach(group => {
-                masterRows += `<tr class="customer-header-export">`;
-                masterRows += `<td class="customer-header-export">${group.date}</td>`;
-                masterRows += `<td class="customer-header-export customer-header-export-name">${group.customerName}</td>`;
-                masterRows += `<td class="customer-header-export">-----</td>`;
-                masterRows += `<td class="customer-header-export">${group.keta3}</td>`;
-                masterRows += `<td class="customer-header-export">${group.handsa}</td>`;
-                masterRows += `<td class="customer-header-export customer-header-export-value">${group.maxLoad}</td>`;
-                masterRows += `<td class="customer-header-export customer-header-export-value">${group.powerFactor}</td>`;
-                masterRows += `<td class="customer-header-export">-----</td>`;
-                masterRows += `<td class="customer-header-export">-----</td>`;
-                masterRows += `<td class="customer-header-export">قيم العدادات أدناه</td>`;
-                masterRows += `</tr>`;
-                group.readings.forEach(r => {
-                    masterRows += `<tr>
-                        <td></td>
-                        <td></td>
-                        <td>${r.meternumber || '-'}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>${r.kwh != null ? r.kwh : '0'}</td>
-                        <td>${r.kvarh != null ? r.kvarh : '0'}</td>
-                        <td>${r.note || '-'}</td>
-                    </tr>`;
-                });
-                masterRows += `<tr><td colspan="10" class="separator-divider"></td></tr>`;
-            });
-
-            renderUI(rows, masterRows, detailCount, stats, startDateObj, endDateObj, fK, fH, fG);
-        }
-
-        // ===== RENDER UI =====
-        function renderUI(rows, masterRows, detailCount, stats, startDateObj, endDateObj, fK, fH, fG) {
-            const customerGroups = {};
+            let customerGroups = {};
 
             for (let subID in passingData) {
                 if (subID === 'customers') continue;
@@ -1410,150 +990,241 @@
                     }
                     if (fG !== '' && !generalMatch) continue;
 
-                    if (!customerGroups[subID]) {
-                        customerGroups[subID] = {
-                            customerId: subID,
-                            metername: v.metername || subID,
-                            keta3: v.keta3 || '-',
-                            handsa: v.handsa || '-',
-                            power_factor: v.power_factor || '-',
-                            max_load: v.max_load || '-',
-                            passing_date: v.visit_date || v.passing_date || '-',
-                            records: []
-                        };
-                    }
                     if (v.readings) {
+                        const readingsArray = Object.values(v.readings);
+
+                        if (!customerGroups[subID]) {
+                            customerGroups[subID] = {
+                                customerId: subID,
+                                metername: v.metername || subID,
+                                keta3: v.keta3 || '-',
+                                handsa: v.handsa || '-',
+                                power_factor: v.power_factor || '-',
+                                max_load: v.max_load || '-',
+                                records: []
+                            };
+                        }
                         customerGroups[subID].records.push({
                             dateKey,
-                            readings: Object.values(v.readings)
+                            readings: readingsArray
                         });
                     }
                 }
             }
 
-            document.getElementById('total_val').innerText = detailCount;
-            const dash = document.getElementById('dash-scroll');
-            while (dash.children.length > 1) dash.removeChild(dash.lastChild);
+            let filteredGroups = {};
+            Object.keys(customerGroups).forEach(id => {
+                const c = customerGroups[id];
+                const pfResult = calculateCustomerPF(c.records);
+                const avgPf = pfResult.pf > 0 ? pfResult.pf : parseFloat(c.power_factor) || 0;
 
-            Object.keys(stats.keta3).forEach(k => {
-                if (k && k !== '') dash.innerHTML +=
-                    `<div class="stat-card stat-card-success"><small>قطاع ${k}</small><strong>${stats.keta3[k]}</strong></div>`;
-            });
-            Object.keys(stats.handsa).forEach(h => {
-                if (h && h !== '') dash.innerHTML +=
-                    `<div class="stat-card stat-card-warning"><small>هندسة ${h}</small><strong>${stats.handsa[h]}</strong></div>`;
+                if (fPF === 'less_092' && avgPf >= 0.92) return;
+                if (fPF === 'more_092' && avgPf < 0.92) return;
+
+                filteredGroups[id] = c;
             });
 
+            currentRenderedGroups = filteredGroups;
+            
+            const { unpassedKeta3 } = getUnpassedCustomersReport(startDateObj, fK, fH);
+            renderMobileUI(filteredGroups, unpassedKeta3);
+        }
+
+        function renderMobileUI(customerGroups, unpassedKeta3) {
             const container = document.getElementById('results-container');
-            if (detailCount > 0) {
+            const selectAllVal = document.getElementById('selectAllCheck').checked;
+
+            const customerKeys = Object.keys(customerGroups);
+            let detailCount = 0;
+
+            if (customerKeys.length > 0) {
                 let cardsHtml = '';
-                let totalAvgPf = 0;
-                let pfCount = 0;
-                let totalKwhSum = 0;
-                let totalKvarhSum = 0;
+                let masterRows = '';
 
-                Object.keys(customerGroups).forEach(customerId => {
-                    const customer = customerGroups[customerId];
-                    const pfResult = calculateCustomerPF(customer.records);
+                customerKeys.forEach(id => {
+                    const c = customerGroups[id];
+                    const pfResult = calculateCustomerPF(c.records);
                     const avgPf = pfResult.pf;
-                    const pfDisplay = avgPf > 0 ? avgPf.toFixed(2) : '0.00';
+                    const pfDisplay = avgPf > 0 ? avgPf.toFixed(2) : (c.power_factor || '-');
 
-                    if (pfResult.hasData && avgPf > 0) {
-                        totalAvgPf += avgPf;
-                        pfCount++;
-                        totalKwhSum += pfResult.totalKwh;
-                        totalKvarhSum += pfResult.totalKvarh;
-                    }
+                    const pfBadgeClass = avgPf > 0 ? (avgPf < 0.92 ? 'pf-danger' : 'pf-success') : '';
 
-                    const recordsTable = customer.records.map(rec => {
-                        return `<tr class="date-group-header"><td colspan="8" style="background: #f0f4fa; font-weight: 700; padding: 8px 10px; color: var(--primary);">📅 ${rec.dateKey}</td></tr>` +
-                            rec.readings.map(r => `<tr>
-                                <td class="date-cell">${rec.dateKey}</td>
-                                <td class="customer-cell">${customer.metername}</td>
-                                <td><span class="meter-badge">${r.meternumber || '-'}</span></td>
-                                <td>${customer.keta3}</td>
-                                <td>${customer.handsa}</td>
-                                <td class="kwh-cell">${r.kwh != null ? r.kwh : '0'}</td>
-                                <td class="kvarh-cell">${r.kvarh != null ? r.kvarh : '0'}</td>
-                                <td class="col-notes">${r.note ? r.note.substring(0, 60) : '-'}</td>
-                            </tr>`).join('');
-                    }).join('');
+                    let metersHtml = '';
+                    c.records.forEach(rec => {
+                        rec.readings.forEach(r => {
+                            detailCount++;
+                            const readingKwh = r.kwh || 0;
+
+                            metersHtml += `
+                            <div class="m-meter-card">
+                                <div class="m-meter-header">
+                                    <span>عداد: <span class="meter-tag">${r.meternumber || '-'}</span></span>
+                                    <span style="font-size:0.7rem; color:var(--text-muted);">${rec.dateKey}</span>
+                                </div>
+                                <div class="m-readings-row">
+                                    <div>ك.و.س: <span class="kwh-val">${r.kwh != null ? r.kwh : '0'}</span></div>
+                                    <div>ك.ف.س: <span class="kvarh-val">${r.kvarh != null ? r.kvarh : '0'}</span></div>
+                                </div>
+                                ${r.note ? `<div class="m-notes">📝 ${r.note}</div>` : ''}
+                            </div>
+                        `;
+
+                            masterRows += `<tr>
+                            <td>${rec.dateKey}</td><td>${c.metername}</td><td>${r.meternumber || '-'}</td>
+                            <td>${c.keta3}</td><td>${c.handsa}</td><td>${c.max_load}</td>
+                            <td>${pfDisplay}</td><td>${readingKwh}</td><td>${r.kvarh || 0}</td>
+                            <td>${r.note || ''}</td>
+                        </tr>`;
+                        });
+                    });
 
                     cardsHtml += `
-                        <div class="grouped-card">
-                            <div class="card-header-main">
-                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                    <span class="customer-title">👤 ${customer.metername}</span>
-                                    <button class="btn-detail-sm" data-customer-id="${customer.customerId}">
-                                        <i class="fas fa-print"></i> طباعة
-                                    </button>
-                                </div>
-                                <div class="merged-info-grid">
-                                    <div class="info-item">🏗️ القطاع: ${customer.keta3}</div>
-                                    <div class="info-item">📐 الهندسة: ${customer.handsa}</div>
-                                    <div class="info-item">📊 معامل القدرة (PF): <strong class="pf-highlight">${pfDisplay}</strong></div>
-                                    <div class="info-item">⚖️ أقصى حمل: ${customer.max_load}</div>
-                                    <div class="info-item">📅 تاريخ اخر مرور: ${customer.records.length > 0 ? customer.records[customer.records.length - 1].dateKey : '-'}</div>
-                                    <div class="info-item">📈 عدد العدادات: ${new Set(customer.records.flatMap(rec => rec.readings.map(r => r.meternumber))).size}</div>
-                                </div>
+                    <div class="m-card ${selectAllVal ? 'selected' : ''}" id="card_${c.customerId}">
+                        <div class="m-card-header">
+                            <div class="m-cust-header-left">
+                                <input type="checkbox" class="cust-checkbox" data-custid="${c.customerId}" ${selectAllVal ? 'checked' : ''}>
+                                <div class="m-cust-name">👤 ${c.metername}</div>
                             </div>
-                            <div class="table-wrapper">
-                                <table class="sub-records-table">
-                                    <thead><tr>
-                                        <th>تاريخ اخر مرور</th><th>اسم المشترك</th><th>رقم العداد</th><th>القطاع</th><th>الهندسة</th><th>القراءة كيلو وات ساعة</th><th>القراءة كيلو فار ساعة</th><th>الملاحظات</th>
-                                    </tr></thead>
-                                    <tbody>${recordsTable}</tbody>
-                                </table>
-                            </div>
-                        </div>`;
+                            <button class="btn-print-m" onclick="window.location.href='MD_Pass_Print.html?customerId=${encodeURIComponent(c.customerId)}'">
+                                🖨️ طباعة
+                            </button>
+                        </div>
+                        <div class="m-info-grid">
+                            <div class="m-info-item">القطاع: <b>${c.keta3}</b></div>
+                            <div class="m-info-item">الهندسة: <b>${c.handsa}</b></div>
+                            <div class="m-info-item">معامل القدرة: <b class="pf-value-tag ${pfBadgeClass}">${pfDisplay}</b></div>
+                            <div class="m-info-item">أقصى حمل: <b>${c.max_load}</b></div>
+                        </div>
+                        ${metersHtml}
+                    </div>
+                `;
                 });
 
-                if (pfCount > 0) {
-                    const overallAvgPf = totalAvgPf / pfCount;
-                    const overallPfDisplay = overallAvgPf.toFixed(2);
-
-                    dash.innerHTML += `<div class="stat-card stat-card-pf">
-                        <small>متوسط PF الكلي</small>
-                        <strong>${overallPfDisplay}</strong>
-                    </div>`;
-
-                    dash.innerHTML += `<div class="stat-card stat-card-success" style="border-top-color: #0d9488;">
-                        <small>إجمالي KWH</small>
-                        <strong style="color: #0d9488;">${totalKwhSum.toFixed(0)}</strong>
-                    </div>`;
-
-                    dash.innerHTML += `<div class="stat-card stat-card-warning" style="border-top-color: #2563eb;">
-                        <small>إجمالي KVARH</small>
-                        <strong style="color: #2563eb;">${totalKvarhSum.toFixed(0)}</strong>
-                    </div>`;
-                }
+                document.getElementById('headerTotalCount').textContent = detailCount;
+                updateHeaderStats(unpassedKeta3);
 
                 container.innerHTML = cardsHtml;
+                document.querySelector("#masterTable tbody").innerHTML = masterRows;
 
-                // Attach print button events - redirect to MD_Pass_Print.html
-                document.querySelectorAll('.btn-detail-sm').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const custId = this.dataset.customerId;
-                        window.location.href = `MD_Pass_Print.html?customerId=${encodeURIComponent(custId)}`;
+                document.querySelectorAll('.cust-checkbox').forEach(chk => {
+                    chk.addEventListener('change', (e) => {
+                        const custId = e.target.getAttribute('data-custid');
+                        const cardEl = document.getElementById(`card_${custId}`);
+                        if (e.target.checked) {
+                            cardEl.classList.add('selected');
+                        } else {
+                            cardEl.classList.remove('selected');
+                            document.getElementById('selectAllCheck').checked = false;
+                        }
                     });
                 });
 
-                document.querySelector("#masterTable tbody").innerHTML = masterRows;
-                document.getElementById('exportBtn').style.display = 'flex';
             } else {
-                container.innerHTML =
-                    `<div class="empty-state"><i class="fas fa-inbox"></i><p>لا توجد قراءات متطابقة مع معايير البحث</p></div>`;
-                document.getElementById('exportBtn').style.display = 'none';
+                document.getElementById('headerTotalCount').textContent = 0;
+                updateHeaderStats(unpassedKeta3);
+                container.innerHTML = `
+                <div class="empty-state-m">
+                    <i class="fas fa-search-minus"></i>
+                    <p>لا توجد نتائج متطابقة مع معايير البحث والفلترة</p>
+                </div>
+            `;
+                document.querySelector("#masterTable tbody").innerHTML = '';
             }
         }
 
-        // ===== EVENT LISTENERS =====
-        document.getElementById('btnSearch').onclick = () => runReport();
-        document.getElementById('btnUpdatePF').onclick = () => updatePFInDatabase();
+        document.getElementById('selectAllCheck').addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            document.querySelectorAll('.cust-checkbox').forEach(chk => {
+                chk.checked = isChecked;
+                const custId = chk.getAttribute('data-custid');
+                const cardEl = document.getElementById(`card_${custId}`);
+                if (cardEl) {
+                    if (isChecked) cardEl.classList.add('selected');
+                    else cardEl.classList.remove('selected');
+                }
+            });
+        });
+
+        async function updatePFInDatabase() {
+            const selectedCheckboxes = document.querySelectorAll('.cust-checkbox:checked');
+            const selectedCustIds = Array.from(selectedCheckboxes).map(chk => chk.getAttribute('data-custid'));
+
+            if (selectedCustIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'تنبيه',
+                    text: 'يرجى تحديد مشترك واحد على الأقل عبر مربع الاختيار (Checkbox) لتحديث معامل القدرة.',
+                    confirmButtonText: 'حسناً'
+                });
+                return;
+            }
+
+            const confirmResult = await Swal.fire({
+                title: 'تأكيد التحديث',
+                text: `هل تريد تحديث معامل القدرة ${selectedCustIds.length} `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، تحديث المحدد',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#7c3aed'
+            });
+
+            if (!confirmResult.isConfirmed) return;
+
+            Swal.fire({
+                title: 'جاري التحديث...',
+                text: `تحديث ${selectedCustIds.length} مشترك`,
+                didOpen: () => Swal.showLoading()
+            });
+
+            let updatePromises = [];
+            let updatedCount = 0;
+
+            selectedCustIds.forEach(subID => {
+                const customer = currentRenderedGroups[subID];
+                if (customer) {
+                    const pfResult = calculateCustomerPF(customer.records);
+                    const newPf = pfResult.pf;
+                    const latestDate = customer.records.length > 0 ? customer.records[customer.records.length - 1].dateKey : '';
+
+                    if (pfResult.hasData && newPf > 0) {
+                        updatePromises.push(set(ref(db, `MD/customers/${subID}/power_factor`), newPf));
+                        updatePromises.push(set(ref(db, `MD/customers/${subID}/pf_calculated_date`), latestDate));
+                        updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/power_factor`), newPf));
+                        updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/pf_calculated_date`), latestDate));
+
+                        for (let record of customer.records) {
+                            updatePromises.push(set(ref(db, `MD_Pass/${subID}/${record.dateKey}/power_factor`), newPf));
+                        }
+                        updatedCount++;
+                    }
+                }
+            });
+
+            try {
+                await Promise.all(updatePromises);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم التحديث بنجاح',
+                    text: `تم تحديث معامل القدرة لـ ${updatedCount} مشترك محدد`,
+                    confirmButtonText: 'حسناً'
+                });
+                await init();
+            } catch (error) {
+                console.error('Error updating PF:', error);
+                Swal.fire('خطأ', 'فشل تحديث البيانات: ' + error.message, 'error');
+            }
+        }
+
         document.getElementById('filter_general').addEventListener('input', () => runReport());
         document.getElementById('filter_keta3').addEventListener('change', () => runReport());
         document.getElementById('filter_handsa').addEventListener('change', () => runReport());
+        document.getElementById('filter_pf_status').addEventListener('change', () => runReport());
+        document.getElementById('date_from').addEventListener('change', () => runReport());
+        document.getElementById('date_to').addEventListener('change', () => runReport());
+
+        document.getElementById('navBtnSearch').onclick = () => runReport();
+        document.getElementById('navBtnUpdatePF').onclick = () => updatePFInDatabase();
 
         init();
     </script>
