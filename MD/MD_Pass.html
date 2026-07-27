@@ -1,34 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
-    <title>مرور دوري - أرشيف الزيارات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>لوحة التقارير الذكية · نظام الإدارة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --primary: #1e293b;
-            --primary-light: #334155;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-card: #f1f5f9;
+            --border: #cbd5e1;
+            --border-focus: #0284c7;
+            --primary: #0284c7;
             --accent: #2563eb;
-            --accent-hover: #1d4ed8;
+            --accent-glow: rgba(37, 99, 235, 0.15);
             --success: #16a34a;
             --danger: #dc2626;
-            --warning: #f59e0b;
-            --bg: #f1f5f9;
-            --white: #ffffff;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --radius: 12px;
-            --border: #e2e8f0;
-            --text: #1e293b;
+            --text: #0f172a;
             --text-muted: #64748b;
+            --radius: 16px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -36,980 +42,1174 @@
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            padding: 20px;
+            padding-bottom: 90px;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1300px;
+        .app-container {
+            max-width: 1200px;
             margin: 0 auto;
-            background: var(--white);
-            padding: 25px 30px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .app-header {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
             border-radius: var(--radius);
+            padding: 16px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
             box-shadow: var(--shadow);
-        }
-
-        /* ===== DROPDOWN (matching MD_Add) ===== */
-        .modern-dropdown {
-            position: relative;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .dropdown-btn {
-            background: var(--primary);
-            color: var(--white);
-            padding: 10px 18px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-family: 'Cairo', sans-serif;
             display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            transition: all 0.3s ease;
-            gap: 10px;
-        }
-
-        .dropdown-btn:hover {
-            background: var(--primary-light);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
-        }
-
-        .dropdown-btn .arrow {
-            font-size: 0.7rem;
-            transition: transform 0.3s ease;
-            opacity: 0.8;
-        }
-
-        .dropdown-btn .arrow.open {
-            transform: rotate(180deg);
-        }
-
-        .dropdown-btn .icon-text {
-            display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             gap: 8px;
         }
 
-        .dropdown-menu {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-radius: var(--radius);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-            display: none;
-            z-index: 2000;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            animation: dropdownFade 0.25s ease;
-        }
-
-        @keyframes dropdownFade {
-            from {
-                opacity: 0;
-                transform: translateY(-8px) scale(0.98);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .dropdown-menu.show {
-            display: block;
-        }
-
-        .dropdown-item {
-            padding: 14px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #f1f5f9;
-            transition: all 0.2s ease;
-            color: var(--primary);
-            font-size: 0.9rem;
-            font-family: 'Cairo', sans-serif;
+        .brand {
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background: #f1f5f9;
-            color: var(--accent);
-            padding-right: 28px;
-        }
-
-        .dropdown-item .item-icon {
+            font-weight: 800;
             font-size: 1.1rem;
-            width: 28px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .dropdown-item .item-label {
-            flex: 1;
-        }
-
-        .dropdown-item .item-badge {
-            background: var(--accent);
-            color: white;
-            font-size: 0.6rem;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            opacity: 0.8;
-        }
-
-        /* ===== PAGE TITLE ===== */
-        .page-title {
-            text-align: center;
-            color: var(--primary);
-            font-size: 1.3rem;
-            margin: 0 0 20px 0;
-            border-bottom: 3px solid var(--accent);
-            padding-bottom: 12px;
-        }
-
-        /* ===== SEARCH BOX ===== */
-        .search-box {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .search-box label {
-            font-weight: 600;
-            display: block;
-            margin-bottom: 6px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        #customerSearch {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 0.95rem;
-            font-family: 'Cairo', sans-serif;
-            transition: border 0.2s, box-shadow 0.2s;
-            background: var(--white);
-        }
-
-        #customerSearch:focus {
-            border-color: var(--accent);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .search-results {
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-radius: var(--radius);
-            z-index: 1000;
-            max-height: 250px;
-            overflow-y: auto;
-            display: none;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-            border: 1px solid var(--border);
-        }
-
-        .search-item {
-            padding: 12px 18px;
-            cursor: pointer;
-            border-bottom: 1px solid #f1f5f9;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-        }
-
-        .search-item:hover {
-            background: #f1f5f9;
-            color: var(--accent);
-            padding-right: 26px;
-        }
-
-        .search-item:last-child {
-            border-bottom: none;
-        }
-
-        /* ===== PASSING HEADER ===== */
-        .passing-header {
-            background: #fffbeb;
-            padding: 16px 20px;
-            border-radius: var(--radius);
-            margin-bottom: 20px;
-            border: 1px solid #fde68a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .passing-header label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        #passing_date {
-            padding: 8px 16px;
-            border: 2px solid var(--warning);
-            border-radius: 8px;
-            font-family: 'Cairo', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            background: var(--white);
             color: var(--text);
         }
 
-        #passing_date:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        .brand i {
+            color: var(--primary);
+            font-size: 1.4rem;
         }
 
-        .btn-unlock-date {
-            background: var(--warning);
-            color: white;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 8px;
-            font-family: 'Cairo', sans-serif;
+        .nav-menu-btn {
+            background: var(--surface-card);
+            border: 1px solid #e2e8f0;
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 600;
-            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             cursor: pointer;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .search-row .form-group-m {
+            flex: 1;
+            min-width: 130px;
+        }
+
+        .form-group-m {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .form-label-m {
+            font-size: 0.7rem;
+            color: var(--text);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-label-m i {
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+
+        .form-input-m {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            padding: 0 10px;
+            height: 38px;
+            border-radius: var(--radius-sm);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            width: 100%;
+            outline: none;
             transition: all 0.2s;
         }
 
-        .btn-unlock-date:hover {
-            background: #d97706;
-            transform: translateY(-1px);
+        select.form-input-m {
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: left 8px center;
+            padding-left: 28px;
         }
 
-        /* ===== SECTION TITLE ===== */
-        .section-title {
+        .form-input-m:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .btn-search-m {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            height: 38px;
+            padding: 0 16px;
+            font-family: 'Cairo', sans-serif;
             font-weight: 700;
-            font-size: 1rem;
-            margin: 18px 0 12px 0;
-            color: var(--primary);
+            font-size: 0.75rem;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .section-dot {
-            background: var(--success);
-            width: 5px;
-            height: 22px;
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
-
-        .section-dot.accent {
-            background: var(--accent);
-        }
-
-        /* ===== CUSTOMER INFO GRID ===== */
-        .customer-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 14px;
-            background: #f8fafc;
-            padding: 16px 20px;
-            border-radius: var(--radius);
-            margin-bottom: 20px;
-            border: 1px solid var(--border);
-        }
-
-        .info-item label {
-            display: block;
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            margin-bottom: 3px;
-        }
-
-        .info-item span {
-            font-weight: 700;
-            color: var(--primary);
-            display: block;
-            font-size: 0.95rem;
-            padding: 2px 0;
-        }
-
-        .info-item input {
-            width: 100%;
-            padding: 6px 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-family: 'Cairo', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            background: var(--white);
-            transition: border 0.2s;
-        }
-
-        .info-item input:focus {
-            border-color: var(--accent);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .info-item input:read-only {
-            background: #f1f5f9;
-            cursor: not-allowed;
-        }
-
-        /* ===== TABLE ===== */
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            margin-bottom: 4px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--white);
-            min-width: 900px;
-        }
-
-        table th {
-            background: var(--primary);
-            color: white;
-            padding: 12px 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-align: center;
+            gap: 6px;
+            justify-content: center;
+            transition: 0.2s;
             white-space: nowrap;
         }
 
-        table td {
-            padding: 8px 6px;
-            border-bottom: 1px solid #f1f5f9;
-            text-align: center;
-            vertical-align: middle;
-            font-size: 0.8rem;
+        .btn-search-m:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
         }
 
-        table tr:hover td {
-            background: #f8fafc;
+        .btn-range-m {
+            background: #16a34a;
         }
 
-        .new-input {
-            width: 80px;
-            padding: 6px 8px;
-            border: 2px solid var(--border);
-            border-radius: 6px;
-            text-align: center;
-            font-weight: 600;
-            font-family: 'Cairo', sans-serif;
-            font-size: 0.85rem;
-            transition: border 0.2s;
+        .btn-range-m:hover {
+            background: #15803d;
         }
 
-        .new-input:focus {
-            border-color: var(--success);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        .header-controls-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        .note-area {
-            width: 100%;
-            min-width: 150px;
-            height: 50px;
-            padding: 6px 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-family: 'Cairo', sans-serif;
-            font-size: 0.8rem;
-            resize: vertical;
-            background: #fafcff;
-            transition: border 0.2s;
+        .date-current-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface-card);
+            padding: 4px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid #e2e8f0;
         }
 
-        .note-area:focus {
-            border-color: var(--accent);
-            background: white;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .meter-number {
+        .date-current-wrapper label {
+            font-size: 0.7rem;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--text-muted);
+            white-space: nowrap;
         }
 
-        .prev-reading {
-            background: #f1f5f9;
+        .date-current-wrapper input[type="date"] {
+            background: #e2e8f0;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0 8px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            outline: none;
+            width: 130px;
+            cursor: not-allowed;
+        }
+
+        .month-select-inline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface-card);
+            padding: 4px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid #e2e8f0;
+        }
+
+        .month-select-inline label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .month-select-dropdown {
+            background: var(--surface);
+            border: 1.5px solid var(--primary);
+            color: var(--text);
+            padding: 2px 8px;
+            height: 32px;
+            border-radius: 6px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .stats-bar {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stats-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .total-badge-m {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .total-badge-m span {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-right: 4px;
+        }
+
+        .stat-chips-wrapper {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip-m {
+            background: var(--surface-card);
+            border: 1px solid #e2e8f0;
+            padding: 3px 10px;
+            border-radius: 16px;
+            font-size: 0.65rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+
+        .stat-chip-m .val {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 800;
+            padding: 0 6px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+        }
+
+        .results-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 14px;
+        }
+
+        .m-card {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .m-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        .m-cust-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .btn-print-m {
+            background: #eff6ff;
+            color: var(--accent);
+            border: 1px solid #bfdbfe;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .m-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 10px;
+            background: var(--surface-card);
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+        }
+
+        .m-info-item {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+
+        .m-info-item b {
+            color: var(--text);
+        }
+
+        .m-meter-card {
+            background: #f8fafc;
+            border-radius: var(--radius-sm);
+            padding: 8px 10px;
+            margin-top: 2px;
+            border-right: 3px solid var(--primary);
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            border-left: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .m-meter-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .meter-tag {
+            background: #e0f2fe;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--primary);
+            font-size: 0.7rem;
+        }
+
+        .m-readings-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+            font-size: 0.7rem;
+            background: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .kwh-val {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .kvarh-val {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .m-notes {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-radius: 24px 24px 0 0;
+            border-top: 1px solid #e2e8f0;
+            padding: 20px;
+            z-index: 2000;
+            transition: bottom 0.3s ease;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .bottom-sheet.show {
+            bottom: 0;
+        }
+
+        .sheet-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: 1999;
+            display: none;
+        }
+
+        .sheet-overlay.show {
+            display: block;
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sheet-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sheet-item {
+            padding: 10px 12px;
+            background: var(--surface-card);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 8px 12px;
+            z-index: 999;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+            gap: 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.2s;
+            padding: 6px 0;
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+        }
+
+        .empty-state-m {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid #e2e8f0;
+        }
+
+        .empty-state-m i {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+        }
+
+        #masterTable {
+            display: none;
+        }
+
+        .mode-display {
+            font-size: 0.75rem;
             font-weight: 700;
             color: var(--accent);
-            padding: 2px 6px;
-            border-radius: 4px;
+            padding: 2px 12px;
+            background: var(--accent-glow);
+            border-radius: 12px;
         }
 
-        /* ===== SAVE BUTTON ===== */
-        .btn-save {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: var(--radius);
-            width: 100%;
+        .visit-date-badge {
+            background: #dbeafe;
+            color: var(--accent);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.65rem;
             font-weight: 700;
-            font-family: 'Cairo', sans-serif;
-            font-size: 1.05rem;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.25);
         }
 
-        .btn-save:hover {
-            background: #15803d;
-            transform: translateY(-2px);
+        .full-width {
+            grid-column: 1/-1;
         }
 
-        .hidden {
-            display: none !important;
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            body {
-                padding: 12px;
+        @media (max-width:768px) {
+            .search-row {
+                flex-direction: column;
             }
-
-            .container {
-                padding: 18px 20px;
+            .search-row .form-group-m {
+                flex: 1 1 100%;
+                min-width: unset;
             }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 8px;
+            .search-row .btn-search-m {
+                width: 100%;
             }
-
-            .container {
-                padding: 14px 14px;
+            .results-wrapper {
+                grid-template-columns: 1fr;
             }
-
-            .page-title {
-                font-size: 1.1rem;
-                margin-bottom: 14px;
-                padding-bottom: 8px;
+            .m-info-grid {
+                grid-template-columns: 1fr;
             }
-
-            .passing-header {
-                padding: 12px 14px;
-                gap: 10px;
+            .header-controls-wrapper {
                 flex-direction: column;
                 align-items: stretch;
-            }
-
-            .passing-header label {
-                text-align: center;
-            }
-
-            #passing_date {
                 width: 100%;
             }
-
-            .btn-unlock-date {
-                width: 100%;
+            .date-current-wrapper, .month-select-inline {
+                justify-content: space-between;
             }
-
-            .customer-info-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-                padding: 12px 14px;
-            }
-
-            .info-item span {
-                font-size: 0.85rem;
-            }
-
-            .section-title {
-                font-size: 0.9rem;
-                margin: 14px 0 8px 0;
-            }
-
-            table {
-                min-width: 700px;
-                font-size: 0.7rem;
-            }
-
-            table th {
-                padding: 8px 4px;
-                font-size: 0.65rem;
-            }
-
-            table td {
-                padding: 6px 4px;
-                font-size: 0.7rem;
-            }
-
-            .new-input {
-                width: 60px;
-                padding: 4px 4px;
-                font-size: 0.75rem;
-            }
-
-            .note-area {
-                min-width: 100px;
-                height: 40px;
-                font-size: 0.7rem;
-            }
-
-            .btn-save {
-                font-size: 0.95rem;
-                padding: 14px;
-            }
-
-            /* Mobile dropdown - slides from bottom */
-            .dropdown-menu {
-                position: fixed;
-                top: auto;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                border-radius: var(--radius) var(--radius) 0 0;
-                max-height: 60vh;
-                overflow-y: auto;
-                animation: slideUp 0.3s ease;
-            }
-
-            @keyframes slideUp {
-                from {
-                    transform: translateY(100%);
-                }
-
-                to {
-                    transform: translateY(0);
-                }
-            }
-
-            .dropdown-item {
-                padding: 14px 18px;
-                font-size: 0.9rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 10px 10px;
-            }
-
-            .customer-info-grid {
-                grid-template-columns: 1fr;
-                gap: 6px;
-                padding: 10px 12px;
-            }
-
-            .search-box label {
-                font-size: 0.8rem;
-            }
-
-            #customerSearch {
-                padding: 10px 14px;
-                font-size: 0.85rem;
-            }
-
-            .search-item {
-                padding: 10px 14px;
-                font-size: 0.8rem;
-            }
-
-            table {
-                min-width: 600px;
-            }
-
-            table th {
-                padding: 6px 3px;
-                font-size: 0.6rem;
-            }
-
-            table td {
-                padding: 4px 3px;
-                font-size: 0.65rem;
-            }
-
-            .new-input {
-                width: 50px;
-                padding: 3px 3px;
-                font-size: 0.7rem;
-            }
-
-            .note-area {
-                min-width: 80px;
-                height: 35px;
-                font-size: 0.65rem;
-            }
-
-            .btn-save {
-                font-size: 0.85rem;
-                padding: 12px;
-            }
-        }
-
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="app-container">
 
-        <!-- ===== DROPDOWN ===== -->
-        <div class="modern-dropdown">
-            <button class="dropdown-btn" id="dropdownBtn">
-                <span class="icon-text">🚀 <span>اختر وجهتك للانتقال</span></span>
-                <span class="arrow" id="arrow">▾</span>
-            </button>
-            <div class="dropdown-menu" id="dropdownMenu">
-                <div class="dropdown-item" data-page="MD.html">
-                    <span class="item-icon">📊</span>
-                    <span class="item-label">بيانات كبار المشتركين</span>
+        <header class="app-header">
+            <div class="header-top">
+                <div class="brand"><i class="fas fa-chart-pie"></i><span>تقرير المرور العام</span></div>
+                <div class="header-actions">
+                    <div class="header-controls-wrapper">
+                        <!-- Transferred Period Dropdown beside Date Current -->
+                        <div class="month-select-inline">
+                            <label for="month_range"><i class="fas fa-clock"></i> الفترة المرجعية</label>
+                            <select id="month_range" class="month-select-dropdown">
+                                <option value="3" selected>3 أشهر</option>
+                                <option value="6">6 أشهر</option>
+                                <option value="9">9 أشهر</option>
+                                <option value="12">12 شهر </option>
+                                <option value="18">18 شهر</option>
+                            </select>
+                        </div>
+
+                        <div class="date-current-wrapper">
+                            <input type="date" id="date_current" readonly>
+                        </div>
+                    </div>
+                    <button class="nav-menu-btn" id="openMenuBtn"><i class="fas fa-compass"></i> التنقل</button>
                 </div>
-                <div class="dropdown-item" data-page="MD_Add.html">
-                    <span class="item-icon">➕</span>
-                    <span class="item-label">إضافة مشترك جديد</span>
+            </div>
+
+            <!-- Date Range Search Section -->
+            <div class="search-row" style="background: var(--surface-card); padding: 10px; border-radius: var(--radius-sm); border: 1px solid #e2e8f0;">
+                <div class="form-group-m">
+                    <label class="form-label-m" for="date_from"><i class="fas fa-calendar-alt"></i> تاريخ من</label>
+                    <input type="date" id="date_from" class="form-input-m">
                 </div>
-                <div class="dropdown-item" data-page="MD_Pass.html">
-                    <span class="item-icon">🔍</span>
-                    <span class="item-label">تسجيل مرور ميداني</span>
-                    <span class="item-badge">الحالية</span>
+                <div class="form-group-m">
+                    <label class="form-label-m" for="date_to"><i class="fas fa-calendar-alt"></i> تاريخ إلى</label>
+                    <input type="date" id="date_to" class="form-input-m">
                 </div>
-                <div class="dropdown-item" data-page="MD_Pass_Dashboard.html">
-                    <span class="item-icon">📅</span>
-                    <span class="item-label">تقرير المرور العام</span>
+                <button class="btn-search-m btn-range-m" id="btnSearchRange"><i class="fas fa-filter"></i> بحث بالفترة المخصصة</button>
+            </div>
+
+            <!-- Standard Dropdown Filters -->
+            <div class="search-row">
+                <div class="form-group-m">
+                    <label class="form-label-m" for="filter_keta3"><i class="fas fa-layer-group"></i> القطاع</label>
+                    <select id="filter_keta3" class="form-input-m">
+                        <option value="">جميع القطاعات</option>
+                    </select>
                 </div>
-                <div class="dropdown-item" data-page="index.html">
-                    <span class="item-icon">🏠</span>
-                    <span class="item-label">الصفحة الرئيسية</span>
+                <div class="form-group-m">
+                    <label class="form-label-m" for="filter_handsa"><i class="fas fa-draw-polygon"></i> الهندسة</label>
+                    <select id="filter_handsa" class="form-input-m">
+                        <option value="">جميع الهندسات</option>
+                    </select>
                 </div>
-                <div class="dropdown-item" data-page="M_D_PF.html">
-                    <span class="item-icon">⚡</span>
-                    <span class="item-label">تقرير معامل القدرة</span>
-                </div>
+                <button class="btn-search-m" id="searchBtn"><i class="fas fa-search"></i> تصفية النتائج</button>
+            </div>
+
+            <div class="form-group-m full-width" style="margin-top:4px;">
+                <label class="form-label-m" for="filter_general"><i class="fas fa-search"></i> بحث عام (في النتائج الحالية)</label>
+                <input type="text" id="filter_general" class="form-input-m"
+                    placeholder="ابحث باسم المشترك، القطاع، الهندسة أو رقم العداد...">
+            </div>
+        </header>
+
+        <div class="stats-bar" id="statsHeaderBar">
+            <div class="stats-top">
+                <div class="total-badge-m">الإجمالي: <span id="headerTotalCount">0</span> مشتركين</div>
+                <div class="mode-display" id="modeDisplay">👆 في انتظار اختيار نوع التقرير</div>
+            </div>
+            <div class="stat-chips-wrapper" id="headerChipGroup">
+                <span style="font-size:0.65rem;color:var(--text-muted);">حدد الفترة المرجعية أعلاه ثم اضغط " تقرير تم المرور" أو "تقرير المتاخرين بالمرور"</span>
             </div>
         </div>
 
-        <h2 class="page-title">🔍 تسجيل المرور على كبار المشتركين</h2>
-
-        <!-- ===== SEARCH ===== -->
-        <div class="search-box">
-            <label for="customerSearch">👤 اسم المشترك:</label>
-            <input type="text" id="customerSearch" placeholder="ابحث عن اسم المشترك هنا..." autocomplete="off">
-            <div id="searchResults" class="search-results"></div>
-        </div>
-
-        <!-- ===== MAIN CONTENT ===== -->
-        <div id="mainContent" class="hidden">
-
-            <!-- Passing Date -->
-            <div class="passing-header">
-                <label>📅 تاريخ المرور الفعلي:</label>
-                <input type="date" id="passing_date" readonly>
-                <button type="button" class="btn-unlock-date" onclick="unlockDateInput()">🔓 تغيير التاريخ</button>
+        <main class="results-wrapper" id="results-container">
+            <div class="empty-state-m">
+                <i class="fas fa-hand-pointer"></i>
+                <p>اختر الفترة المرجعية من الأعلى ثم اضغط " تقرير تم المرور" أو "تقرير المتاخرين بالمرور"</p>
             </div>
-
-            <!-- Customer Info -->
-            <div class="section-title">
-                <div class="section-dot accent"></div>
-                بيانات المشترك
-            </div>
-            <div class="customer-info-grid">
-                <div class="info-item"><label>اسم المشترك:</label><span id="disp_name"></span></div>
-                <div class="info-item"><label>القطاع:</label><span id="disp_keta3"></span></div>
-                <div class="info-item"><label>الهندسة:</label><span id="disp_handsa"></span></div>
-                <div class="info-item">
-                    <label>معامل القدرة (PF):</label>
-                    <input type="number" step="0.01" id="edit_pf" readonly>
-                </div>
-                <div class="info-item">
-                    <label>أقصى حمل:</label>
-                    <input type="number" id="edit_max">
-                </div>
-            </div>
-
-            <!-- Meters Table -->
-            <div class="section-title">
-                <div class="section-dot"></div>
-                القراءات الحالية والملاحظات الفنية
-            </div>
-
-            <div class="table-wrapper">
-                <table id="metersTable">
-                    <thead>
-                        <tr>
-                            <th>رقم العداد</th>
-                            <th>المكان / الثابت</th>
-                            <th>المحولات</th>
-                            <th style="background: #34495e;">السابقة (kWh)</th>
-                            <th style="background: #34495e;">السابقة (kVARh)</th>
-                            <th style="background: #27ae60;">الحالية (kWh)</th>
-                            <th style="background: #27ae60;">الحالية (kVARh)</th>
-                            <th>ملاحظات فنية</th>
-                        </tr>
-                    </thead>
-                    <tbody id="metersBody"></tbody>
-                </table>
-            </div>
-
-            <button class="btn-save" onclick="savePassingRecord()">💾 حفظ السجل</button>
-        </div>
-
+        </main>
     </div>
 
-    <script>
-        // ===== DROPDOWN =====
-        document.addEventListener('DOMContentLoaded', function () {
-            const btn = document.getElementById('dropdownBtn');
-            const menu = document.getElementById('dropdownMenu');
-            const arrow = document.getElementById('arrow');
+    <div class="sheet-overlay" id="sheetOverlay"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="sheet-header">
+            <h4 style="font-size:0.9rem;">قائمة الصفحات</h4><i class="fas fa-times" id="closeSheetBtn"
+                style="cursor:pointer;font-size:1rem;"></i>
+        </div>
+        <div class="sheet-menu">
+            <a href="MD.html" class="sheet-item">📊 بيانات كبار المشتركين</a>
+            <a href="MD_Add.html" class="sheet-item">➕ إضافة مشترك جديد</a>
+            <a href="MD_Site.html" class="sheet-item">🔍 تسجيل مرور ميداني</a>
+            <a href="MD_Pass.html" class="sheet-item" style="border:1px solid var(--accent);background:#eff6ff;">📅 تقرير المرور العام</a>
+            <a href="index.html" class="sheet-item">🏠 الصفحة الرئيسية</a>
+            <a href="M_D_PF.html" class="sheet-item">⚡ تقرير معامل القدرة</a>
+        </div>
+    </div>
 
-            btn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                menu.classList.toggle('show');
-                arrow.classList.toggle('open');
-            });
+    <!-- Smart Action Bar -->
+    <nav class="bottom-nav">
+        <div class="nav-item" id="navBtnSearch"><i class="fas fa-check-circle"></i><span> تقرير تم المرور</span></div>
+        <div class="nav-item" id="navBtnDelayed"><i class="fas fa-hourglass-end"></i><span>تقرير المتاخرين بالمرور</span></div>
+        <div class="nav-item" id="navBtnExport"><i class="fas fa-file-excel"></i><span>تصدير</span></div>
+    </nav>
 
-            const items = document.querySelectorAll('.dropdown-item');
-            items.forEach(item => {
-                item.addEventListener('click', function () {
-                    const page = this.getAttribute('data-page');
-                    if (page) {
-                        window.location.href = page;
-                    }
-                });
-            });
-
-            window.addEventListener('click', function () {
-                if (menu.classList.contains('show')) {
-                    menu.classList.remove('show');
-                    arrow.classList.remove('open');
-                }
-            });
-        });
-
-        // ===== UNLOCK DATE =====
-        window.unlockDateInput = function () {
-            const SECRET_PASS = "123";
-
-            Swal.fire({
-                title: 'تغيير تاريخ المرور',
-                input: 'password',
-                inputLabel: 'أدخل كلمة المرور لتمكين التعديل',
-                inputPlaceholder: 'كلمة المرور',
-                showCancelButton: true,
-                confirmButtonText: 'تأكيد',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    if (result.value === SECRET_PASS) {
-                        const dateInput = document.getElementById('passing_date');
-                        dateInput.removeAttribute('readonly');
-                        dateInput.focus();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم فتح خانة التاريخ',
-                            text: 'يمكنك الآن تعديل تاريخ المرور',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        Swal.fire('خطأ', 'كلمة المرور غير صحيحة!', 'error');
-                    }
-                }
-            });
-        };
-    </script>
+    <table id="masterTable">
+        <thead>
+            <tr>
+                <th>تاريخ المرور</th>
+                <th>اسم المشترك</th>
+                <th>رقم العداد</th>
+                <th>القطاع</th>
+                <th>الهندسة</th>
+                <th>أقصى حمل</th>
+                <th>معامل القدرة</th>
+                <th>القراءة كيلوات ساعة</th>
+                <th>القراءة كيلو فار ساعة</th>
+                <th>الملاحظات</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-        import { getDatabase, ref, get, set, remove, update } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-analytics.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAnKRhT5xJTBvsQKpW7e9w-hGSbAQJWTSo",
-            authDomain: "production1-ae85.firebaseapp.com",
-            projectId: "production1-ae85",
-            storageBucket: "production1-ae85.firebasestorage.app",
-            messagingSenderId: "490438031865",
-            appId: "1:490438031865:web:a4a69335989f30cd13a528",
-            measurementId: "G-W3TZ1EKWWN"
-        };
+const firebaseConfig = {
+    apiKey: "AIzaSyAnKRhT5xJTBvsQKpW7e9w-hGSbAQJWTSo",
+    authDomain: "production1-ae85.firebaseapp.com",
+    databaseURL: "https://production1-ae85-default-rtdb.firebaseio.com",
+    projectId: "production1-ae85",
+    storageBucket: "production1-ae85.firebasestorage.app",
+    messagingSenderId: "490438031865",
+    appId: "1:490438031865:web:a4a69335989f30cd13a528",
+    measurementId: "G-W3TZ1EKWWN"
+};
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        try {
-            getAnalytics(app);
-        } catch (err) {
-            console.warn("Analytics disabled:", err);
-        }
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-        let allCustomers = {};
-        let selectedCustomerKey = "";
+let rawCustomersData = {};
+let currentMode = null; 
 
-        async function fetchAllForSearch() {
-            const snapshot = await get(ref(db, 'MD/customers'));
-            if (snapshot.exists()) { allCustomers = snapshot.val(); }
-        }
+function setTodayReferenceDate() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const dateInput = document.getElementById('date_current');
+    if (dateInput) {
+        dateInput.value = `${yyyy}-${mm}-${dd}`;
+    }
+}
 
-        const searchInput = document.getElementById('customerSearch');
-        const resultsDiv = document.getElementById('searchResults');
+function toDDMMYYYY(dateStr) {
+    if (!dateStr) return null;
+    let cleanStr = String(dateStr).trim().replace(/\//g, '-');
+    
+    if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(cleanStr)) {
+        const parts = cleanStr.split('-');
+        return `${parts[2].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[0]}`;
+    }
+    
+    if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(cleanStr)) {
+        const parts = cleanStr.split('-');
+        return `${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[2]}`;
+    }
+    
+    return cleanStr;
+}
 
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            resultsDiv.innerHTML = '';
-            if (!term) { resultsDiv.style.display = 'none'; return; }
-            let found = false;
-            for (let key in allCustomers) {
-                if (allCustomers[key].metername && allCustomers[key].metername.toLowerCase().includes(term)) {
-                    const item = document.createElement('div');
-                    item.className = 'search-item';
-                    item.innerText = allCustomers[key].metername;
-                    item.onclick = () => selectCustomer(key);
-                    resultsDiv.appendChild(item);
-                    found = true;
+function parseDDMMYYYYToDate(ddmmyyyyStr) {
+    const formatted = toDDMMYYYY(ddmmyyyyStr);
+    if (!formatted) return null;
+    const parts = formatted.split('-');
+    if (parts.length !== 3) return null;
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+    return new Date(year, month, day);
+}
+
+function formatDateToDDMMYYYY(dateObj) {
+    if (!dateObj || isNaN(dateObj.getTime())) return null;
+    const d = String(dateObj.getDate()).padStart(2, '0');
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const y = dateObj.getFullYear();
+    return `${d}-${m}-${y}`;
+}
+
+function compareDDMMYYYY(date1Str, date2Str) {
+    const d1 = parseDDMMYYYYToDate(date1Str);
+    const d2 = parseDDMMYYYYToDate(date2Str);
+    if (!d1 || !d2) return 0;
+    if (d1.getTime() === d2.getTime()) return 0;
+    return d1.getTime() < d2.getTime() ? -1 : 1;
+}
+
+function extractReadingsFromDateNode(dateNode) {
+    let readings = [];
+    if (!dateNode || !dateNode.readings) return readings;
+
+    const rdData = dateNode.readings;
+    if (typeof rdData === 'object') {
+        Object.keys(rdData).forEach(meterKey => {
+            const item = rdData[meterKey];
+            readings.push({
+                meternumber: item.meternumber || meterKey || '-',
+                kwh: item.kwh ?? 0,
+                kvarh: item.kvarh ?? 0,
+                note: item.note || ''
+            });
+        });
+    }
+    return readings;
+}
+
+function runReport(mode) {
+    if (!mode) return;
+    if (!rawCustomersData || typeof rawCustomersData !== 'object') {
+        updateUIWithNoData();
+        return;
+    }
+
+    currentMode = mode;
+
+    const btnPassed = document.getElementById('navBtnSearch');
+    const btnDelayed = document.getElementById('navBtnDelayed');
+    if (btnPassed) btnPassed.classList.toggle('active', mode === 'passed');
+    if (btnDelayed) btnDelayed.classList.toggle('active', mode === 'delayed');
+
+    // Reference month calculation
+    const selectedMonths = parseInt(document.getElementById('month_range')?.value || '3', 10);
+
+    const todayObj = new Date();
+    const todayDDMMYYYY = formatDateToDDMMYYYY(todayObj);
+    
+    // Boundary date calculation
+    const pastLimitObj = new Date(todayObj);
+    pastLimitObj.setMonth(pastLimitObj.getMonth() - selectedMonths);
+    const pastLimitDDMMYYYY = formatDateToDDMMYYYY(pastLimitObj);
+
+    const rangeFromRaw = document.getElementById('date_from')?.value;
+    const rangeToRaw = document.getElementById('date_to')?.value;
+    const rangeFromDDMMYYYY = rangeFromRaw ? toDDMMYYYY(rangeFromRaw) : null;
+    const rangeToDDMMYYYY = rangeToRaw ? toDDMMYYYY(rangeToRaw) : null;
+
+    const fK = document.getElementById('filter_keta3')?.value || '';
+    const fH = document.getElementById('filter_handsa')?.value || '';
+    const fG = document.getElementById('filter_general')?.value.trim().toLowerCase() || '';
+
+    let stats = { keta3: {} };
+    let filteredRecords = [];
+    const dateKeyRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
+
+    Object.entries(rawCustomersData).forEach(([customerKey, customerNode]) => {
+        if (!customerNode || typeof customerNode !== 'object' || customerKey.startsWith('_')) return;
+
+        let newestVisitDDMMYYYY = null;
+        let newestVisitNode = null;
+
+        Object.keys(customerNode).forEach(subKey => {
+            const cleanSubKey = subKey.trim();
+            if (dateKeyRegex.test(cleanSubKey) && typeof customerNode[subKey] === 'object') {
+                const subKeyDDMMYYYY = toDDMMYYYY(cleanSubKey);
+                if (!newestVisitDDMMYYYY || compareDDMMYYYY(subKeyDDMMYYYY, newestVisitDDMMYYYY) > 0) {
+                    newestVisitDDMMYYYY = subKeyDDMMYYYY;
+                    newestVisitNode = customerNode[subKey];
                 }
             }
-            resultsDiv.style.display = found ? 'block' : 'none';
         });
 
-        window.selectCustomer = function (key) {
-            selectedCustomerKey = key;
-            const data = allCustomers[key];
-            searchInput.value = data.metername;
-            resultsDiv.style.display = 'none';
+        // Determine if customer's latest visit falls in selected period
+        let isWithinSelectedMonths = false;
+        if (newestVisitDDMMYYYY) {
+            const isAfterOrOnLimit = compareDDMMYYYY(newestVisitDDMMYYYY, pastLimitDDMMYYYY) >= 0;
+            const isBeforeOrOnToday = compareDDMMYYYY(newestVisitDDMMYYYY, todayDDMMYYYY) <= 0;
+            isWithinSelectedMonths = isAfterOrOnLimit && isBeforeOrOnToday;
+        }
 
-            document.getElementById('disp_name').innerText = data.metername;
-            document.getElementById('disp_keta3').innerText = data.keta3 || '-';
-            document.getElementById('disp_handsa').innerText = data.handsa || '-';
-            document.getElementById('edit_pf').value = data.power_factor || 0;
-            document.getElementById('edit_max').value = data.max_load || 0;
+        // --- Filter Logic ---
+        if (mode === 'passed') {
+            // ONLY customers visited within the selected reference period
+            if (!isWithinSelectedMonths) return;
+        } 
+        else if (mode === 'delayed') {
+            // ALL customers EXCEPT those visited within the selected reference period
+            if (isWithinSelectedMonths) return;
+        } 
+        else if (mode === 'range') {
+            if (!newestVisitDDMMYYYY) return;
+            let isAfterFrom = true;
+            let isBeforeTo = true;
+            if (rangeFromDDMMYYYY) isAfterFrom = compareDDMMYYYY(newestVisitDDMMYYYY, rangeFromDDMMYYYY) >= 0;
+            if (rangeToDDMMYYYY) isBeforeTo = compareDDMMYYYY(newestVisitDDMMYYYY, rangeToDDMMYYYY) <= 0;
+            if (!isAfterFrom || !isBeforeTo) return;
+        }
 
-            const tbody = document.getElementById('metersBody');
-            tbody.innerHTML = '';
+        // Base metadata extraction
+        const metername = (newestVisitNode && newestVisitNode.metername) || customerNode.metername || customerNode.name || customerKey;
+        const keta3 = (newestVisitNode && newestVisitNode.keta3) || customerNode.keta3 || '-';
+        const handsa = (newestVisitNode && newestVisitNode.handsa) || customerNode.handsa || '-';
+        const power_factor = (newestVisitNode && newestVisitNode.power_factor) || customerNode.power_factor || '-';
+        const max_load = (newestVisitNode && newestVisitNode.max_load) || customerNode.max_load || '-';
 
-            for (let mKey in data.meters) {
-                const meter = data.meters[mKey];
-                tbody.innerHTML += `
-                    <tr class="meter-row" data-mkey="${mKey}" data-mno="${meter.meternumber}">
-                        <td class="meter-number">${meter.meternumber}</td>
-                        <td><small>${meter.location || '-'}<br>ثابت: ${meter.constant}</small></td>
-                        <td><small>جهد: ${meter.vt_ratio}<br>تيار: ${meter.ct_ratio}</small></td>
-                        <td class="prev-reading">${meter.kwh_reading || 0}</td>
-                        <td class="prev-reading">${meter.kvarh_reading || 0}</td>
-                        <td><input type="number" class="new-kwh new-input" placeholder="0"></td>
-                        <td><input type="number" class="new-kvarh new-input" placeholder="0"></td>
-                        <td><textarea class="visit-note note-area" placeholder="ملاحظات..."></textarea></td>
-                    </tr>
-                `;
-            }
+        if (fK && keta3 !== fK) return;
+        if (fH && handsa !== fH) return;
 
-            const dateInput = document.getElementById('passing_date');
-            dateInput.value = new Date().toISOString().split('T')[0];
-            dateInput.setAttribute('readonly', 'readonly');
-            document.getElementById('mainContent').classList.remove('hidden');
-        };
+        const readings = newestVisitNode ? extractReadingsFromDateNode(newestVisitNode) : [];
 
-        window.savePassingRecord = async function () {
-            const passingDate = document.getElementById('passing_date').value;
-            if (!passingDate) return Swal.fire("خطأ", "يرجى تحديد تاريخ المرور", "error");
+        if (fG) {
+            const meterNumbers = readings.map(r => r.meternumber || '').join(' ');
+            const searchText = `${customerKey} ${metername} ${keta3} ${handsa} ${meterNumbers} ${newestVisitDDMMYYYY || ''}`.toLowerCase();
+            if (!searchText.includes(fG)) return;
+        }
 
-            const rows = document.querySelectorAll('.meter-row');
-            let readingsForPass = {};
-            let updates = {};
+        const sector = keta3 || '-';
+        stats.keta3[sector] = (stats.keta3[sector] || 0) + 1;
 
-            rows.forEach(row => {
-                const mKey = row.getAttribute('data-mkey');
-                const newKwh = row.querySelector('.new-kwh').value;
-                const newKvarh = row.querySelector('.new-kvarh').value;
-                const note = row.querySelector('.visit-note').value;
+        filteredRecords.push({
+            customerKey,
+            metername,
+            keta3,
+            handsa,
+            power_factor,
+            max_load,
+            latest_visit_date: newestVisitDDMMYYYY ? newestVisitDDMMYYYY : 'بدون تاريخ مرور',
+            readings
+        });
+    });
 
-                readingsForPass[mKey] = {
-                    meternumber: row.getAttribute('data-mno'),
-                    kwh: newKwh || 0,
-                    kvarh: newKvarh || 0,
-                    note: note || ""
-                };
+    updateHeaderStats(stats, filteredRecords.length, mode, pastLimitDDMMYYYY, todayDDMMYYYY, selectedMonths);
+    renderResults(filteredRecords, mode);
+}
 
-                if (newKwh !== "" || newKvarh !== "") {
-                    const baseRef = `MD/customers/${selectedCustomerKey}/meters/${mKey}`;
-
-                    if (newKwh !== "") updates[`${baseRef}/kwh_reading`] = parseFloat(newKwh);
-                    if (newKvarh !== "") updates[`${baseRef}/kvarh_reading`] = parseFloat(newKvarh);
-
-                    updates[`${baseRef}/meternotes`] = note || "";
-                    updates[`${baseRef}/inspection_date`] = passingDate;
+function updateHeaderStats(stats, totalCount, mode, startDate, endDate, monthsCount) {
+    const totalEl = document.getElementById('headerTotalCount');
+    if (totalEl) totalEl.textContent = totalCount || 0;
+    
+    const modeEl = document.getElementById('modeDisplay');
+    if (modeEl) {
+        if (mode === 'passed') modeEl.textContent = `✅ تقرير تقرير تم المرور (خلال آخر ${monthsCount} أشهر): من ${startDate} إلى ${endDate}`;
+        else if (mode === 'delayed') modeEl.textContent = `⏰ تقرير المتاخرين بالمرور(جميع المشتركين باستثناء من مر عليهم خلال ${monthsCount} أشهر)`;
+        else if (mode === 'range') modeEl.textContent = `📅 بحث بالفترة المخصصة`;
+    }
+    
+    const chipGroup = document.getElementById('headerChipGroup');
+    if (chipGroup) {
+        let chipsHtml = '';
+        if (stats && stats.keta3) {
+            Object.entries(stats.keta3).forEach(([name, count]) => {
+                if (name && name !== '-' && name !== '') {
+                    chipsHtml += `<div class="stat-chip-m"><span>${name}</span><span class="val">${count}</span></div>`;
                 }
             });
+        }
+        chipGroup.innerHTML = chipsHtml || `<span style="font-size:0.65rem;color:var(--text-muted);">لا توجد إحصائيات</span>`;
+    }
+}
 
-            updates[`MD/customers/${selectedCustomerKey}/power_factor`] = document.getElementById('edit_pf').value;
-            updates[`MD/customers/${selectedCustomerKey}/max_load`] = document.getElementById('edit_max').value;
-            updates[`MD/customers/${selectedCustomerKey}/passing_date`] = document.getElementById('passing_date').value;
+function renderResults(results, mode) {
+    const container = document.getElementById('results-container');
+    if (!container) return;
 
-            const historicalRecord = {
-                metername: document.getElementById('disp_name').innerText,
-                visit_date: passingDate,
-                readings: readingsForPass,
-                keta3: document.getElementById('disp_keta3').innerText,
-                handsa: document.getElementById('disp_handsa').innerText,
-                power_factor: document.getElementById('edit_pf').value,
-                max_load: document.getElementById('edit_max').value,
-                timestamp: new Date().getTime()
-            };
+    if (results.length === 0) {
+        container.innerHTML = `<div class="empty-state-m"><i class="fas fa-search-minus"></i><p>لا توجد نتائج مطابقة لشروط البحث</p></div>`;
+        const tbody = document.querySelector("#masterTable tbody");
+        if (tbody) tbody.innerHTML = '';
+        return;
+    }
 
-            try {
-                Swal.fire({ title: 'جاري تحديث البيانات ...', didOpen: () => Swal.showLoading() });
+    let cardsHtml = '', masterRows = '';
 
-                await set(ref(db, `MD_Pass/${selectedCustomerKey}/${passingDate}`), historicalRecord);
+    results.forEach(record => {
+        let metersHtml = '';
+        if (record.readings.length === 0) {
+            metersHtml = `<div class="m-meter-card"><div class="m-notes">⚠️ لا توجد قراءات تفصيلية مسجلة</div></div>`;
+        } else {
+            record.readings.forEach(r => {
+                metersHtml += `<div class="m-meter-card">
+                    <div class="m-meter-header">
+                        <span>عداد: <span class="meter-tag">${r.meternumber || '-'}</span></span>
+                        <span class="visit-date-badge">📅 ${record.latest_visit_date}</span>
+                    </div>
+                    <div class="m-readings-row">
+                        <div>ك.و.س: <span class="kwh-val">${r.kwh ?? 0}</span></div>
+                        <div>ك.ف.س: <span class="kvarh-val">${r.kvarh ?? 0}</span></div>
+                    </div>
+                    ${r.note ? `<div class="m-notes">📝 ${r.note}</div>` : ''}
+                </div>`;
 
-                for (let path in updates) {
-                    await set(ref(db, path), updates[path]);
-                }
+                masterRows += `<tr>
+                    <td>${record.latest_visit_date}</td>
+                    <td>${record.metername}</td>
+                    <td>${r.meternumber || '-'}</td>
+                    <td>${record.keta3}</td>
+                    <td>${record.handsa}</td>
+                    <td>${record.max_load}</td>
+                    <td>${record.power_factor}</td>
+                    <td>${r.kwh ?? 0}</td>
+                    <td>${r.kvarh ?? 0}</td>
+                    <td>${r.note || ''}</td>
+                </tr>`;
+            });
+        }
 
-                Swal.fire("تم بنجاح", "تم تحديث القراءات، الملاحظات، وتاريخ المعاينة", "success")
-                    .then(() => location.reload());
-            } catch (e) {
-                console.error(e);
-                Swal.fire("خطأ في الحفظ", e.message, "error");
+        if (record.readings.length === 0) {
+            masterRows += `<tr>
+                <td>${record.latest_visit_date}</td>
+                <td>${record.metername}</td>
+                <td>-</td>
+                <td>${record.keta3}</td>
+                <td>${record.handsa}</td>
+                <td>${record.max_load}</td>
+                <td>${record.power_factor}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>لا توجد تفاصيل قراءات</td>
+            </tr>`;
+        }
+
+        cardsHtml += `<div class="m-card">
+            <div class="m-card-header">
+                <div>
+                    <div class="m-cust-name">👤 ${record.metername}</div>
+                </div>
+                <button class="btn-print-m" onclick="window.location.href='MD_Pass_Print.html?customerId=${encodeURIComponent(record.customerKey)}&date=${encodeURIComponent(record.latest_visit_date)}'">🖨️ طباعة</button>
+            </div>
+            <div class="m-info-grid">
+                <div class="m-info-item">القطاع: <b>${record.keta3}</b></div>
+                <div class="m-info-item">الهندسة: <b>${record.handsa}</b></div>
+                <div class="m-info-item">معامل القدرة: <b>${record.power_factor}</b></div>
+                <div class="m-info-item">أقصى حمل: <b>${record.max_load}</b></div>
+                <div class="m-info-item" style="grid-column:1/-1;">📅 آخر زيارة: <b>${record.latest_visit_date}</b></div>
+            </div>
+            ${metersHtml}
+        </div>`;
+    });
+
+    container.innerHTML = cardsHtml;
+    const tbody = document.querySelector("#masterTable tbody");
+    if (tbody) tbody.innerHTML = masterRows;
+}
+
+function updateUIWithNoData() {
+    const container = document.getElementById('results-container');
+    if (container) {
+        container.innerHTML = `<div class="empty-state-m"><i class="fas fa-database"></i><p>لا توجد بيانات للعرض</p></div>`;
+    }
+    const totalEl = document.getElementById('headerTotalCount');
+    if (totalEl) totalEl.textContent = '0';
+}
+
+function populateDropdowns() {
+    const kSet = new Set(), hSet = new Set();
+    const dateKeyRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
+
+    Object.entries(rawCustomersData).forEach(([key, node]) => {
+        if (!node || typeof node !== 'object' || key.startsWith('_')) return;
+
+        if (node.keta3 && node.keta3 !== '-') kSet.add(node.keta3);
+        if (node.handsa && node.handsa !== '-') hSet.add(node.handsa);
+
+        Object.keys(node).forEach(subKey => {
+            if (dateKeyRegex.test(subKey.trim()) && typeof node[subKey] === 'object') {
+                if (node[subKey].keta3 && node[subKey].keta3 !== '-') kSet.add(node[subKey].keta3);
+                if (node[subKey].handsa && node[subKey].handsa !== '-') hSet.add(node[subKey].handsa);
             }
-        };
+        });
+    });
 
-        fetchAllForSearch();
+    const kSel = document.getElementById('filter_keta3');
+    const hSel = document.getElementById('filter_handsa');
+    
+    if (kSel) {
+        kSel.innerHTML = '<option value="">جميع القطاعات</option>';
+        [...kSet].sort().forEach(k => kSel.innerHTML += `<option value="${k}">${k}</option>`);
+    }
+    if (hSel) {
+        hSel.innerHTML = '<option value="">جميع الهندسات</option>';
+        [...hSet].sort().forEach(h => hSel.innerHTML += `<option value="${h}">${h}</option>`);
+    }
+}
+
+export function exportData() {
+    const tbody = document.querySelector("#masterTable tbody");
+    if (!tbody || tbody.children.length === 0) {
+        Swal.fire('تنبيه', 'لا توجد بيانات للتصدير', 'info');
+        return;
+    }
+    
+    const rows = tbody.querySelectorAll('tr');
+    const data = [];
+    const headers = ['تاريخ المرور', 'اسم المشترك', 'رقم العداد', 'القطاع', 'الهندسة', 'أقصى حمل', 'معامل القدرة', 'ك.و.س', 'ك.ف.س', 'الملاحظات'];
+    data.push(headers);
+    
+    rows.forEach(row => {
+        const cols = row.querySelectorAll('td');
+        const rowData = [];
+        cols.forEach(col => rowData.push(col.textContent.trim()));
+        data.push(rowData);
+    });
+    
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'تقرير المرور');
+    XLSX.writeFile(wb, `تقرير_المرور_${new Date().toISOString().slice(0,10)}.xlsx`);
+    
+    Swal.fire('نجاح', 'تم تصدير البيانات بنجاح', 'success');
+}
+
+window.exportData = exportData;
+
+async function init() {
+    setTodayReferenceDate();
+    try {
+        const passSnap = await get(ref(db, 'MD_Pass/customers'));
+        if (passSnap.exists()) {
+            rawCustomersData = passSnap.val();
+        } else {
+            const rootSnap = await get(ref(db, 'MD_Pass'));
+            if (rootSnap.exists() && rootSnap.val().customers) {
+                rawCustomersData = rootSnap.val().customers;
+            } else {
+                updateUIWithNoData();
+                return;
+            }
+        }
+
+        populateDropdowns();
+
+    } catch (err) {
+        console.error('❌ Error loading data:', err);
+        updateUIWithNoData();
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById('searchBtn')?.addEventListener('click', () => {
+        if (currentMode) runReport(currentMode);
+        else runReport('passed');
+    });
+    document.getElementById('btnSearchRange')?.addEventListener('click', () => runReport('range'));
+    document.getElementById('filter_general')?.addEventListener('input', () => {
+        if (currentMode) runReport(currentMode);
+    });
+    document.getElementById('filter_keta3')?.addEventListener('change', () => {
+        if (currentMode) runReport(currentMode);
+    });
+    document.getElementById('filter_handsa')?.addEventListener('change', () => {
+        if (currentMode) runReport(currentMode);
+    });
+
+    // Automatically recalculate current mode when month selection changes
+    document.getElementById('month_range')?.addEventListener('change', () => {
+        if (currentMode) runReport(currentMode);
+    });
+
+    // Action bar buttons
+    document.getElementById('navBtnSearch')?.addEventListener('click', () => runReport('passed'));
+    document.getElementById('navBtnDelayed')?.addEventListener('click', () => runReport('delayed'));
+    document.getElementById('navBtnExport')?.addEventListener('click', exportData);
+
+    document.getElementById('openMenuBtn')?.addEventListener('click', () => {
+        document.getElementById('bottomSheet')?.classList.add('show');
+        document.getElementById('sheetOverlay')?.classList.add('show');
+    });
+
+    document.getElementById('closeSheetBtn')?.addEventListener('click', () => {
+        document.getElementById('bottomSheet')?.classList.remove('show');
+        document.getElementById('sheetOverlay')?.classList.remove('show');
+    });
+
+    document.getElementById('sheetOverlay')?.addEventListener('click', () => {
+        document.getElementById('bottomSheet')?.classList.remove('show');
+        document.getElementById('sheetOverlay')?.classList.remove('show');
+    });
+
+    init();
+});
     </script>
 </body>
 

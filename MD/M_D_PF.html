@@ -453,20 +453,6 @@
             font-weight: 700;
         }
 
-        .diff-badge {
-            background: #f3e8ff;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.65rem;
-            color: var(--pf-color);
-            font-weight: 700;
-        }
-
-        .m-notes {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
-
         .sheet-overlay {
             position: fixed;
             inset: 0;
@@ -598,7 +584,7 @@
             <div class="header-top">
                 <div class="brand">
                     <i class="fas fa-bolt"></i>
-                    <span>تقرير معامل القدرة والمرور</span>
+                    <span>تقرير معامل القدرة </span>
                 </div>
                 <button class="nav-menu-btn" id="openMenuBtn">
                     <i class="fas fa-compass"></i> التنقل
@@ -608,12 +594,12 @@
             <div class="filters-grid">
                 <div class="form-group-m">
                     <label class="form-label-m" for="date_from"><i class="far fa-calendar-alt"></i> التاريخ من</label>
-                    <input type="date" id="date_from" class="form-input-m" value="2026-02-01">
+                    <input type="date" id="date_from" class="form-input-m" value="2026-01-01">
                 </div>
 
                 <div class="form-group-m">
                     <label class="form-label-m" for="date_to"><i class="far fa-calendar-check"></i> التاريخ إلى</label>
-                    <input type="date" id="date_to" class="form-input-m" value="2026-08-01">
+                    <input type="date" id="date_to" class="form-input-m" value="2026-12-31">
                 </div>
 
                 <div class="form-group-m">
@@ -653,19 +639,19 @@
                     إجمالي القراءات المعروضة: <span id="headerTotalCount">0</span>
                 </div>
                 <label class="select-all-wrapper" for="selectAllCheck">
-                    <input type="checkbox" id="selectAllCheck" checked>
-                    <span>تحديد الكل للتحديث</span>
+                    <input type="checkbox" id="selectAllCheck" unchecked>
+                    <span>تحديد الكل لحساب معامل القدرة</span>
                 </label>
             </div>
             <div class="stat-chips-wrapper" id="headerChipGroup">
-                <span style="font-size: 0.7rem; color: var(--text-muted);">جاري تحميل إحصائيات القطاعات...</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">اضغط على "عرض التقرير" لعرض الإحصائيات...</span>
             </div>
         </div>
 
         <main class="results-wrapper" id="results-container">
             <div class="empty-state-m">
                 <i class="fas fa-inbox"></i>
-                <p>قم بتحديد فترة للبحث أو اختيار العملية من الأسفل</p>
+                <p>اضغط على زر "عرض التقرير" بالأسفل لتحميل البيانات</p>
             </div>
         </main>
     </div>
@@ -679,8 +665,8 @@
         <div class="sheet-menu">
             <a href="MD.html" class="sheet-item">📊 بيانات كبار المشتركين</a>
             <a href="MD_Add.html" class="sheet-item">➕ إضافة مشترك جديد</a>
-            <a href="MD_Pass.html" class="sheet-item">🔍 تسجيل مرور ميداني</a>
-            <a href="MD_Pass_Dashboard.html" class="sheet-item">📅 تقرير المرور العام</a>
+            <a href="MD_Site.html" class="sheet-item">🔍 تسجيل مرور ميداني</a>
+            <a href="MD_Pass.html" class="sheet-item">📅 تقرير المرور العام</a>
             <a href="index.html" class="sheet-item">🏠 الصفحة الرئيسية</a>
             <a href="M_D_PF.html" class="sheet-item"
                 style="border: 1px solid var(--pf-color); background: #f3e8ff;">⚡ تقرير معامل القدرة (الحالية)</a>
@@ -723,24 +709,22 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-analytics.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAnKRhT5xJTBvsQKpW7e9w-hGSbAQJWTSo",
             authDomain: "production1-ae85.firebaseapp.com",
+            databaseURL: "https://production1-ae85-default-rtdb.firebaseio.com",
             projectId: "production1-ae85",
             storageBucket: "production1-ae85.firebasestorage.app",
             messagingSenderId: "490438031865",
-            appId: "1:490438031865:web:a4a69335989f30cd13a528",
-            measurementId: "G-W3TZ1EKWWN"
+            appId: "1:490438031865:web:a4a69335989f30cd13a528"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        try { getAnalytics(app); } catch (err) { }
 
-        let passingData = {};
-        let allCustomersData = {};
+        let passingData = null;
+        let allCustomersData = null;
         let currentRenderedGroups = {};
 
         const openBtn = document.getElementById('openMenuBtn');
@@ -779,17 +763,17 @@
 
         function parseDateFlexible(raw) {
             if (!raw && raw !== 0) return null;
-            const s = String(raw).trim();
-            if (/^\d+$/.test(s)) {
-                const n = Number(s);
-                return n > 1e12 ? new Date(n) : new Date(n * 1000);
+            const s = String(raw).trim().replace(/\//g, '-');
+            if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(s)) {
+                const parts = s.split('-');
+                return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
             }
-            if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(s)) {
-                const parts = s.includes('-') ? s.split('-') : s.split('/');
+            if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(s)) {
+                const parts = s.split('-');
                 return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
             }
             const dt = new Date(s);
-            return isNaN(dt) ? null : dt;
+            return isNaN(dt.getTime()) ? null : dt;
         }
 
         function calculatePFFromDiff(kwhDiff, kvarhDiff) {
@@ -804,7 +788,6 @@
                 return { pf: 0, totalKwhDiff: 0, totalKvarhDiff: 0, hasData: false, oldestReading: null, newestReading: null };
             }
 
-            // Filter records within date range
             let filteredRecords = records.filter(rec => {
                 const recDate = parseDateFlexible(rec.dateKey);
                 if (!recDate) return false;
@@ -817,33 +800,27 @@
                 return { pf: 0, totalKwhDiff: 0, totalKvarhDiff: 0, hasData: false, oldestReading: null, newestReading: null };
             }
 
-            // Sort by date
             filteredRecords.sort((a, b) => {
                 const dateA = parseDateFlexible(a.dateKey);
                 const dateB = parseDateFlexible(b.dateKey);
                 return dateA - dateB;
             });
 
-            // Get oldest and newest readings
             const oldest = filteredRecords[0];
             const newest = filteredRecords[filteredRecords.length - 1];
 
-            // Find the meter readings - use the first meter from each record
             const oldestReadings = oldest.readings || [];
             const newestReadings = newest.readings || [];
 
-            // Calculate total differences across all meters
             let totalKwhDiff = 0;
             let totalKvarhDiff = 0;
             let hasData = false;
 
-            // Match readings by meter number or index
             const maxLen = Math.max(oldestReadings.length, newestReadings.length);
             for (let i = 0; i < maxLen; i++) {
                 const oldR = oldestReadings[i] || {};
                 const newR = newestReadings[i] || {};
 
-                // If meter numbers match or we're using index
                 const oldKwh = parseFloat(oldR.kwh) || 0;
                 const newKwh = parseFloat(newR.kwh) || 0;
                 const oldKvarh = parseFloat(oldR.kvarh) || 0;
@@ -874,11 +851,27 @@
             };
         }
 
-        async function init() {
+        async function ensureDataLoaded() {
+            if (passingData && allCustomersData) return true;
+
+            Swal.fire({
+                title: 'جاري تحميل البيانات...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
             try {
-                let snap = await get(ref(db, 'MD_Pass/visits'));
-                if (!snap.exists()) snap = await get(ref(db, 'MD_Pass'));
-                if (snap.exists()) passingData = snap.val();
+                const passSnap = await get(ref(db, 'MD_Pass/customers'));
+                if (passSnap.exists()) {
+                    passingData = passSnap.val();
+                } else {
+                    const rootSnap = await get(ref(db, 'MD_Pass'));
+                    if (rootSnap.exists() && rootSnap.val().customers) {
+                        passingData = rootSnap.val().customers;
+                    } else {
+                        passingData = {};
+                    }
+                }
 
                 const customerSnap = await get(ref(db, 'MD/customers'));
                 if (customerSnap.exists()) {
@@ -893,38 +886,42 @@
 
                     const kSel = document.getElementById('filter_keta3');
                     const hSel = document.getElementById('filter_handsa');
+                    kSel.innerHTML = '<option value="">جميع القطاعات</option>';
+                    hSel.innerHTML = '<option value="">جميع الهندسات</option>';
                     [...kSet].sort().forEach(k => kSel.innerHTML += `<option value="${k}">${k}</option>`);
                     [...hSet].sort().forEach(h => hSel.innerHTML += `<option value="${h}">${h}</option>`);
+                } else {
+                    allCustomersData = {};
                 }
 
-                runReport();
+                Swal.close();
+                return true;
             } catch (err) {
-                console.error(err);
+                console.error("❌ Data Fetch Error:", err);
+                Swal.fire('خطأ', 'فشل في تحميل البيانات من قاعدة البيانات', 'error');
+                return false;
             }
         }
 
         function getUnpassedCustomersReport(startDateObj, fK, fH) {
             let unpassedKeta3 = {};
-
             if (!startDateObj) return { unpassedKeta3 };
 
             const passedCustomerIds = new Set();
+            const dateRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
 
-            for (let subID in passingData) {
-                if (subID === 'customers') continue;
+            for (let custID in passingData) {
+                const custNode = passingData[custID];
+                if (!custNode || typeof custNode !== 'object') continue;
 
-                for (let dateKey in passingData[subID]) {
-                    const v = passingData[subID][dateKey];
-                    let recordDateRaw = (v && (v.visit_date || v.passing_date || v.passingDate || v.date)) ?
-                        (v.visit_date || v.passing_date || v.passingDate || v.date) : dateKey;
-                    
-                    let recordDate = parseDateFlexible(recordDateRaw) || parseDateFlexible(dateKey);
-                    if (!recordDate) continue;
-
-                    if (recordDate < startDateObj) {
-                        passedCustomerIds.add(subID);
+                Object.keys(custNode).forEach(dateKey => {
+                    if (dateRegex.test(dateKey.trim())) {
+                        let recordDate = parseDateFlexible(dateKey);
+                        if (recordDate && recordDate >= startDateObj) {
+                            passedCustomerIds.add(custID);
+                        }
                     }
-                }
+                });
             }
 
             for (let custId in allCustomersData) {
@@ -961,7 +958,6 @@
         function updateHeaderStats(unpassedKeta3) {
             const chipGroup = document.getElementById('headerChipGroup');
             let chipsHtml = '';
-
             const currentKeta3Filter = document.getElementById('filter_keta3').value;
 
             if (unpassedKeta3 && Object.keys(unpassedKeta3).length > 0) {
@@ -975,7 +971,7 @@
                         miniTableHtml = `
                             <div class="unpassed-table-container">
                                 <table class="unpassed-mini-table">
-                                    <thead><tr><th>#</th><th>اسم المشترك اللم يتم المرور</th></tr></thead>
+                                    <thead><tr><th>#</th><th>اسم المشترك الذي لم يتم المرور عليه</th></tr></thead>
                                     <tbody>${rows}</tbody>
                                 </table>
                             </div>
@@ -999,10 +995,13 @@
                 });
             }
 
-            chipGroup.innerHTML = chipsHtml || `<span style="font-size:0.75rem;color:var(--text-muted);">جميع المشتركين تم المرور عليهم قبل هذا التاريخ</span>`;
+            chipGroup.innerHTML = chipsHtml || `<span style="font-size:0.75rem;color:var(--text-muted);">جميع المشتركين تم المرور عليهم ضمن هذه الفترة</span>`;
         }
 
         async function runReport() {
+            const loaded = await ensureDataLoaded();
+            if (!loaded) return;
+
             const start = document.getElementById('date_from').value;
             const end = document.getElementById('date_to').value;
             const fK = document.getElementById('filter_keta3').value;
@@ -1014,77 +1013,76 @@
             const endDateObj = end ? parseDateFlexible(end) : null;
             if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
 
-            // Build customer records from passing data
             let customerRecords = {};
+            const dateRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
 
             for (let subID in passingData) {
-                if (subID === 'customers') continue;
-                for (let dateKey in passingData[subID]) {
-                    const v = passingData[subID][dateKey];
-                    let recordDateRaw = (v && (v.visit_date || v.passing_date || v.passingDate || v.date)) ?
-                        (v.visit_date || v.passing_date || v.passingDate || v.date) : dateKey;
-                    let recordDate = parseDateFlexible(recordDateRaw) || parseDateFlexible(dateKey);
-                    if (!recordDate) continue;
+                const customerNode = passingData[subID];
+                if (!customerNode || typeof customerNode !== 'object') continue;
 
-                    let match = false;
-                    if (!startDateObj && !endDateObj) match = true;
-                    else {
-                        const s = startDateObj || new Date('0000-01-01');
-                        const e = endDateObj || new Date('9999-12-31');
-                        match = recordDate >= s && recordDate <= e;
-                    }
-                    if (!match) continue;
-                    if (fK && v.keta3 !== fK) continue;
-                    if (fH && v.handsa !== fH) continue;
+                Object.keys(customerNode).forEach(dateKey => {
+                    if (dateRegex.test(dateKey.trim())) {
+                        const v = customerNode[dateKey];
+                        let recordDate = parseDateFlexible(dateKey);
+                        if (!recordDate) return;
 
-                    let generalMatch = false;
-                    const baseSearchStr = `${v.metername || ''} ${v.keta3 || ''} ${v.handsa || ''}`.toLowerCase();
-                    if (baseSearchStr.includes(fG) || fG === '') generalMatch = true;
-                    else if (v.readings) {
-                        for (let rKey in v.readings) {
-                            const r = v.readings[rKey];
-                            const searchStr = `${baseSearchStr} ${r.meternumber || ''}`.toLowerCase();
-                            if (searchStr.includes(fG)) { generalMatch = true; break; }
+                        let match = true;
+                        if (startDateObj && recordDate < startDateObj) match = false;
+                        if (endDateObj && recordDate > endDateObj) match = false;
+                        if (!match) return;
+
+                        const keta3 = v.keta3 || customerNode.keta3 || '-';
+                        const handsa = v.handsa || customerNode.handsa || '-';
+                        const metername = v.metername || customerNode.metername || customerNode.name || subID;
+
+                        if (fK && keta3 !== fK) return;
+                        if (fH && handsa !== fH) return;
+
+                        let readingsArray = [];
+                        if (v.readings) {
+                            readingsArray = Object.values(v.readings);
                         }
-                    }
-                    if (fG !== '' && !generalMatch) continue;
 
-                    if (v.readings) {
-                        const readingsArray = Object.values(v.readings);
+                        let generalMatch = false;
+                        const meterNums = readingsArray.map(r => r.meternumber || '').join(' ');
+                        const baseSearchStr = `${metername} ${keta3} ${handsa} ${meterNums}`.toLowerCase();
+                        if (fG === '' || baseSearchStr.includes(fG)) generalMatch = true;
+                        if (!generalMatch) return;
+
                         if (!customerRecords[subID]) {
                             customerRecords[subID] = {
                                 customerId: subID,
-                                metername: v.metername || subID,
-                                keta3: v.keta3 || '-',
-                                handsa: v.handsa || '-',
-                                max_load: v.max_load || '-',
+                                metername: metername,
+                                keta3: keta3,
+                                handsa: handsa,
+                                max_load: v.max_load || customerNode.max_load || '-',
+                                rawPf: v.power_factor || customerNode.power_factor || '-',
                                 records: []
                             };
                         }
+
                         customerRecords[subID].records.push({
                             dateKey: dateKey,
                             readings: readingsArray,
                             raw: v
                         });
                     }
-                }
+                });
             }
 
-            // Calculate PF for each customer using the date range
             let filteredGroups = {};
             Object.keys(customerRecords).forEach(id => {
                 const c = customerRecords[id];
                 const pfResult = calculateCustomerPFWithDateRange(c.records, startDateObj, endDateObj);
                 const avgPf = pfResult.pf;
 
-                // Apply PF filter
                 if (fPF === 'less_092' && avgPf >= 0.92) return;
                 if (fPF === 'more_092' && avgPf < 0.92) return;
 
                 filteredGroups[id] = {
                     ...c,
                     pfResult: pfResult,
-                    pfDisplay: pfResult.hasData ? pfResult.pf.toFixed(2) : (c.raw?.power_factor || '-'),
+                    pfDisplay: pfResult.hasData ? pfResult.pf.toFixed(2) : c.rawPf,
                     totalKwhDiff: pfResult.totalKwhDiff,
                     totalKvarhDiff: pfResult.totalKvarhDiff,
                     oldestDate: pfResult.oldestDate,
@@ -1094,7 +1092,6 @@
             });
 
             currentRenderedGroups = filteredGroups;
-            
             const { unpassedKeta3 } = getUnpassedCustomersReport(startDateObj, fK, fH);
             renderMobileUI(filteredGroups, unpassedKeta3);
         }
@@ -1145,7 +1142,6 @@
                         });
                     });
 
-                    // Show calculation details
                     const calcInfo = c.hasPfData ? `
                         <div class="text-sm" style="margin-top:4px; padding:4px 8px; background:#f3e8ff; border-radius:4px;">
                             <i class="fas fa-calculator"></i> 
@@ -1238,10 +1234,10 @@
 
             const confirmResult = await Swal.fire({
                 title: 'تأكيد التحديث',
-                text: `هل تريد تحديث معامل القدرة لـ ${selectedCustIds.length} مشترك محدد؟`,
+                text: `هل تريد تحديث معامل القدرة لـ ${selectedCustIds.length} مشترك محدد (لآخر تاريخ مرور فقط)؟`,
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'نعم، تحديث المحدد',
+                confirmButtonText: 'نعم، تحديث لآخر تاريخ',
                 cancelButtonText: 'إلغاء',
                 confirmButtonColor: '#7c3aed'
             });
@@ -1257,27 +1253,22 @@
             let updatePromises = [];
             let updatedCount = 0;
 
-            const start = document.getElementById('date_from').value;
-            const end = document.getElementById('date_to').value;
-            const startDateObj = start ? parseDateFlexible(start) : null;
-            const endDateObj = end ? parseDateFlexible(end) : null;
-            if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
-
             selectedCustIds.forEach(subID => {
                 const customer = currentRenderedGroups[subID];
                 if (customer && customer.hasPfData) {
                     const newPf = customer.pfResult.pf;
+                    const lastVisitDate = customer.newestDate; // Targets only the latest date
                     
-                    if (newPf > 0) {
+                    if (newPf > 0 && lastVisitDate) {
                         updatePromises.push(set(ref(db, `MD/customers/${subID}/power_factor`), newPf));
-                        updatePromises.push(set(ref(db, `MD/customers/${subID}/pf_calculated_date`), customer.newestDate));
+                        updatePromises.push(set(ref(db, `MD/customers/${subID}/pf_calculated_date`), lastVisitDate));
+                        
                         updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/power_factor`), newPf));
-                        updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/pf_calculated_date`), customer.newestDate));
+                        updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/pf_calculated_date`), lastVisitDate));
 
-                        // Update each record in the range with the PF
-                        customer.records.forEach(rec => {
-                            updatePromises.push(set(ref(db, `MD_Pass/${subID}/${rec.dateKey}/power_factor`), newPf));
-                        });
+                        // ONLY updates the power_factor under the newest visit date node
+                        updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/${lastVisitDate}/power_factor`), newPf));
+
                         updatedCount++;
                     }
                 }
@@ -1288,27 +1279,25 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'تم التحديث بنجاح',
-                    text: `تم تحديث معامل القدرة لـ ${updatedCount} مشترك محدد`,
+                    text: `تم تحديث معامل القدرة في أحدث تاريخ مرور لـ ${updatedCount} مشترك محدد`,
                     confirmButtonText: 'حسناً'
                 });
-                await init();
+                await runReport();
             } catch (error) {
                 console.error('Error updating PF:', error);
                 Swal.fire('خطأ', 'فشل تحديث البيانات: ' + error.message, 'error');
             }
         }
 
-        document.getElementById('filter_general').addEventListener('input', () => runReport());
-        document.getElementById('filter_keta3').addEventListener('change', () => runReport());
-        document.getElementById('filter_handsa').addEventListener('change', () => runReport());
-        document.getElementById('filter_pf_status').addEventListener('change', () => runReport());
-        document.getElementById('date_from').addEventListener('change', () => runReport());
-        document.getElementById('date_to').addEventListener('change', () => runReport());
-
         document.getElementById('navBtnSearch').onclick = () => runReport();
         document.getElementById('navBtnUpdatePF').onclick = () => updatePFInDatabase();
 
-        init();
+        document.getElementById('filter_general').addEventListener('input', () => { if(passingData) runReport(); });
+        document.getElementById('filter_keta3').addEventListener('change', () => { if(passingData) runReport(); });
+        document.getElementById('filter_handsa').addEventListener('change', () => { if(passingData) runReport(); });
+        document.getElementById('filter_pf_status').addEventListener('change', () => { if(passingData) runReport(); });
+        document.getElementById('date_from').addEventListener('change', () => { if(passingData) runReport(); });
+        document.getElementById('date_to').addEventListener('change', () => { if(passingData) runReport(); });
     </script>
 </body>
 

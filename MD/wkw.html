@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مُحول تواريخ ملفات الإكسيل</title>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS (xlsx.full.min.js) for Excel processing -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #107c41;
+            --primary-dark: #0b592e;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --border: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h2 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--primary);
+            background: #eef7f2;
+            border-radius: 12px;
+            padding: 35px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            background: #d8eee1;
+            border-color: var(--primary-dark);
+        }
+
+        .drop-zone i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .format-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .format-selector select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--primary-dark);
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow-x: auto;
+            max-height: 500px;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .date-highlight {
+            background-color: #e8f5e9;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .status-msg {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2><i class="fas fa-file-excel"></i> تحويل وتنسيق تواريخ ملفات الإكسيل</h2>
+        <p>اختر تنسيق التاريخ المناسب وقم بتحميل الملف فوراً</p>
+    </div>
+
+    <!-- File Upload Dropzone -->
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <h3>اسحب ملف الإكسيل هنا أو اضغط للاختيار</h3>
+        <p class="status-msg">يدعم ملفات .xlsx و .xls</p>
+        <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+        <span id="fileInfo" class="status-msg">لم يتم اختيار ملف بعد</span>
+
+        <!-- Date Format Selection Dropdown -->
+        <div class="format-selector">
+            <label for="dateFormatSelect"><i class="fas fa-calendar-alt"></i> صيغة التاريخ:</label>
+            <select id="dateFormatSelect" onchange="reprocessCurrentData()">
+                <option value="DD/MM/YYYY">DD/MM/YYYY (مثال: 27/07/2026)</option>
+                <option value="DD-MM-YYYY" selected>DD-MM-YYYY (مثال: 27-07-2026)</option>
+            </select>
+        </div>
+
+        <button id="downloadBtn" class="btn" disabled onclick="downloadConvertedExcel()">
+            <i class="fas fa-file-download"></i> تحميل الملف المنسق
+        </button>
+    </div>
+
+    <!-- Table Preview -->
+    <div class="table-container">
+        <table id="previewTable">
+            <thead>
+                <tr id="tableHeader"></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let rawWorkbookData = null;
+    let processedData = [];
+    let currentFileName = "converted_report.xlsx";
+
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const fileInfo = document.getElementById('fileInfo');
+    const dateFormatSelect = document.getElementById('dateFormatSelect');
+
+    // Drag and drop handlers
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            handleFile(e.target.files[0]);
+        }
+    });
+
+    /**
+     * Converts raw dates into the requested format (DD/MM/YYYY or DD-MM-YYYY)
+     */
+    function formatDateValue(val, format) {
+        if (val === null || val === undefined || val === '') return '';
+
+        const separator = format.includes('-') ? '-' : '/';
+        let day, month, year;
+
+        // Excel serial date number
+        if (typeof val === 'number') {
+            const dateObj = XLSX.SSF.parse_date_code(val);
+            if (dateObj) {
+                day = String(dateObj.d).padStart(2, '0');
+                month = String(dateObj.m).padStart(2, '0');
+                year = dateObj.y;
+                return `${day}${separator}${month}${separator}${year}`;
+            }
+        }
+
+        const s = String(val).trim();
+
+        // Pattern 1: YYYY-MM-DD or YYYY/MM/DD
+        let match = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+        if (match) {
+            year = match[1];
+            month = match[2].padStart(2, '0');
+            day = match[3].padStart(2, '0');
+            return `${day}${separator}${month}${separator}${year}`;
+        }
+
+        // Pattern 2: DD-MM-YYYY or DD/MM/YYYY
+        match = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+        if (match) {
+            day = match[1].padStart(2, '0');
+            month = match[2].padStart(2, '0');
+            year = match[3];
+            return `${day}${separator}${month}${separator}${year}`;
+        }
+
+        // Standard JS Date object parse
+        const parsed = new Date(s);
+        if (!isNaN(parsed.getTime())) {
+            day = String(parsed.getDate()).padStart(2, '0');
+            month = String(parsed.getMonth() + 1).padStart(2, '0');
+            year = parsed.getFullYear();
+            return `${day}${separator}${month}${separator}${year}`;
+        }
+
+        return s;
+    }
+
+    function handleFile(file) {
+        currentFileName = file.name.replace(/\.[^/.]+$/, "") + "_formatted.xlsx";
+        fileInfo.textContent = `📁 الملف المحدد: ${file.name}`;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            rawWorkbookData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+            if (!rawWorkbookData || rawWorkbookData.length === 0) {
+                alert("الملف فارغ!");
+                return;
+            }
+
+            reprocessCurrentData();
+            downloadBtn.disabled = false;
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function reprocessCurrentData() {
+        if (!rawWorkbookData) return;
+
+        const selectedFormat = dateFormatSelect.value;
+
+        processedData = rawWorkbookData.map(row => {
+            let formattedRow = {};
+            for (let col in row) {
+                const isDateCol = col.includes('تاريخ') || col.toLowerCase().includes('date');
+                if (isDateCol) {
+                    formattedRow[col] = formatDateValue(row[col], selectedFormat);
+                } else {
+                    formattedRow[col] = row[col];
+                }
+            }
+            return formattedRow;
+        });
+
+        renderPreviewTable(processedData);
+    }
+
+    function renderPreviewTable(data) {
+        const thead = document.getElementById('tableHeader');
+        const tbody = document.getElementById('tableBody');
+
+        thead.innerHTML = '';
+        tbody.innerHTML = '';
+
+        if (!data.length) return;
+
+        const headers = Object.keys(data[0]);
+
+        headers.forEach(h => {
+            const th = document.createElement('th');
+            th.textContent = h;
+            thead.appendChild(th);
+        });
+
+        data.slice(0, 50).forEach(row => {
+            const tr = document.createElement('tr');
+            headers.forEach(h => {
+                const td = document.createElement('td');
+                td.textContent = row[h];
+                if (h.includes('تاريخ') || h.toLowerCase().includes('date')) {
+                    td.classList.add('date-highlight');
+                }
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    function downloadConvertedExcel() {
+        if (!processedData.length) return;
+
+        const worksheet = XLSX.utils.json_to_sheet(processedData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Converted");
+
+        XLSX.writeFile(workbook, currentFileName);
+    }
+</script>
+
+</body>
+</html>
