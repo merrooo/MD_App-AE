@@ -105,14 +105,45 @@
         }
         .info-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 2fr 1fr 1fr;  /* Changed: First column gets 2x space */
             row-gap: 4px;
             column-gap: 20px;
             margin-bottom: 6px;
         }
-        .info-field { display: flex; align-items: baseline; }
-        .info-label { font-weight: 700; white-space: nowrap; margin-left: 4px; font-size: 11.5px; color: #555; }
-        .info-value { flex: 1; border-bottom: 1px dotted #000; padding-bottom: 1px; font-weight: 600; padding-right: 4px; font-size: 11.5px; }
+        .info-field { 
+            display: flex; 
+            align-items: baseline; 
+            padding: 2px 0;
+        }
+        /* First column fields (اسم المشترك, النشاط) get more space */
+        .info-field.col-span-2 {
+            grid-column: span 1;
+        }
+        .info-label { 
+            font-weight: 700; 
+            white-space: nowrap; 
+            margin-left: 8px;
+            font-size: 11.5px; 
+            color: #555; 
+            min-width: 80px;
+        }
+        .info-value { 
+            flex: 1; 
+            border-bottom: 1px dotted #000; 
+            padding-bottom: 1px; 
+            font-weight: 600; 
+            padding-right: 4px; 
+            font-size: 11.5px;
+            min-width: 120px;
+        }
+        /* Fields in column 2 and 3 (التاريخ, معامل القدرة, etc.) */
+        .info-field.compact .info-label {
+            min-width: 60px;
+            margin-left: 4px;
+        }
+        .info-field.compact .info-value {
+            min-width: 70px;
+        }
         .table-section-title {
             text-align: center;
             font-weight: 700;
@@ -202,7 +233,6 @@
         .table-wrapper {
             position: relative;
         }
-        /* Notes inside signature section */
         .notes-inside {
             grid-column: 1 / -1;
             margin-bottom: 4px;
@@ -254,7 +284,6 @@
                 overflow: hidden !important;
                 position: relative !important;
             }
-            /* --- SMALLER FONT SIZES FOR PRINT --- */
             .header-left-logo, .header-right-title {
                 font-size: 4pt !important;
                 line-height: 1.2 !important;
@@ -266,9 +295,14 @@
             .info-label, .info-value {
                 font-size: 4pt !important;
             }
+            .info-label {
+                min-width: 40px !important;
+                margin-left: 4px !important;
+            }
             .info-grid {
                 row-gap: 1px !important;
                 margin-bottom: 2px !important;
+                grid-template-columns: 2fr 1fr 1fr !important;
             }
             .table-section-title {
                 font-size: 5.5pt !important;
@@ -321,11 +355,9 @@
             .header-logo-img {
                 width: 35px !important;
             }
-            /* Make tables fill available space */
             table.form-table {
                 margin-bottom: 2px !important;
             }
-            /* Ensure content fills the page */
             .form-header, .info-grid, .table-section-title, table.form-table {
                 flex-shrink: 0 !important;
             }
@@ -409,24 +441,118 @@
         fetchCustomerData();
     }
 
+    // ========== DATE CONVERSION FUNCTIONS ==========
+    function toYYYYMMDD(dateStr) {
+        if (!dateStr) return null;
+        const parts = dateStr.split('-');
+        if (parts.length !== 3) return dateStr;
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+
+    function toDDMMYYYY(dateStr) {
+        if (!dateStr) return null;
+        const parts = dateStr.split('-');
+        if (parts.length !== 3) return dateStr;
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+
+    function compareDates(date1, date2) {
+        if (!date1 || !date2) return 0;
+        if (date1 === date2) return 0;
+        return date1 < date2 ? -1 : 1;
+    }
+
+    function getTodayDDMMYYYY() {
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = String(today.getDate()).padStart(2, '0');
+        return `${d}-${m}-${y}`;
+    }
+
     async function fetchCustomerData() {
         try {
-            const visitsSnap = await get(ref(db, `MD_Pass/visits/${customerId}`));
-            if (visitsSnap.exists()) {
-                allVisits = visitsSnap.val();
-            } else {
+            console.log('🔍 Fetching data for customer:', customerId);
+            
+            // First, get customer data from MD/customers for meter details and location
+            const customerSnap = await get(ref(db, `MD/customers/${customerId}`));
+            let customerData = {};
+            if (customerSnap.exists()) {
+                customerData = customerSnap.val();
+                console.log('📦 Customer data loaded:', customerData);
+            }
+
+            // Try MD_Pass/customers/{customerId} first (new structure)
+            const passCustomerSnap = await get(ref(db, `MD_Pass/customers/${customerId}`));
+            if (passCustomerSnap.exists()) {
+                const data = passCustomerSnap.val();
+                // Check for date keys in DD-MM-YYYY format
+                for (let key in data) {
+                    if (/^\d{2}-\d{2}-\d{4}$/.test(key) && typeof data[key] === 'object') {
+                        // Merge with customer data to get location
+                        allVisits[key] = { 
+                            ...data[key],
+                            location: data[key].location || customerData.location || '',
+                            activity: data[key].activity || customerData.activity || ''
+                        };
+                    }
+                }
+                // Also check for passing_date at root
+                if (data.passing_date && /^\d{2}-\d{2}-\d{4}$/.test(data.passing_date)) {
+                    if (!allVisits[data.passing_date]) {
+                        allVisits[data.passing_date] = { 
+                            ...data,
+                            location: data.location || customerData.location || '',
+                            activity: data.activity || customerData.activity || ''
+                        };
+                    }
+                }
+                console.log('📦 Found visits in MD_Pass/customers:', Object.keys(allVisits));
+            }
+
+            // If no visits found, try MD_Pass/{customerId} (old structure)
+            if (Object.keys(allVisits).length === 0) {
                 const altSnap = await get(ref(db, `MD_Pass/${customerId}`));
                 if (altSnap.exists()) {
                     const data = altSnap.val();
                     for (let key in data) {
-                        if (key !== 'customers' && key !== 'meters' && !key.startsWith('_')) {
-                            allVisits[key] = data[key];
+                        if (/^\d{2}-\d{2}-\d{4}$/.test(key) && typeof data[key] === 'object') {
+                            allVisits[key] = { 
+                                ...data[key],
+                                location: data[key].location || customerData.location || '',
+                                activity: data[key].activity || customerData.activity || ''
+                            };
                         }
                     }
+                    if (Object.keys(allVisits).length === 0 && data.passing_date && /^\d{2}-\d{2}-\d{4}$/.test(data.passing_date)) {
+                        allVisits[data.passing_date] = { 
+                            ...data,
+                            location: data.location || customerData.location || '',
+                            activity: data.activity || customerData.activity || ''
+                        };
+                    }
+                    console.log('📦 Found visits in MD_Pass/root:', Object.keys(allVisits));
                 }
             }
 
-            const metersSnap = await get(ref(db, `MD_Pass/customers/${customerId}/meters`));
+            // If still no visits, create from MD/customers
+            if (Object.keys(allVisits).length === 0 && customerData) {
+                const today = getTodayDDMMYYYY();
+                allVisits[today] = { 
+                    metername: customerData.metername || customerId,
+                    keta3: customerData.keta3 || '',
+                    handsa: customerData.handsa || '',
+                    power_factor: customerData.power_factor || '',
+                    max_load: customerData.max_load || '',
+                    location: customerData.location || '',
+                    activity: customerData.activity || '',
+                    readings: customerData.meters || {}
+                };
+                console.log('📦 Created fallback visit from MD/customers');
+            }
+
+            // Fetch meter details from MD/customers for additional info
+            const metersSnap = await get(ref(db, `MD/customers/${customerId}/meters`));
             if (metersSnap.exists()) {
                 const metersData = metersSnap.val();
                 for (let meterKey in metersData) {
@@ -434,24 +560,32 @@
                     const meterNum = meter.meternumber || meterKey;
                     customerMeters[meterNum] = { ...meter, _key: meterKey };
                 }
+                console.log('📦 Customer meters loaded:', Object.keys(customerMeters).length);
             }
 
-            if (Object.keys(allVisits).length === 0) {
+            if (Object.keys(allVisits).length === 0 && Object.keys(customerMeters).length === 0) {
                 document.getElementById('formContainer').innerHTML = `
                     <div class="status-msg">لا توجد زيارات مسجلة لهذا المشترك</div>
                 `;
                 return;
             }
 
-            const dates = Object.keys(allVisits).sort().reverse();
-            selectedDate = dates[0];
+            // Sort dates (DD-MM-YYYY) - convert to YYYY-MM-DD for sorting
+            const dates = Object.keys(allVisits).sort((a, b) => {
+                const aDate = toYYYYMMDD(a);
+                const bDate = toYYYYMMDD(b);
+                if (!aDate || !bDate) return 0;
+                return compareDates(bDate, aDate); // descending
+            });
+            
+            selectedDate = dates[0] || getTodayDDMMYYYY();
             const dateSelect = document.getElementById('dateSelect');
             dateSelect.innerHTML = dates.map(d => `<option value="${d}">${d}</option>`).join('');
 
             onDateChange(selectedDate);
 
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('❌ Error fetching data:', error);
             document.getElementById('formContainer').innerHTML = `
                 <div class="status-msg" style="color:red;">حدث خطأ أثناء تحميل البيانات: ${error.message}</div>
             `;
@@ -471,7 +605,6 @@
         const readings = visit.readings || {};
         const keys = Object.keys(readings);
 
-        // Filter out keys that are already added
         const addedInstalledKeys = addedInstalledRows.map(r => r.key);
         const addedRemovedKeys = addedRemovedRows.map(r => r.key);
         const availableKeys = keys.filter(k => 
@@ -506,7 +639,6 @@
         renderCurrentState();
     };
 
-    // Called when user clicks "إضافة" button
     window.applyMeterSelection = function() {
         const processType = document.getElementById('processSelect').value;
         if (processType !== 'رفع-تركيب') {
@@ -520,7 +652,6 @@
         const installedKey = document.getElementById('installedMeterSelect').value;
         const removedKey = document.getElementById('removedMeterSelect').value;
 
-        // Check if keys are valid and not already added
         const allAddedKeys = [...addedInstalledRows.map(r => r.key), ...addedRemovedRows.map(r => r.key)];
         
         if (installedKey && !allAddedKeys.includes(installedKey) && readings[installedKey]) {
@@ -537,12 +668,10 @@
             return;
         }
 
-        // Refresh the dropdowns to show remaining available meters
         populateMeterSelectors();
         renderCurrentState();
     };
 
-    // Reset all added rows
     window.resetAddedRows = function() {
         addedInstalledRows = [];
         addedRemovedRows = [];
@@ -560,11 +689,9 @@
         let removedReadings = [];
 
         if (processType === 'رفع-تركيب') {
-            // Use added rows
             installedReadings = addedInstalledRows.map(r => ({ ...r }));
             removedReadings = addedRemovedRows.map(r => ({ ...r }));
         } else {
-            // Review mode: all readings
             installedReadings = readingKeys.map(k => ({ key: k, ...readings[k] }));
         }
 
@@ -582,14 +709,14 @@
             ? 'محضر ( رفع / تركيب ) عداد ثلاثي قدرة 5 أمبير'
             : 'محضر ( مراجعة ) عداد ثلاثي قدرة 5 أمبير';
 
-        const locationFieldHtml = (processType === 'مراجعة') ? `
-            <div class="info-field">
+        // Location field - always shown with compact style (in column 1)
+        const locationFieldHtml = `
+            <div class="info-field compact" style="grid-column: 1;">
                 <span class="info-label">مكان التركيب /</span>
                 <span class="info-value">${location}</span>
             </div>
-        ` : '';
+        `;
 
-        // Use the actual number of added rows
         const installedRowCount = Math.max(3, installedReadings.length);
         const removedRowCount = Math.max(3, removedReadings.length);
 
@@ -615,30 +742,41 @@
             </table>
         ` : '';
 
-        // Build info grid - 3 columns
+        // Grid layout: First column gets more space for اسم المشترك and النشاط
+        // Second column: التاريخ, معامل القدرة
+        // Third column: مكان التركيب, أقصى حمل
         let infoGridHtml = `
-            <div class="info-field">
+            <!-- Row 1 -->
+            <div class="info-field" style="grid-column: 1;">
                 <span class="info-label">اسم المشترك /</span>
-                <span class="info-value">${meterName}</span>
+                <span class="info-value" style="min-width: 180px;">${meterName}</span>
             </div>
-            <div class="info-field">
+            <div class="info-field compact" style="grid-column: 2;">
                 <span class="info-label">التاريخ /</span>
                 <span class="info-value">${selectedDate}</span>
             </div>
-            ${locationFieldHtml}
-            <div class="info-field">
-                <span class="info-label">النشاط /</span>
-                <span class="info-value">${activity}</span>
-            </div>
-            <div class="info-field">
+            <div class="info-field compact" style="grid-column: 3;">
                 <span class="info-label">معامل القدرة /</span>
                 <span class="info-value">${powerFactor || '-'}</span>
             </div>
-            <div class="info-field">
+            
+            <!-- Row 2 -->
+            <div class="info-field" style="grid-column: 1;">
+                <span class="info-label">النشاط /</span>
+                <span class="info-value" style="min-width: 180px;">${activity}</span>
+            </div>
+            <div class="info-field compact" style="grid-column: 2;">
+                <span class="info-label">مكان التركيب /</span>
+                <span class="info-value">${location}</span>
+            </div>
+            <div class="info-field compact" style="grid-column: 3;">
                 <span class="info-label">أقصى حمل /</span>
                 <span class="info-value">${maxLoad || '-'}</span>
             </div>
         `;
+
+        // Get notes from the visit
+        const notes = visit.notes || visit.general_notes || visit.meternotes || '';
 
         let html = `
             <div class="form-header">
@@ -682,11 +820,9 @@
 
             ${removedTableSectionHtml}
 
-            <!-- Signature Section with Notes inside -->
             <div class="signature-section">
-                <!-- Notes placed here, above committee -->
                 <div class="notes-inside">
-                    <div class="notes-title">الملاحظات : ${visit.notes || visit.general_notes || ''}</div>
+                    <div class="notes-title">الملاحظات : ${notes}</div>
                     <div class="dotted-line"></div>
                     <div class="dotted-line"></div>
                 </div>
