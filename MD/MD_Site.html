@@ -1023,7 +1023,7 @@
                     if (newKwh !== "") updates[`${baseRef}/kwh_reading`] = parseFloat(newKwh);
                     if (newKvarh !== "") updates[`${baseRef}/kvarh_reading`] = parseFloat(newKvarh);
 
-                    updates[`${baseRef}/meternotes`] = note || "";
+                    updates[`${baseRef}/note`] = note || "";
                     updates[`${baseRef}/inspection_date`] = formattedDate;
                 }
             });

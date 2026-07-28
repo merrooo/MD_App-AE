@@ -1026,7 +1026,7 @@
                         inspection_date: formatExcelDate(getVal(row, ['تاريخ الرفع'])),
                         fix_date: formatExcelDate(getVal(row, ['تاريخ التركيب'])),
                         power_date: formatExcelDate(getVal(row, ['تاريخ الأطلاق'])),
-                        meternotes: getVal(row, ['ملاحظات']) || ""
+                        note: getVal(row, ['ملاحظات']) || ""
                     };
                 });
                 try {
@@ -1143,7 +1143,7 @@
                                 <div><span class="label">تاريخ الرفع:</span> <span class="value">${m.inspection_date || '-'}</span></div>
                                 <div><span class="label">تاريخ التركيب:</span> <span class="value">${m.fix_date || '-'}</span></div>
                                 <div><span class="label">تاريخ الإطلاق:</span> <span class="value">${m.power_date || '-'}</span></div>
-                                <div class="full"><span class="label">الملاحظات:</span> <span class="value">${m.meternotes || 'لا توجد ملاحظات'}</span></div>
+                                <div class="full"><span class="label">الملاحظات:</span> <span class="value">${m.meternote || 'لا توجد ملاحظات'}</span></div>
                             </div>
                         </div>`;
                 });
@@ -1262,7 +1262,7 @@
                 document.getElementById("constant").value = m.constant || "";
                 document.getElementById("location").value = m.location || "";
                 document.getElementById("mtype").value = m.metertype || "";
-                document.getElementById("notes").value = m.meternotes || "";
+                document.getElementById("notes").value = m.note || "";
                 document.querySelectorAll("#formSingle input, #formSingle select, #formSingle textarea").forEach(i => i
                     .disabled = false);
                 document.getElementById("updateAllBtn").style.display = "none";
@@ -1290,7 +1290,7 @@
                 inspection_date: document.getElementById("inspection_date").value || "",
                 fix_date: document.getElementById("fix_date").value || "",
                 power_date: document.getElementById("power_date").value || "",
-                meternotes: document.getElementById("notes").value || ""
+                note: document.getElementById("notes").value || ""
             };
             const finalMeterData = { ...existingMeter, ...meterEditableData, kwh_reading: existingMeter.kwh_reading ||
                     0, kvarh_reading: existingMeter.kvarh_reading || 0 };
@@ -1336,7 +1336,7 @@
                 inspection_date: document.getElementById("inspection_date").value || "",
                 fix_date: document.getElementById("fix_date").value || "",
                 power_date: document.getElementById("power_date").value || "",
-                meternotes: document.getElementById("notes").value || ""
+                note: document.getElementById("notes").value || ""
             };
             try {
                 await Promise.all([

@@ -105,7 +105,7 @@
         }
         .info-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;  /* Changed: First column gets 2x space */
+            grid-template-columns: 2fr 1fr 1fr;
             row-gap: 4px;
             column-gap: 20px;
             margin-bottom: 6px;
@@ -114,10 +114,6 @@
             display: flex; 
             align-items: baseline; 
             padding: 2px 0;
-        }
-        /* First column fields (اسم المشترك, النشاط) get more space */
-        .info-field.col-span-2 {
-            grid-column: span 1;
         }
         .info-label { 
             font-weight: 700; 
@@ -129,14 +125,11 @@
         }
         .info-value { 
             flex: 1; 
-            border-bottom: 1px dotted #000; 
-            padding-bottom: 1px; 
             font-weight: 600; 
             padding-right: 4px; 
             font-size: 11.5px;
             min-width: 120px;
         }
-        /* Fields in column 2 and 3 (التاريخ, معامل القدرة, etc.) */
         .info-field.compact .info-label {
             min-width: 60px;
             margin-left: 4px;
@@ -241,8 +234,7 @@
             font-weight: 700;
             font-size: 11px;
         }
-        .notes-inside .dotted-line {
-            border-bottom: 1px dotted #000;
+        .notes-inside .empty-line {
             height: 18px;
             width: 100%;
         }
@@ -321,7 +313,7 @@
             .notes-inside .notes-title {
                 font-size: 4pt !important;
             }
-            .notes-inside .dotted-line {
+            .notes-inside .empty-line {
                 height: 12px !important;
             }
             .signature-section {
@@ -427,9 +419,9 @@
 
     let allVisits = {};
     let customerMeters = {};
+    let allMetersData = {};
     let selectedDate = '';
     
-    // Store added rows for swap mode
     let addedInstalledRows = [];
     let addedRemovedRows = [];
 
@@ -441,7 +433,6 @@
         fetchCustomerData();
     }
 
-    // ========== DATE CONVERSION FUNCTIONS ==========
     function toYYYYMMDD(dateStr) {
         if (!dateStr) return null;
         const parts = dateStr.split('-');
@@ -470,11 +461,36 @@
         return `${d}-${m}-${y}`;
     }
 
+    function getMeterLocation(customerId, meterNumber) {
+        if (allMetersData[customerId] && allMetersData[customerId][meterNumber]) {
+            return allMetersData[customerId][meterNumber].location || '';
+        }
+        return '';
+    }
+
+    async function loadAllMetersData() {
+        try {
+            const metersSnap = await get(ref(db, 'MD/customers'));
+            if (metersSnap.exists()) {
+                const customersData = metersSnap.val();
+                for (let custId in customersData) {
+                    if (customersData[custId] && customersData[custId].meters) {
+                        allMetersData[custId] = customersData[custId].meters;
+                    }
+                }
+                console.log('📦 All meters data loaded:', Object.keys(allMetersData).length, 'customers');
+            }
+        } catch (err) {
+            console.warn('⚠️ Could not load meters data:', err);
+        }
+    }
+
     async function fetchCustomerData() {
         try {
             console.log('🔍 Fetching data for customer:', customerId);
             
-            // First, get customer data from MD/customers for meter details and location
+            await loadAllMetersData();
+            
             const customerSnap = await get(ref(db, `MD/customers/${customerId}`));
             let customerData = {};
             if (customerSnap.exists()) {
@@ -482,60 +498,50 @@
                 console.log('📦 Customer data loaded:', customerData);
             }
 
-            // Try MD_Pass/customers/{customerId} first (new structure)
             const passCustomerSnap = await get(ref(db, `MD_Pass/customers/${customerId}`));
             if (passCustomerSnap.exists()) {
                 const data = passCustomerSnap.val();
-                // Check for date keys in DD-MM-YYYY format
+                console.log('📦 Raw MD_Pass/customers data:', data);
+                
                 for (let key in data) {
                     if (/^\d{2}-\d{2}-\d{4}$/.test(key) && typeof data[key] === 'object') {
-                        // Merge with customer data to get location
+                        const visitLocation = data[key].location || customerData.location || '';
+                        const visitActivity = data[key].activity || customerData.activity || '';
+                        
                         allVisits[key] = { 
                             ...data[key],
-                            location: data[key].location || customerData.location || '',
-                            activity: data[key].activity || customerData.activity || ''
+                            location: visitLocation,
+                            activity: visitActivity,
+                            general_notes: data[key].general_notes || data[key].notes || ''
                         };
+                        console.log(`✅ Loaded visit ${key}:`, allVisits[key]);
                     }
                 }
-                // Also check for passing_date at root
-                if (data.passing_date && /^\d{2}-\d{2}-\d{4}$/.test(data.passing_date)) {
-                    if (!allVisits[data.passing_date]) {
-                        allVisits[data.passing_date] = { 
-                            ...data,
-                            location: data.location || customerData.location || '',
-                            activity: data.activity || customerData.activity || ''
-                        };
-                    }
-                }
-                console.log('📦 Found visits in MD_Pass/customers:', Object.keys(allVisits));
             }
 
-            // If no visits found, try MD_Pass/{customerId} (old structure)
             if (Object.keys(allVisits).length === 0) {
                 const altSnap = await get(ref(db, `MD_Pass/${customerId}`));
                 if (altSnap.exists()) {
                     const data = altSnap.val();
+                    console.log('📦 Raw MD_Pass data:', data);
+                    
                     for (let key in data) {
                         if (/^\d{2}-\d{2}-\d{4}$/.test(key) && typeof data[key] === 'object') {
+                            const visitLocation = data[key].location || customerData.location || '';
+                            const visitActivity = data[key].activity || customerData.activity || '';
+                            
                             allVisits[key] = { 
                                 ...data[key],
-                                location: data[key].location || customerData.location || '',
-                                activity: data[key].activity || customerData.activity || ''
+                                location: visitLocation,
+                                activity: visitActivity,
+                                general_notes: data[key].general_notes || data[key].notes || ''
                             };
+                            console.log(`✅ Loaded visit ${key}:`, allVisits[key]);
                         }
                     }
-                    if (Object.keys(allVisits).length === 0 && data.passing_date && /^\d{2}-\d{2}-\d{4}$/.test(data.passing_date)) {
-                        allVisits[data.passing_date] = { 
-                            ...data,
-                            location: data.location || customerData.location || '',
-                            activity: data.activity || customerData.activity || ''
-                        };
-                    }
-                    console.log('📦 Found visits in MD_Pass/root:', Object.keys(allVisits));
                 }
             }
 
-            // If still no visits, create from MD/customers
             if (Object.keys(allVisits).length === 0 && customerData) {
                 const today = getTodayDDMMYYYY();
                 allVisits[today] = { 
@@ -546,12 +552,12 @@
                     max_load: customerData.max_load || '',
                     location: customerData.location || '',
                     activity: customerData.activity || '',
+                    general_notes: '',
                     readings: customerData.meters || {}
                 };
                 console.log('📦 Created fallback visit from MD/customers');
             }
 
-            // Fetch meter details from MD/customers for additional info
             const metersSnap = await get(ref(db, `MD/customers/${customerId}/meters`));
             if (metersSnap.exists()) {
                 const metersData = metersSnap.val();
@@ -563,19 +569,18 @@
                 console.log('📦 Customer meters loaded:', Object.keys(customerMeters).length);
             }
 
-            if (Object.keys(allVisits).length === 0 && Object.keys(customerMeters).length === 0) {
+            if (Object.keys(allVisits).length === 0) {
                 document.getElementById('formContainer').innerHTML = `
                     <div class="status-msg">لا توجد زيارات مسجلة لهذا المشترك</div>
                 `;
                 return;
             }
 
-            // Sort dates (DD-MM-YYYY) - convert to YYYY-MM-DD for sorting
             const dates = Object.keys(allVisits).sort((a, b) => {
                 const aDate = toYYYYMMDD(a);
                 const bDate = toYYYYMMDD(b);
                 if (!aDate || !bDate) return 0;
-                return compareDates(bDate, aDate); // descending
+                return compareDates(bDate, aDate);
             });
             
             selectedDate = dates[0] || getTodayDDMMYYYY();
@@ -692,7 +697,12 @@
             installedReadings = addedInstalledRows.map(r => ({ ...r }));
             removedReadings = addedRemovedRows.map(r => ({ ...r }));
         } else {
-            installedReadings = readingKeys.map(k => ({ key: k, ...readings[k] }));
+            installedReadings = readingKeys.map(k => {
+                const item = readings[k];
+                const meterNum = item.meternumber || k;
+                const location = getMeterLocation(customerId, meterNum);
+                return { key: k, ...item, location: location || item.location || '' };
+            });
         }
 
         renderFormContent(visit, installedReadings, removedReadings, processType);
@@ -702,20 +712,30 @@
         const meterName = visit.metername || customerId;
         const maxLoad = visit.max_load || '';
         const powerFactor = visit.power_factor || '';
-        const location = visit.location || '';
+        
+        let location = visit.location || '';
+        if (!location) {
+            if (installedReadings.length > 0) {
+                const firstReading = installedReadings[0];
+                const meterNum = firstReading.meternumber || firstReading.key;
+                location = getMeterLocation(customerId, meterNum);
+            }
+        }
+        
         const activity = visit.activity || visit.activity_type || '';
+
+        let notes = '';
+        const readingNotes = installedReadings.map(r => r.note || r.notes || '').filter(n => n);
+        if (readingNotes.length > 0) {
+            notes = readingNotes.join(' | ');
+        }
+        if (!notes) {
+            notes = visit.general_notes || visit.notes || visit.meternotes || '';
+        }
 
         const formTitle = (processType === 'رفع-تركيب')
             ? 'محضر ( رفع / تركيب ) عداد ثلاثي قدرة 5 أمبير'
             : 'محضر ( مراجعة ) عداد ثلاثي قدرة 5 أمبير';
-
-        // Location field - always shown with compact style (in column 1)
-        const locationFieldHtml = `
-            <div class="info-field compact" style="grid-column: 1;">
-                <span class="info-label">مكان التركيب /</span>
-                <span class="info-value">${location}</span>
-            </div>
-        `;
 
         const installedRowCount = Math.max(3, installedReadings.length);
         const removedRowCount = Math.max(3, removedReadings.length);
@@ -742,9 +762,6 @@
             </table>
         ` : '';
 
-        // Grid layout: First column gets more space for اسم المشترك and النشاط
-        // Second column: التاريخ, معامل القدرة
-        // Third column: مكان التركيب, أقصى حمل
         let infoGridHtml = `
             <!-- Row 1 -->
             <div class="info-field" style="grid-column: 1;">
@@ -774,9 +791,6 @@
                 <span class="info-value">${maxLoad || '-'}</span>
             </div>
         `;
-
-        // Get notes from the visit
-        const notes = visit.notes || visit.general_notes || visit.meternotes || '';
 
         let html = `
             <div class="form-header">
@@ -823,8 +837,8 @@
             <div class="signature-section">
                 <div class="notes-inside">
                     <div class="notes-title">الملاحظات : ${notes}</div>
-                    <div class="dotted-line"></div>
-                    <div class="dotted-line"></div>
+                    <div class="empty-line"></div>
+                    <div class="empty-line"></div>
                 </div>
 
                 <div class="committee-box">
@@ -836,7 +850,7 @@
                             <option>م/ مروة ابراهيم شهاب</option>
                             <option>م/ احمد رمضان</option>
                             <option>م/ كريم كبشة</option>
-                            <option>.................................................</option>
+                            <option>....................................</option>
                             <option value="ADD_NEW" style="color: #27ae60; font-weight: bold;">[ ➕ إضافة عضو جديد... ]</option>
                         </select>
                     </div>
@@ -847,7 +861,7 @@
                             <option>م/ مروة ابراهيم شهاب</option>
                             <option>م/ احمد رمضان</option>
                             <option>م/ كريم كبشة</option>
-                            <option>.................................................</option>
+                            <option>....................................</option>
                             <option value="ADD_NEW" style="color: #27ae60; font-weight: bold;">[ ➕ إضافة عضو جديد... ]</option>
                         </select>
                     </div>
@@ -858,7 +872,7 @@
                             <option>م/ مروة ابراهيم شهاب</option>
                             <option>م/ احمد رمضان</option>
                             <option>م/ كريم كبشة</option>
-                            <option>.................................................</option>
+                            <option>....................................</option>
                             <option value="ADD_NEW" style="color: #27ae60; font-weight: bold;">[ ➕ إضافة عضو جديد... ]</option>
                         </select>
                     </div>
@@ -885,6 +899,8 @@
             if (item) {
                 const meterNum = item.meternumber || item.key || '';
                 const permMeter = customerMeters[meterNum] || customerMeters[item.key] || {};
+                const location = getMeterLocation(customerId, meterNum) || permMeter.location || item.location || '';
+                
                 rowsHtml += `
                     <tr>
                         <td>${i + 1}</td>
@@ -917,6 +933,8 @@
             if (item) {
                 const meterNum = item.meternumber || item.key || '';
                 const permMeter = customerMeters[meterNum] || customerMeters[item.key] || {};
+                const location = getMeterLocation(customerId, meterNum) || permMeter.location || item.location || '';
+                
                 rowsHtml += `
                     <tr>
                         <td>${i + 1}</td>
@@ -927,7 +945,7 @@
                         <td>${permMeter.vt_ratio || item.vt_ratio || ''}</td>
                         <td>${permMeter.ct_ratio || item.ct_ratio || ''}</td>
                         <td>${permMeter.constant || item.constant || ''}</td>
-                        <td>${permMeter.location || item.location || ''}</td>
+                        <td>${location}</td>
                     </tr>
                 `;
             } else {

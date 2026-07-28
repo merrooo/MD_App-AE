@@ -447,9 +447,22 @@
             font-weight: 700;
         }
 
+        .m-location {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: #f0fdf4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border-right: 2px solid var(--success);
+        }
+
         .m-notes {
             font-size: 0.65rem;
             color: var(--text-muted);
+            background: #fefce8;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border-right: 2px solid var(--warning);
         }
 
         .bottom-sheet {
@@ -636,7 +649,6 @@
                 <div class="brand"><i class="fas fa-chart-pie"></i><span>تقرير المرور العام</span></div>
                 <div class="header-actions">
                     <div class="header-controls-wrapper">
-                        <!-- Transferred Period Dropdown beside Date Current -->
                         <div class="month-select-inline">
                             <label for="month_range"><i class="fas fa-clock"></i> الفترة المرجعية</label>
                             <select id="month_range" class="month-select-dropdown">
@@ -656,7 +668,6 @@
                 </div>
             </div>
 
-            <!-- Date Range Search Section -->
             <div class="search-row" style="background: var(--surface-card); padding: 10px; border-radius: var(--radius-sm); border: 1px solid #e2e8f0;">
                 <div class="form-group-m">
                     <label class="form-label-m" for="date_from"><i class="fas fa-calendar-alt"></i> تاريخ من</label>
@@ -669,7 +680,6 @@
                 <button class="btn-search-m btn-range-m" id="btnSearchRange"><i class="fas fa-filter"></i> بحث بالفترة المخصصة</button>
             </div>
 
-            <!-- Standard Dropdown Filters -->
             <div class="search-row">
                 <div class="form-group-m">
                     <label class="form-label-m" for="filter_keta3"><i class="fas fa-layer-group"></i> القطاع</label>
@@ -727,7 +737,6 @@
         </div>
     </div>
 
-    <!-- Smart Action Bar -->
     <nav class="bottom-nav">
         <div class="nav-item" id="navBtnSearch"><i class="fas fa-check-circle"></i><span> تقرير تم المرور</span></div>
         <div class="nav-item" id="navBtnDelayed"><i class="fas fa-hourglass-end"></i><span>تقرير المتاخرين بالمرور</span></div>
@@ -746,6 +755,7 @@
                 <th>معامل القدرة</th>
                 <th>القراءة كيلوات ساعة</th>
                 <th>القراءة كيلو فار ساعة</th>
+                <th>مكان التركيب</th>
                 <th>الملاحظات</th>
             </tr>
         </thead>
@@ -771,6 +781,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let rawCustomersData = {};
+let allMetersData = {};
 let currentMode = null; 
 
 function setTodayReferenceDate() {
@@ -828,7 +839,16 @@ function compareDDMMYYYY(date1Str, date2Str) {
     return d1.getTime() < d2.getTime() ? -1 : 1;
 }
 
-function extractReadingsFromDateNode(dateNode) {
+// Function to get location for a specific meter number from allMetersData
+function getMeterLocation(customerId, meterNumber) {
+    // First try to find in allMetersData
+    if (allMetersData[customerId] && allMetersData[customerId][meterNumber]) {
+        return allMetersData[customerId][meterNumber].location || '';
+    }
+    return '';
+}
+
+function extractReadingsFromDateNode(dateNode, customerId) {
     let readings = [];
     if (!dateNode || !dateNode.readings) return readings;
 
@@ -836,15 +856,44 @@ function extractReadingsFromDateNode(dateNode) {
     if (typeof rdData === 'object') {
         Object.keys(rdData).forEach(meterKey => {
             const item = rdData[meterKey];
+            const meterNumber = item.meternumber || meterKey || '-';
+            
+            // Get location from meters data using the meter number
+            let location = getMeterLocation(customerId, meterNumber);
+            
+            // Fallback: check if location exists in the item itself
+            if (!location && item.location) {
+                location = item.location;
+            }
+            
             readings.push({
-                meternumber: item.meternumber || meterKey || '-',
+                meternumber: meterNumber,
                 kwh: item.kwh ?? 0,
                 kvarh: item.kvarh ?? 0,
-                note: item.note || ''
+                note: item.note || '',
+                location: location
             });
         });
     }
     return readings;
+}
+
+async function loadMetersData() {
+    try {
+        // Fetch all meters data from MD/customers/{customerId}/meters
+        const metersSnap = await get(ref(db, 'MD/customers'));
+        if (metersSnap.exists()) {
+            const customersData = metersSnap.val();
+            for (let customerId in customersData) {
+                if (customersData[customerId] && customersData[customerId].meters) {
+                    allMetersData[customerId] = customersData[customerId].meters;
+                }
+            }
+            console.log('📦 All meters data loaded:', Object.keys(allMetersData).length, 'customers');
+        }
+    } catch (err) {
+        console.warn('⚠️ Could not load meters data:', err);
+    }
 }
 
 function runReport(mode) {
@@ -861,13 +910,11 @@ function runReport(mode) {
     if (btnPassed) btnPassed.classList.toggle('active', mode === 'passed');
     if (btnDelayed) btnDelayed.classList.toggle('active', mode === 'delayed');
 
-    // Reference month calculation
     const selectedMonths = parseInt(document.getElementById('month_range')?.value || '3', 10);
 
     const todayObj = new Date();
     const todayDDMMYYYY = formatDateToDDMMYYYY(todayObj);
     
-    // Boundary date calculation
     const pastLimitObj = new Date(todayObj);
     pastLimitObj.setMonth(pastLimitObj.getMonth() - selectedMonths);
     const pastLimitDDMMYYYY = formatDateToDDMMYYYY(pastLimitObj);
@@ -902,7 +949,6 @@ function runReport(mode) {
             }
         });
 
-        // Determine if customer's latest visit falls in selected period
         let isWithinSelectedMonths = false;
         if (newestVisitDDMMYYYY) {
             const isAfterOrOnLimit = compareDDMMYYYY(newestVisitDDMMYYYY, pastLimitDDMMYYYY) >= 0;
@@ -910,13 +956,10 @@ function runReport(mode) {
             isWithinSelectedMonths = isAfterOrOnLimit && isBeforeOrOnToday;
         }
 
-        // --- Filter Logic ---
         if (mode === 'passed') {
-            // ONLY customers visited within the selected reference period
             if (!isWithinSelectedMonths) return;
         } 
         else if (mode === 'delayed') {
-            // ALL customers EXCEPT those visited within the selected reference period
             if (isWithinSelectedMonths) return;
         } 
         else if (mode === 'range') {
@@ -928,7 +971,6 @@ function runReport(mode) {
             if (!isAfterFrom || !isBeforeTo) return;
         }
 
-        // Base metadata extraction
         const metername = (newestVisitNode && newestVisitNode.metername) || customerNode.metername || customerNode.name || customerKey;
         const keta3 = (newestVisitNode && newestVisitNode.keta3) || customerNode.keta3 || '-';
         const handsa = (newestVisitNode && newestVisitNode.handsa) || customerNode.handsa || '-';
@@ -938,11 +980,13 @@ function runReport(mode) {
         if (fK && keta3 !== fK) return;
         if (fH && handsa !== fH) return;
 
-        const readings = newestVisitNode ? extractReadingsFromDateNode(newestVisitNode) : [];
+        // Pass customerKey to extractReadingsFromDateNode to get location from meters data
+        const readings = newestVisitNode ? extractReadingsFromDateNode(newestVisitNode, customerKey) : [];
 
         if (fG) {
             const meterNumbers = readings.map(r => r.meternumber || '').join(' ');
-            const searchText = `${customerKey} ${metername} ${keta3} ${handsa} ${meterNumbers} ${newestVisitDDMMYYYY || ''}`.toLowerCase();
+            const locations = readings.map(r => r.location || '').join(' ');
+            const searchText = `${customerKey} ${metername} ${keta3} ${handsa} ${meterNumbers} ${locations} ${newestVisitDDMMYYYY || ''}`.toLowerCase();
             if (!searchText.includes(fG)) return;
         }
 
@@ -1009,6 +1053,9 @@ function renderResults(results, mode) {
             metersHtml = `<div class="m-meter-card"><div class="m-notes">⚠️ لا توجد قراءات تفصيلية مسجلة</div></div>`;
         } else {
             record.readings.forEach(r => {
+                const locationHtml = r.location ? `<div class="m-location">📍 <b>مكان التركيب:</b> ${r.location}</div>` : '';
+                const noteHtml = r.note ? `<div class="m-notes">📝 ${r.note}</div>` : '';
+                
                 metersHtml += `<div class="m-meter-card">
                     <div class="m-meter-header">
                         <span>عداد: <span class="meter-tag">${r.meternumber || '-'}</span></span>
@@ -1018,7 +1065,8 @@ function renderResults(results, mode) {
                         <div>ك.و.س: <span class="kwh-val">${r.kwh ?? 0}</span></div>
                         <div>ك.ف.س: <span class="kvarh-val">${r.kvarh ?? 0}</span></div>
                     </div>
-                    ${r.note ? `<div class="m-notes">📝 ${r.note}</div>` : ''}
+                    ${locationHtml}
+                    ${noteHtml}
                 </div>`;
 
                 masterRows += `<tr>
@@ -1031,6 +1079,7 @@ function renderResults(results, mode) {
                     <td>${record.power_factor}</td>
                     <td>${r.kwh ?? 0}</td>
                     <td>${r.kvarh ?? 0}</td>
+                    <td>${r.location || ''}</td>
                     <td>${r.note || ''}</td>
                 </tr>`;
             });
@@ -1045,6 +1094,7 @@ function renderResults(results, mode) {
                 <td>${record.handsa}</td>
                 <td>${record.max_load}</td>
                 <td>${record.power_factor}</td>
+                <td>-</td>
                 <td>-</td>
                 <td>-</td>
                 <td>لا توجد تفاصيل قراءات</td>
@@ -1123,7 +1173,7 @@ export function exportData() {
     
     const rows = tbody.querySelectorAll('tr');
     const data = [];
-    const headers = ['تاريخ المرور', 'اسم المشترك', 'رقم العداد', 'القطاع', 'الهندسة', 'أقصى حمل', 'معامل القدرة', 'ك.و.س', 'ك.ف.س', 'الملاحظات'];
+    const headers = ['تاريخ المرور', 'اسم المشترك', 'رقم العداد', 'القطاع', 'الهندسة', 'أقصى حمل', 'معامل القدرة', 'ك.و.س', 'ك.ف.س', 'مكان التركيب', 'الملاحظات'];
     data.push(headers);
     
     rows.forEach(row => {
@@ -1146,6 +1196,9 @@ window.exportData = exportData;
 async function init() {
     setTodayReferenceDate();
     try {
+        // First load meters data to get locations
+        await loadMetersData();
+        
         const passSnap = await get(ref(db, 'MD_Pass/customers'));
         if (passSnap.exists()) {
             rawCustomersData = passSnap.val();
@@ -1183,12 +1236,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (currentMode) runReport(currentMode);
     });
 
-    // Automatically recalculate current mode when month selection changes
     document.getElementById('month_range')?.addEventListener('change', () => {
         if (currentMode) runReport(currentMode);
     });
 
-    // Action bar buttons
     document.getElementById('navBtnSearch')?.addEventListener('click', () => runReport('passed'));
     document.getElementById('navBtnDelayed')?.addEventListener('click', () => runReport('delayed'));
     document.getElementById('navBtnExport')?.addEventListener('click', exportData);
