@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>محضر قياس أقصى حمل ومتوسط معامل القدرة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #eef2f6;
+            color: #000;
+            direction: rtl;
+            padding: 10px 0;
+        }
+
+        .actions-toolbar {
+            max-width: 210mm;
+            margin: 0 auto 10px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .actions-toolbar .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: #1e40af;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .controls-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .control-group select {
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-family: 'Cairo', sans-serif;
+            font-size: 12px;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            max-height: 297mm;
+            margin: 0 auto;
+            background: #fff;
+            padding: 8mm 12mm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .doc-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 10.5px;
+            font-weight: bold;
+            line-height: 1.3;
+            margin-bottom: 5px;
+        }
+
+        .doc-header .right-side {
+            text-align: right;
+        }
+
+        .doc-title {
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            margin: 5px 0 10px 0;
+            position: relative;
+        }
+
+        .meta-section {
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .dotted-line {
+            border-bottom: 1px dotted #000;
+            display: inline-block;
+            min-width: 120px;
+            padding: 0 5px;
+        }
+
+        .layout-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+        }
+
+        .layout-table th,
+        .layout-table td {
+            border: 1px solid #000;
+            padding: 3px 2px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .layout-table th {
+            background-color: #f9f9f9;
+            padding: 4px 2px;
+        }
+
+        .notes-section {
+            margin-top: 6px;
+            font-size: 11.5px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .notes-lines {
+            margin-top: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .note-line {
+            border-bottom: 1px dotted #000;
+            min-height: 16px;
+            width: 100%;
+            line-height: 3;
+            font-size: 11px;
+        }
+
+        /* Signatures Section */
+        .signature-section {
+            margin: 4px 0 8px 0;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 15px;
+        }
+
+        .committee-box {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .select-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .member-number {
+            font-weight: bold;
+            font-size: 11px;
+            min-width: 16px;
+            color: #1e40af;
+        }
+
+        .inline-select {
+            width: 100%;
+            height: 26px;
+            padding: 1px 4px;
+            border: 1px solid #ccc;
+            font-size: 11px;
+            background: #ffffff;
+            border-radius: 4px;
+            outline: none;
+            font-family: 'Cairo', sans-serif;
+            text-align: right;
+        }
+
+        .sig-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .customer-sig-row {
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 4px;
+            text-align: right;
+            letter-spacing: 2px;
+        }
+
+        .bottom-signatures {
+            margin-top: auto;
+            padding-top: 10px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 15px;
+            padding-right: 10px;
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+            }
+
+            .actions-toolbar {
+                display: none !important;
+            }
+
+            .page {
+                box-shadow: none !important;
+                width: 100% !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
+                padding: 8mm 12mm !important;
+            }
+
+            .inline-select {
+                border: none !important;
+                background: transparent !important;
+                appearance: none;
+                -webkit-appearance: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="actions-toolbar">
+        <button class="btn btn-secondary" onclick="goBack()"><i class="fas fa-arrow-right"></i> رجوع</button>
+        <div class="controls-wrap">
+            <div class="control-group">
+                <label for="dateSelect"><i class="fas fa-calendar-alt"></i> التاريخ:</label>
+                <select id="dateSelect" onchange="onDateChange(this.value)"></select>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> طباعة / PDF</button>
+    </div>
+
+    <div class="page" id="formContainer">
+        <div style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-spin"></i> جاري تحميل البيانات...
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnKRhT5xJTBvsQKpW7e9w-hGSbAQJWTSo",
+            authDomain: "production1-ae85.firebaseapp.com",
+            projectId: "production1-ae85",
+            storageBucket: "production1-ae85.firebasestorage.app",
+            messagingSenderId: "490438031865",
+            appId: "1:490438031865:web:a4a69335989f30cd13a528"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const customerId = urlParams.get('customerId');
+
+        let allVisits = {};
+        let customerMeters = {};
+        let selectedDate = '';
+
+        if (customerId) {
+            fetchData();
+        }
+
+        function getArabicDayName(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return '';
+            const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+            const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            return days[dateObj.getDay()] || '';
+        }
+
+        async function fetchData() {
+            try {
+                const customerSnap = await get(ref(db, `MD/customers/${customerId}`));
+                let custData = customerSnap.exists() ? customerSnap.val() : {};
+
+                const metersSnap = await get(ref(db, `MD/customers/${customerId}/meters`));
+                if (metersSnap.exists()) {
+                    customerMeters = metersSnap.val();
+                }
+
+                const passSnap = await get(ref(db, `MD_Pass/customers/${customerId}`));
+                if (passSnap.exists()) {
+                    const data = passSnap.val();
+                    for (let k in data) {
+                        if (typeof data[k] === 'object') {
+                            allVisits[k] = { ...data[k] };
+                        }
+                    }
+                }
+
+                if (Object.keys(allVisits).length === 0) {
+                    const today = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+                    allVisits[today] = {
+                        metername: custData.metername || customerId,
+                        readings: custData.meters || {}
+                    };
+                }
+
+                const dates = Object.keys(allVisits);
+                selectedDate = dates[0];
+
+                const dateSelect = document.getElementById('dateSelect');
+                dateSelect.innerHTML = dates.map(d => `<option value="${d}">${d}</option>`).join('');
+
+                renderForm();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        window.onDateChange = function (d) {
+            selectedDate = d;
+            renderForm();
+        };
+
+        function renderForm() {
+            const visit = allVisits[selectedDate] || {};
+            const readings = visit.readings || {};
+            const readingKeys = Object.keys(readings);
+
+            let rowsHtml = '';
+            let meterTypes = [];
+            let locations = [];
+
+            if (readingKeys.length > 0) {
+                readingKeys.forEach((key) => {
+                    const item = readings[key] || {};
+                    const permMeter = customerMeters[key] || customerMeters[item.meternumber] || {};
+
+                    const mType = permMeter.metertype || item.metertype || '';
+                    const mLoc = permMeter.location || item.location || visit.location || '';
+
+                    if (mType && !meterTypes.includes(mType)) meterTypes.push(mType);
+                    if (mLoc && !locations.includes(mLoc)) locations.push(mLoc);
+
+                    rowsHtml += `
+                    <tr>
+                        <td>${item.meternumber || key}</td>
+                        <td>${item.kwh || ''}</td>
+                        <td>${item.kvarh || ''}</td>
+                        <td>${permMeter.vt_ratio || item.vt_ratio || ''}</td>
+                        <td>${permMeter.ct_ratio || item.ct_ratio || ''}</td>
+                        <td>${permMeter.constant || item.constant || ''}</td>
+                    </tr>
+                `;
+                });
+            } else {
+                rowsHtml = `
+                <tr>
+                    <td style="height:24px;"></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+            `;
+            }
+
+            const arabicDay = getArabicDayName(selectedDate);
+            const meterTypeStr = meterTypes.join(' - ') || '';
+            const locationStr = locations.join(' - ') || visit.location || '';
+            const dynamicNoteText = `تم حساب اقصى حمل من خلال العداد/العدادات المركبة &nbsp;&nbsp;&nbsp;&nbsp; ${locationStr} &nbsp;&nbsp;&nbsp;&nbsp; طراز &nbsp;&nbsp;&nbsp;&nbsp; ${meterTypeStr}`;
+
+            const html = `
+            <div class="doc-content">
+                <div class="doc-header">
+                    <div class="right-side">
+                        شمال الدلتا لتوزيع الكهرباء<br>
+                        قطاع الشئون الفنية<br>
+                        إدارة العدادات وأجهزة القياس
+                    </div>
+                </div>
+
+                <div class="doc-title">
+                    محضر قياس أقصى حمل ومتوسط معامل القدرة
+                </div>
+
+                <div class="meta-section">
+                    <div>اسم العملية / <span style="font-weight: 700;">${visit.metername || customerId}</span></div>
+                    <div>أنه في يوم &nbsp; <span style="min-width: 80px; text-align: center; font-weight: 700;">${arabicDay}</span>&nbsp; الموافق &nbsp; <span style="min-width: 110px; text-align: center; font-weight: 700;">${selectedDate}</span>&nbsp; وبحضور كلا من :</div>
+                </div>
+
+                <!-- 1. قسم اللجنة والمشترك الرئيسي -->
+                <div class="signature-section">
+                    <div class="committee-box">
+                        <p style="font-weight: bold; font-size: 11.5px; margin-bottom: 2px; color: #1e40af;">اللجنة :-</p>
+                        <div class="select-row">
+                            <span class="member-number">1-</span>
+                            <select id="inputlagna1" class="inline-select" onchange="checkDropdownSelection('inputlagna1')">
+                                <option value="">اختر العضو الأول</option>
+                                <option>م/ مروة ابراهيم شهاب</option>
+                                <option>م/ احمد رمضان</option>
+                                <option>م/ كريم كبشة</option>
+                                <option value="ADD_NEW" style="color: #27ae60; font-weight: bold;">[ ➕ إضافة عضو جديد... ]</option>
+                            </select>
+                        </div>
+                        <div class="select-row">
+                            <span class="member-number">2-</span>
+                            <select id="inputlagna2" class="inline-select" onchange="checkDropdownSelection('inputlagna2')">
+                                <option value="">اختر العضو الثاني</option>
+                                <option>م/ مروة ابراهيم شهاب</option>
+                                <option>م/ احمد رمضان</option>
+                                <option>م/ كريم كبشة</option>
+                                <option value="ADD_NEW" style="color: #27ae60; font-weight: bold;">[ ➕ إضافة عضو جديد... ]</option>
+                            </select>
+                        </div>
+                        <div class="select-row">
+                            <span class="member-number">3-</span>
+                            <select id="inputlagna3" class="inline-select" onchange="checkDropdownSelection('inputlagna3')">
+                                <option value="">اختر العضو الثالث</option>
+                                <option>م/ مروة ابراهيم شهاب</option>
+                                <option>م/ احمد رمضان</option>
+                                <option>م/ كريم كبشة</option>
+                                <option value="ADD_NEW" style="color: #27ae60; font-weight: bold;">[ ➕ إضافة عضو جديد... ]</option>
+                            </select>
+                        </div>
+                    
+                    <div class="sig-box">
+                        <p style="font-weight: bold; font-size: 12px; color: #1e40af;">عن المشترك :-</p>
+                        <div class="customer-sig-row">1- .....................</div>
+                        <div class="customer-sig-row">2- .....................</div>
+                    </div>
+                </div>
+                </div>
+                <!-- 2. جدول القياسات -->
+                <div style="font-weight: bold; font-size: 12px; margin-bottom: 3px;">تم قياس الآتى :-</div>
+                <table class="layout-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">أقصى حمل (ك . وات)</th>
+                            <th style="width: 25%;">تاريخ حدوثه</th>
+                            <th style="width: 25%;">ساعة حدوثه</th>
+                            <th style="width: 25%;">متوسط معامل القدرة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="height: 24px;">${visit.max_load || ''}</td>
+                            <td>${visit.max_load_date || ''}</td>
+                            <td>${visit.max_load_time || ''}</td>
+                            <td>${visit.power_factor || ''}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 3. جدول العدادات -->
+                <div style="font-weight: bold; font-size: 12px; margin-bottom: 3px;">بيانات العدادات :-</div>
+                <table class="layout-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">رقم العداد</th>
+                            <th>ك . و . س</th>
+                            <th>ك . فار . س</th>
+                            <th>محولات الجهد</th>
+                            <th>محولات التيار</th>
+                            <th>ثابت</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+
+                <!-- 4. الملاحظات -->
+                <div class="notes-section">
+                    <div>ملاحظات :-</div>
+                    <div class="notes-lines">
+                        <div class="note-line">${dynamicNoteText}</div>
+                        <div class="note-line">${visit.general_notes || ''}</div>
+                    </div>
+                </div>
+
+                <!-- 5. قسم التوقيع السفلي (هذا محضر منا بذلك - وعن المشترك) -->
+                <div class="bottom-signatures">
+                    <div class="sig-box">
+                        <p style="font-weight: bold; font-size: 12px; color: #1e40af;">هذا محضر منا بذلك- :</p>
+                        <p style="font-weight: bold; font-size: 12px; color: #1e40af; margin-top: 2px;">عن شركة شمال الدلتا :</p>
+                        <div class="customer-sig-row">1- .....................</div>
+                        <div class="customer-sig-row">2- .....................</div>
+                        <div class="customer-sig-row">3- .....................</div>
+                    </div>
+                    <div class="sig-box">
+                        <p style="font-weight: bold; font-size: 12px; color: #1e40af;">عن المشترك :-</p>
+                        <div class="customer-sig-row">1- .....................</div>
+                        <div class="customer-sig-row">2- .....................</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+            document.getElementById('formContainer').innerHTML = html;
+        }
+
+        window.checkDropdownSelection = function (selectId) {
+            const selectElement = document.getElementById(selectId);
+            if (selectElement.value === "ADD_NEW") {
+                Swal.fire({
+                    title: 'إضافة عضو لجنة جديد',
+                    input: 'text',
+                    inputPlaceholder: 'أدخل اسم عضو اللجنة هنا...',
+                    showCancelButton: true,
+                    confirmButtonText: 'حفظ',
+                    cancelButtonText: 'إلغاء',
+                    confirmButtonColor: '#1e40af',
+                    cancelButtonColor: '#d33',
+                    inputValidator: (value) => {
+                        if (!value || value.trim() === "") return 'لا يمكن ترك الحقل فارغاً!';
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const cleanValue = result.value.trim();
+                        const committeeDropdowns = ['inputlagna1', 'inputlagna2', 'inputlagna3'];
+                        committeeDropdowns.forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) {
+                                const newOption = document.createElement("option");
+                                newOption.text = cleanValue;
+                                newOption.value = cleanValue;
+                                el.add(newOption, el.options[el.options.length - 1]);
+                            }
+                        });
+                        selectElement.value = cleanValue;
+                    } else {
+                        selectElement.value = "";
+                    }
+                });
+            }
+        };
+
+        window.goBack = function () {
+            window.location.href = 'MD_PF.html';
+        };
+    </script>
+
+</body>
+
+</html>
