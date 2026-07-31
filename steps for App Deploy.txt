@@ -109,3 +109,5 @@ power-factor-app/
 ├── android/               ✅ Created (npx cap add android)
 └── .gitignore             👉 Optional but recommended
 ------------------
+the location for App icon
+C:\Users\Pc\Desktop\MD_App-AE\android\app\src\main\res\mipmap-hdpi
