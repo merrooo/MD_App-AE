@@ -109,5 +109,19 @@ power-factor-app/
 ├── android/               ✅ Created (npx cap add android)
 └── .gitignore             👉 Optional but recommended
 ------------------
-the location for App icon
-C:\Users\Pc\Desktop\MD_App-AE\android\app\src\main\res\mipmap-hdpi
+for change the App icon
+Open this folder:
+C:\Users\Pc\Desktop\MD_App-AE\android\app\src\main\res
+Inside it, go to the mipmap folders:
+mipmap-hdpi
+mipmap-mdpi
+mipmap-xhdpi
+mipmap-xxhdpi
+mipmap-xxxhdpi
+Replace the existing icon files with your new PNG:
+ic_launcher.png
+ic_launcher_round.png
+ic_launcher_foreground.png
+Important:
+
+** Keep the same file names for you new image
