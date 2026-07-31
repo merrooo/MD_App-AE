@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <title>لوحة التقارير الذكية · نظام الإدارة</title>
+    <title>تقرير المرور العام لكبار المشتركين</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,6 +23,7 @@
             --accent-glow: rgba(37, 99, 235, 0.15);
             --success: #16a34a;
             --danger: #dc2626;
+            --warning: #d97706;
             --text: #0f172a;
             --text-muted: #64748b;
             --radius: 16px;
@@ -267,6 +268,160 @@
             cursor: pointer;
         }
 
+        /* --- Report Section (Unpassed Customers Dashboard) --- */
+        .report-section {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .report-section.visible {
+            display: block;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .report-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .report-title i {
+            color: var(--danger);
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-excel {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #217346;
+            color: white;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+
+        .btn-excel:hover {
+            background: #1a5c38;
+            transform: scale(1.02);
+        }
+
+        .btn-excel:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .badge-count {
+            background: var(--danger);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-right: 8px;
+        }
+
+        .report-summary {
+            background: var(--surface-card);
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .report-summary .total-all { color: var(--text); }
+        .report-summary .passed-all { color: var(--success); }
+        .report-summary .not-passed-all { color: var(--danger); }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .report-item {
+            background: #f8fafc;
+            padding: 14px 18px;
+            border-radius: 8px;
+            border-right: 4px solid var(--danger);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .report-item:hover {
+            background: #f1f5f9;
+            transform: translateX(-3px);
+        }
+
+        .report-item .sector-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .report-item .report-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .report-item .not-passed-count {
+            font-weight: 800;
+            color: var(--danger);
+            font-size: 0.95rem;
+        }
+
+        .report-item .total-count {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .report-item .passed-count {
+            font-weight: 600;
+            color: var(--success);
+            font-size: 0.8rem;
+        }
+
+        /* --- Stats Bar --- */
         .stats-bar {
             background: var(--surface);
             border-radius: var(--radius);
@@ -301,32 +456,92 @@
 
         .stat-chips-wrapper {
             display: flex;
-            gap: 6px;
+            gap: 10px;
             overflow-x: auto;
-            padding-bottom: 4px;
-            flex-wrap: wrap;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+            align-items: flex-start;
         }
 
         .stat-chip-m {
             background: var(--surface-card);
-            border: 1px solid #e2e8f0;
-            padding: 3px 10px;
-            border-radius: 16px;
-            font-size: 0.65rem;
-            white-space: nowrap;
+            border: 1px solid #cbd5e1;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-weight: 700;
+            min-width: 240px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: right;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .stat-chip-m:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .stat-chip-m.selected-chip {
+            background: #e0f2fe;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .stat-chip-m .title {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-chip-m .val-row {
             display: flex;
             align-items: center;
-            gap: 4px;
-            font-weight: 600;
+            justify-content: space-between;
+            gap: 8px;
         }
 
         .stat-chip-m .val {
-            background: var(--primary);
-            color: #fff;
+            color: var(--text);
             font-weight: 800;
-            padding: 0 6px;
-            border-radius: 8px;
-            font-size: 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        .unpassed-table-container {
+            margin-top: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #ffffff;
+        }
+
+        .unpassed-mini-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+        }
+
+        .unpassed-mini-table th {
+            background: #e2e8f0;
+            color: var(--text);
+            padding: 4px 8px;
+            text-align: right;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .unpassed-mini-table td {
+            padding: 4px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text);
+            white-space: nowrap;
         }
 
         .results-wrapper {
@@ -511,19 +726,6 @@
             gap: 6px;
         }
 
-        .sheet-item {
-            padding: 10px 12px;
-            background: var(--surface-card);
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.8rem;
-            color: var(--text);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -612,29 +814,62 @@
             flex-wrap: wrap;
         }
 
+        .sheet-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            text-decoration: none;
+            color: var(--text);
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .sheet-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .item-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-right: auto;
+            white-space: nowrap;
+        }
+
         @media (max-width:768px) {
             .search-row {
                 flex-direction: column;
             }
+
             .search-row .form-group-m {
                 flex: 1 1 100%;
                 min-width: unset;
             }
+
             .search-row .btn-search-m {
                 width: 100%;
             }
+
             .results-wrapper {
                 grid-template-columns: 1fr;
             }
+
             .m-info-grid {
                 grid-template-columns: 1fr;
             }
+
             .header-controls-wrapper {
                 flex-direction: column;
                 align-items: stretch;
                 width: 100%;
             }
-            .date-current-wrapper, .month-select-inline {
+
+            .date-current-wrapper,
+            .month-select-inline {
                 justify-content: space-between;
             }
         }
@@ -646,11 +881,11 @@
 
         <header class="app-header">
             <div class="header-top">
-                <div class="brand"><i class="fas fa-chart-pie"></i><span>تقرير المرور العام</span></div>
+                <div class="brand"><i class="fas fa-chart-pie"></i><span>تقرير المرور العام لكبار المشتركين</span></div>
                 <div class="header-actions">
                     <div class="header-controls-wrapper">
                         <div class="month-select-inline">
-                            <label for="month_range"><i class="fas fa-clock"></i> الفترة المرجعية</label>
+                            <label for="month_range"><i class="fas fa-clock"></i> فترة المرور</label>
                             <select id="month_range" class="month-select-dropdown">
                                 <option value="3" selected>3 أشهر</option>
                                 <option value="6">6 أشهر</option>
@@ -668,7 +903,8 @@
                 </div>
             </div>
 
-            <div class="search-row" style="background: var(--surface-card); padding: 10px; border-radius: var(--radius-sm); border: 1px solid #e2e8f0;">
+            <div class="search-row"
+                style="background: var(--surface-card); padding: 10px; border-radius: var(--radius-sm); border: 1px solid #e2e8f0;">
                 <div class="form-group-m">
                     <label class="form-label-m" for="date_from"><i class="fas fa-calendar-alt"></i> تاريخ من</label>
                     <input type="date" id="date_from" class="form-input-m">
@@ -703,20 +939,48 @@
             </div>
         </header>
 
+        <!-- Dynamic Unpassed Dashboard Section from MD_PF -->
+        <div class="report-section" id="reportSection">
+            <div class="report-header">
+                <div class="report-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>تقرير المشتركين الذين لم يتم المرور عليهم</span>
+                    <span class="badge-count" id="totalNotPassed">0</span>
+                </div>
+                <div class="report-actions">
+                    <button class="btn-excel" id="exportNotPassedBtn" disabled>
+                        <i class="fas fa-file-excel"></i> تحميل إكسل للمتأخرين
+                    </button>
+                </div>
+            </div>
+
+            <div class="report-summary" id="reportSummary">
+                <span class="total-all">إجمالي المشتركين: <span id="summaryTotal">0</span></span>
+                <span class="passed-all">تم المرور: <span id="summaryPassed">0</span></span>
+                <span class="not-passed-all">لم يتم المرور: <span id="summaryNotPassed">0</span></span>
+            </div>
+
+            <div class="report-grid" id="notPassedReport">
+                <div style="text-align:center;color:#94a3b8;grid-column:1/-1;padding:20px;">
+                    <i class="fas fa-info-circle"></i> جارِ تحميل ملخص بيانات المرور...
+                </div>
+            </div>
+        </div>
+
         <div class="stats-bar" id="statsHeaderBar">
             <div class="stats-top">
                 <div class="total-badge-m">الإجمالي: <span id="headerTotalCount">0</span> مشتركين</div>
                 <div class="mode-display" id="modeDisplay">👆 في انتظار اختيار نوع التقرير</div>
             </div>
             <div class="stat-chips-wrapper" id="headerChipGroup">
-                <span style="font-size:0.65rem;color:var(--text-muted);">حدد الفترة المرجعية أعلاه ثم اضغط " تقرير تم المرور" أو "تقرير المتاخرين بالمرور"</span>
+                <span style="font-size:0.65rem;color:var(--text-muted);">حدد فترة المرور أعلاه ثم اضغط "تقرير ما تم المرور عليه" أو "تقرير المتأخرين بالمرور"</span>
             </div>
         </div>
 
         <main class="results-wrapper" id="results-container">
             <div class="empty-state-m">
                 <i class="fas fa-hand-pointer"></i>
-                <p>اختر الفترة المرجعية من الأعلى ثم اضغط " تقرير تم المرور" أو "تقرير المتاخرين بالمرور"</p>
+                <p>اختر فترة المرور من الأعلى ثم اضغط "تقرير ما تم المرور عليه" أو "تقرير المتأخرين بالمرور"</p>
             </div>
         </main>
     </div>
@@ -731,14 +995,17 @@
             <a href="MD.html" class="sheet-item">📊 بيانات كبار المشتركين</a>
             <a href="MD_Add.html" class="sheet-item">➕ إضافة مشترك جديد</a>
             <a href="MD_Site.html" class="sheet-item">🔍 تسجيل مرور ميداني</a>
-            <a href="MD_Pass.html" class="sheet-item" style="border:1px solid var(--accent);background:#eff6ff;">📅 تقرير المرور العام</a>
+            <a href="MD_Pass.html" class="sheet-item active" style="border:1px solid var(--accent);background:#eff6ff;">📅
+                تقرير المرور العام
+                <span class="item-badge">الحالية</span>
+            </a>
             <a href="index.html" class="sheet-item">🏠 الصفحة الرئيسية</a>
             <a href="MD_PF.html" class="sheet-item">⚡ تقرير معامل القدرة</a>
         </div>
     </div>
 
     <nav class="bottom-nav">
-        <div class="nav-item" id="navBtnSearch"><i class="fas fa-check-circle"></i><span> تقرير تم المرور</span></div>
+        <div class="nav-item" id="navBtnSearch"><i class="fas fa-check-circle"></i><span> تقرير ماتم المرور عليه</span></div>
         <div class="nav-item" id="navBtnDelayed"><i class="fas fa-hourglass-end"></i><span>تقرير المتاخرين بالمرور</span></div>
         <div class="nav-item" id="navBtnExport"><i class="fas fa-file-excel"></i><span>تصدير</span></div>
     </nav>
@@ -763,300 +1030,484 @@
     </table>
 
     <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAnKRhT5xJTBvsQKpW7e9w-hGSbAQJWTSo",
-    authDomain: "production1-ae85.firebaseapp.com",
-    databaseURL: "https://production1-ae85-default-rtdb.firebaseio.com",
-    projectId: "production1-ae85",
-    storageBucket: "production1-ae85.firebasestorage.app",
-    messagingSenderId: "490438031865",
-    appId: "1:490438031865:web:a4a69335989f30cd13a528",
-    measurementId: "G-W3TZ1EKWWN"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnKRhT5xJTBvsQKpW7e9w-hGSbAQJWTSo",
+            authDomain: "production1-ae85.firebaseapp.com",
+            databaseURL: "https://production1-ae85-default-rtdb.firebaseio.com",
+            projectId: "production1-ae85",
+            storageBucket: "production1-ae85.firebasestorage.app",
+            messagingSenderId: "490438031865",
+            appId: "1:490438031865:web:a4a69335989f30cd13a528",
+            measurementId: "G-W3TZ1EKWWN"
+        };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-let rawCustomersData = {};
-let allMetersData = {};
-let currentMode = null; 
+        let rawCustomersData = {};
+        let allCustomersData = {};
+        let allMetersData = {};
+        let currentMode = null;
+        let notPassedCustomers = [];
 
-function setTodayReferenceDate() {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const dateInput = document.getElementById('date_current');
-    if (dateInput) {
-        dateInput.value = `${yyyy}-${mm}-${dd}`;
-    }
-}
-
-function toDDMMYYYY(dateStr) {
-    if (!dateStr) return null;
-    let cleanStr = String(dateStr).trim().replace(/\//g, '-');
-    
-    if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(cleanStr)) {
-        const parts = cleanStr.split('-');
-        return `${parts[2].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[0]}`;
-    }
-    
-    if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(cleanStr)) {
-        const parts = cleanStr.split('-');
-        return `${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[2]}`;
-    }
-    
-    return cleanStr;
-}
-
-function parseDDMMYYYYToDate(ddmmyyyyStr) {
-    const formatted = toDDMMYYYY(ddmmyyyyStr);
-    if (!formatted) return null;
-    const parts = formatted.split('-');
-    if (parts.length !== 3) return null;
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
-    const year = parseInt(parts[2], 10);
-    return new Date(year, month, day);
-}
-
-function formatDateToDDMMYYYY(dateObj) {
-    if (!dateObj || isNaN(dateObj.getTime())) return null;
-    const d = String(dateObj.getDate()).padStart(2, '0');
-    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const y = dateObj.getFullYear();
-    return `${d}-${m}-${y}`;
-}
-
-function compareDDMMYYYY(date1Str, date2Str) {
-    const d1 = parseDDMMYYYYToDate(date1Str);
-    const d2 = parseDDMMYYYYToDate(date2Str);
-    if (!d1 || !d2) return 0;
-    if (d1.getTime() === d2.getTime()) return 0;
-    return d1.getTime() < d2.getTime() ? -1 : 1;
-}
-
-// Function to get location for a specific meter number from allMetersData
-function getMeterLocation(customerId, meterNumber) {
-    // First try to find in allMetersData
-    if (allMetersData[customerId] && allMetersData[customerId][meterNumber]) {
-        return allMetersData[customerId][meterNumber].location || '';
-    }
-    return '';
-}
-
-function extractReadingsFromDateNode(dateNode, customerId) {
-    let readings = [];
-    if (!dateNode || !dateNode.readings) return readings;
-
-    const rdData = dateNode.readings;
-    if (typeof rdData === 'object') {
-        Object.keys(rdData).forEach(meterKey => {
-            const item = rdData[meterKey];
-            const meterNumber = item.meternumber || meterKey || '-';
-            
-            // Get location from meters data using the meter number
-            let location = getMeterLocation(customerId, meterNumber);
-            
-            // Fallback: check if location exists in the item itself
-            if (!location && item.location) {
-                location = item.location;
+        function setTodayReferenceDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const dateInput = document.getElementById('date_current');
+            if (dateInput) {
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
             }
-            
-            readings.push({
-                meternumber: meterNumber,
-                kwh: item.kwh ?? 0,
-                kvarh: item.kvarh ?? 0,
-                note: item.note || '',
-                location: location
+        }
+
+        function toDDMMYYYY(dateStr) {
+            if (!dateStr) return null;
+            let cleanStr = String(dateStr).trim().replace(/\//g, '-');
+
+            if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(cleanStr)) {
+                const parts = cleanStr.split('-');
+                return `${parts[2].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[0]}`;
+            }
+
+            if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(cleanStr)) {
+                const parts = cleanStr.split('-');
+                return `${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[2]}`;
+            }
+
+            return cleanStr;
+        }
+
+        function parseDDMMYYYYToDate(ddmmyyyyStr) {
+            const formatted = toDDMMYYYY(ddmmyyyyStr);
+            if (!formatted) return null;
+            const parts = formatted.split('-');
+            if (parts.length !== 3) return null;
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            return new Date(year, month, day);
+        }
+
+        function formatDateToDDMMYYYY(dateObj) {
+            if (!dateObj || isNaN(dateObj.getTime())) return null;
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const y = dateObj.getFullYear();
+            return `${d}-${m}-${y}`;
+        }
+
+        function compareDDMMYYYY(date1Str, date2Str) {
+            const d1 = parseDDMMYYYYToDate(date1Str);
+            const d2 = parseDDMMYYYYToDate(date2Str);
+            if (!d1 || !d2) return 0;
+            if (d1.getTime() === d2.getTime()) return 0;
+            return d1.getTime() < d2.getTime() ? -1 : 1;
+        }
+
+        function getMeterLocation(customerId, meterNumber) {
+            if (allMetersData[customerId] && allMetersData[customerId][meterNumber]) {
+                return allMetersData[customerId][meterNumber].location || '';
+            }
+            return '';
+        }
+
+        function extractReadingsFromDateNode(dateNode, customerId) {
+            let readings = [];
+            if (!dateNode || !dateNode.readings) return readings;
+
+            const rdData = dateNode.readings;
+            if (typeof rdData === 'object') {
+                Object.keys(rdData).forEach(meterKey => {
+                    const item = rdData[meterKey];
+                    const meterNumber = item.meternumber || meterKey || '-';
+
+                    let location = getMeterLocation(customerId, meterNumber);
+                    if (!location && item.location) {
+                        location = item.location;
+                    }
+
+                    readings.push({
+                        meternumber: meterNumber,
+                        kwh: item.kwh ?? 0,
+                        kvarh: item.kvarh ?? 0,
+                        note: item.note || '',
+                        location: location
+                    });
+                });
+            }
+            return readings;
+        }
+
+        async function loadAllCustomersMaster() {
+            try {
+                const customerSnap = await get(ref(db, 'MD/customers'));
+                if (customerSnap.exists()) {
+                    allCustomersData = customerSnap.val();
+                    for (let customerId in allCustomersData) {
+                        if (allCustomersData[customerId] && allCustomersData[customerId].meters) {
+                            allMetersData[customerId] = allCustomersData[customerId].meters;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn('⚠️ Error loading master customers:', err);
+            }
+        }
+
+        function calculateUnpassedReport(fK, fH, pastLimitDDMMYYYY, todayDDMMYYYY) {
+            notPassedCustomers = [];
+            let sectorData = {};
+            let totalAll = 0;
+            let totalPassed = 0;
+
+            const dateKeyRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
+
+            for (let custId in allCustomersData) {
+                const cust = allCustomersData[custId];
+                const keta3 = cust.keta3 || 'غير محدد';
+                const handsa = cust.handsa || 'غير محدد';
+
+                if (fK && keta3 !== fK) continue;
+                if (fH && handsa !== fH) continue;
+
+                totalAll++;
+
+                if (!sectorData[keta3]) {
+                    sectorData[keta3] = { total: 0, passed: 0, notPassed: 0, customers: [] };
+                }
+                sectorData[keta3].total++;
+
+                const passNode = rawCustomersData[custId];
+                let isPassedWithinPeriod = false;
+                let lastPassDate = 'لا يوجد مرور سابق';
+
+                if (passNode && typeof passNode === 'object') {
+                    let newestVisit = null;
+                    Object.keys(passNode).forEach(dateKey => {
+                        const cleanKey = dateKey.trim();
+                        if (dateKeyRegex.test(cleanKey)) {
+                            const formatted = toDDMMYYYY(cleanKey);
+                            if (!newestVisit || compareDDMMYYYY(formatted, newestVisit) > 0) {
+                                newestVisit = formatted;
+                            }
+                        }
+                    });
+
+                    if (newestVisit) {
+                        lastPassDate = newestVisit;
+                        const isAfterLimit = compareDDMMYYYY(newestVisit, pastLimitDDMMYYYY) >= 0;
+                        const isBeforeToday = compareDDMMYYYY(newestVisit, todayDDMMYYYY) <= 0;
+                        if (isAfterLimit && isBeforeToday) {
+                            isPassedWithinPeriod = true;
+                        }
+                    }
+                }
+
+                if (isPassedWithinPeriod) {
+                    sectorData[keta3].passed++;
+                    totalPassed++;
+                } else {
+                    sectorData[keta3].notPassed++;
+                    const custObj = {
+                        id: custId,
+                        name: cust.metername || cust.name || custId,
+                        keta3: keta3,
+                        handsa: handsa,
+                        lastPassDate: lastPassDate
+                    };
+                    sectorData[keta3].customers.push(custObj);
+                    notPassedCustomers.push(custObj);
+                }
+            }
+
+            const totalNotPassed = totalAll - totalPassed;
+            return { sectorData, totalAll, totalPassed, totalNotPassed };
+        }
+
+        function renderUnpassedReport(sectorData, totalAll, totalPassed, totalNotPassed) {
+            const container = document.getElementById('notPassedReport');
+            const reportSection = document.getElementById('reportSection');
+
+            document.getElementById('totalNotPassed').innerText = totalNotPassed;
+            document.getElementById('summaryTotal').innerText = totalAll;
+            document.getElementById('summaryPassed').innerText = totalPassed;
+            document.getElementById('summaryNotPassed').innerText = totalNotPassed;
+
+            reportSection.classList.add('visible');
+
+            const exportBtn = document.getElementById('exportNotPassedBtn');
+            if (exportBtn) exportBtn.disabled = (totalNotPassed === 0);
+
+            if (totalNotPassed === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;color:var(--success);grid-column:1/-1;padding:20px;">
+                        <i class="fas fa-check-circle" style="font-size:2rem;"></i>
+                        <p style="margin-top:10px;font-weight:700;">جميع المشتركين تم المرور عليهم في هذه الفترة</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sortedSectors = Object.entries(sectorData)
+                .filter(([_, data]) => data.notPassed > 0)
+                .sort((a, b) => b[1].notPassed - a[1].notPassed);
+
+            container.innerHTML = sortedSectors.map(([sector, data]) => `
+                <div class="report-item" onclick="filterBySector('${sector}')">
+                    <div class="sector-name">قطاع ${sector}</div>
+                    <div class="report-stats">
+                        <span class="total-count">الإجمالي: ${data.total}</span>
+                        <span class="passed-count">تم المرور: ${data.passed}</span>
+                        <span class="not-passed-count">
+                            <i class="fas fa-user-times"></i>
+                            لم يتم المرور: ${data.notPassed}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.filterBySector = function (sectorName) {
+            const kSel = document.getElementById('filter_keta3');
+            kSel.value = (kSel.value === sectorName) ? "" : sectorName;
+            runReport(currentMode || 'delayed');
+        };
+
+        window.toggleKeta3Filter = function (keta3Name) {
+            const kSel = document.getElementById('filter_keta3');
+            kSel.value = (kSel.value === keta3Name) ? "" : keta3Name;
+            runReport(currentMode || 'delayed');
+        };
+
+        function exportNotPassedToExcel() {
+            if (notPassedCustomers.length === 0) {
+                Swal.fire('تنبيه', 'لا يوجد مشتركين لم يتم المرور عليهم', 'info');
+                return;
+            }
+
+            const exportData = notPassedCustomers.map(c => ({
+                'اسم المشترك': c.name,
+                'القطاع': c.keta3,
+                'الهندسة': c.handsa,
+                'تاريخ أخر مرور': c.lastPassDate
+            }));
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            XLSX.utils.book_append_sheet(wb, ws, 'لم يتم المرور');
+
+            ws['!cols'] = [{ wch: 30 }, { wch: 25 }, { wch: 25 }, { wch: 20 }];
+            const fileName = `المشتركين_لم_يتم_المرور_${new Date().toLocaleDateString('ar-EG').replace(/\//g, '-')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+
+            Swal.fire('تم', `تم تحميل ${notPassedCustomers.length} مشترك بنجاح`, 'success');
+        }
+
+        function runReport(mode) {
+            if (!mode) return;
+            currentMode = mode;
+
+            const btnPassed = document.getElementById('navBtnSearch');
+            const btnDelayed = document.getElementById('navBtnDelayed');
+            if (btnPassed) btnPassed.classList.toggle('active', mode === 'passed');
+            if (btnDelayed) btnDelayed.classList.toggle('active', mode === 'delayed');
+
+            const selectedMonths = parseInt(document.getElementById('month_range')?.value || '3', 10);
+            const todayObj = new Date();
+            const todayDDMMYYYY = formatDateToDDMMYYYY(todayObj);
+
+            const pastLimitObj = new Date(todayObj);
+            pastLimitObj.setMonth(pastLimitObj.getMonth() - selectedMonths);
+            const pastLimitDDMMYYYY = formatDateToDDMMYYYY(pastLimitObj);
+
+            const rangeFromRaw = document.getElementById('date_from')?.value;
+            const rangeToRaw = document.getElementById('date_to')?.value;
+            const rangeFromDDMMYYYY = rangeFromRaw ? toDDMMYYYY(rangeFromRaw) : null;
+            const rangeToDDMMYYYY = rangeToRaw ? toDDMMYYYY(rangeToRaw) : null;
+
+            const fK = document.getElementById('filter_keta3')?.value || '';
+            const fH = document.getElementById('filter_handsa')?.value || '';
+            const fG = document.getElementById('filter_general')?.value.trim().toLowerCase() || '';
+
+            // Update Unpassed Customers Section
+            const { sectorData, totalAll, totalPassed, totalNotPassed } = calculateUnpassedReport(fK, fH, pastLimitDDMMYYYY, todayDDMMYYYY);
+            renderUnpassedReport(sectorData, totalAll, totalPassed, totalNotPassed);
+
+            let stats = { keta3: {} };
+            let filteredRecords = [];
+            const dateKeyRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
+
+            Object.entries(rawCustomersData).forEach(([customerKey, customerNode]) => {
+                if (!customerNode || typeof customerNode !== 'object' || customerKey.startsWith('_')) return;
+
+                let newestVisitDDMMYYYY = null;
+                let newestVisitNode = null;
+
+                Object.keys(customerNode).forEach(subKey => {
+                    const cleanSubKey = subKey.trim();
+                    if (dateKeyRegex.test(cleanSubKey) && typeof customerNode[subKey] === 'object') {
+                        const subKeyDDMMYYYY = toDDMMYYYY(cleanSubKey);
+                        if (!newestVisitDDMMYYYY || compareDDMMYYYY(subKeyDDMMYYYY, newestVisitDDMMYYYY) > 0) {
+                            newestVisitDDMMYYYY = subKeyDDMMYYYY;
+                            newestVisitNode = customerNode[subKey];
+                        }
+                    }
+                });
+
+                let isWithinSelectedMonths = false;
+                if (newestVisitDDMMYYYY) {
+                    const isAfterOrOnLimit = compareDDMMYYYY(newestVisitDDMMYYYY, pastLimitDDMMYYYY) >= 0;
+                    const isBeforeOrOnToday = compareDDMMYYYY(newestVisitDDMMYYYY, todayDDMMYYYY) <= 0;
+                    isWithinSelectedMonths = isAfterOrOnLimit && isBeforeOrOnToday;
+                }
+
+                if (mode === 'passed') {
+                    if (!isWithinSelectedMonths) return;
+                }
+                else if (mode === 'delayed') {
+                    if (isWithinSelectedMonths) return;
+                }
+                else if (mode === 'range') {
+                    if (!newestVisitDDMMYYYY) return;
+                    let isAfterFrom = true;
+                    let isBeforeTo = true;
+                    if (rangeFromDDMMYYYY) isAfterFrom = compareDDMMYYYY(newestVisitDDMMYYYY, rangeFromDDMMYYYY) >= 0;
+                    if (rangeToDDMMYYYY) isBeforeTo = compareDDMMYYYY(newestVisitDDMMYYYY, rangeToDDMMYYYY) <= 0;
+                    if (!isAfterFrom || !isBeforeTo) return;
+                }
+
+                const metername = (newestVisitNode && newestVisitNode.metername) || customerNode.metername || customerNode.name || customerKey;
+                const keta3 = (newestVisitNode && newestVisitNode.keta3) || customerNode.keta3 || '-';
+                const handsa = (newestVisitNode && newestVisitNode.handsa) || customerNode.handsa || '-';
+                const power_factor = (newestVisitNode && newestVisitNode.power_factor) || customerNode.power_factor || '-';
+                const max_load = (newestVisitNode && newestVisitNode.max_load) || customerNode.max_load || '-';
+
+                if (fK && keta3 !== fK) return;
+                if (fH && handsa !== fH) return;
+
+                const readings = newestVisitNode ? extractReadingsFromDateNode(newestVisitNode, customerKey) : [];
+
+                if (fG) {
+                    const meterNumbers = readings.map(r => r.meternumber || '').join(' ');
+                    const locations = readings.map(r => r.location || '').join(' ');
+                    const searchText = `${customerKey} ${metername} ${keta3} ${handsa} ${meterNumbers} ${locations} ${newestVisitDDMMYYYY || ''}`.toLowerCase();
+                    if (!searchText.includes(fG)) return;
+                }
+
+                const sector = keta3 || '-';
+                stats.keta3[sector] = (stats.keta3[sector] || 0) + 1;
+
+                filteredRecords.push({
+                    customerKey,
+                    metername,
+                    keta3,
+                    handsa,
+                    power_factor,
+                    max_load,
+                    latest_visit_date: newestVisitDDMMYYYY ? newestVisitDDMMYYYY : 'بدون تاريخ مرور',
+                    readings
+                });
             });
-        });
-    }
-    return readings;
-}
 
-async function loadMetersData() {
-    try {
-        // Fetch all meters data from MD/customers/{customerId}/meters
-        const metersSnap = await get(ref(db, 'MD/customers'));
-        if (metersSnap.exists()) {
-            const customersData = metersSnap.val();
-            for (let customerId in customersData) {
-                if (customersData[customerId] && customersData[customerId].meters) {
-                    allMetersData[customerId] = customersData[customerId].meters;
-                }
+            updateHeaderStats(stats, filteredRecords.length, mode, pastLimitDDMMYYYY, todayDDMMYYYY, selectedMonths);
+            renderResults(filteredRecords, mode);
+        }
+
+        function updateHeaderStats(stats, totalCount, mode, startDate, endDate, monthsCount) {
+            const totalEl = document.getElementById('headerTotalCount');
+            if (totalEl) totalEl.textContent = totalCount || 0;
+
+            const modeEl = document.getElementById('modeDisplay');
+            if (modeEl) {
+                if (mode === 'passed') modeEl.textContent = `✅ تقرير ما تم المرور عليه (خلال آخر ${monthsCount} أشهر): من ${startDate} إلى ${endDate}`;
+                else if (mode === 'delayed') modeEl.textContent = `⏰ تقرير المتأخرين بالمرور (جميع المشتركين باستثناء من مر عليهم خلال ${monthsCount} أشهر)`;
+                else if (mode === 'range') modeEl.textContent = `📅 بحث بالفترة المخصصة`;
             }
-            console.log('📦 All meters data loaded:', Object.keys(allMetersData).length, 'customers');
-        }
-    } catch (err) {
-        console.warn('⚠️ Could not load meters data:', err);
-    }
-}
 
-function runReport(mode) {
-    if (!mode) return;
-    if (!rawCustomersData || typeof rawCustomersData !== 'object') {
-        updateUIWithNoData();
-        return;
-    }
+            const chipGroup = document.getElementById('headerChipGroup');
+            const currentKeta3Filter = document.getElementById('filter_keta3').value;
 
-    currentMode = mode;
+            if (mode === 'delayed' && notPassedCustomers.length > 0) {
+                const grouped = {};
+                notPassedCustomers.forEach(c => {
+                    if (!grouped[c.keta3]) grouped[c.keta3] = [];
+                    grouped[c.keta3].push(c);
+                });
 
-    const btnPassed = document.getElementById('navBtnSearch');
-    const btnDelayed = document.getElementById('navBtnDelayed');
-    if (btnPassed) btnPassed.classList.toggle('active', mode === 'passed');
-    if (btnDelayed) btnDelayed.classList.toggle('active', mode === 'delayed');
+                let chipsHtml = '';
+                Object.entries(grouped).forEach(([name, data]) => {
+                    const isSelected = currentKeta3Filter === name;
+                    const selectedClass = isSelected ? 'selected-chip' : '';
 
-    const selectedMonths = parseInt(document.getElementById('month_range')?.value || '3', 10);
+                    let miniTableHtml = '';
+                    if (isSelected && data.length > 0) {
+                        let rows = data.map((n, idx) => `<tr><td>${idx + 1}</td><td>${n.name}</td></tr>`).join('');
+                        miniTableHtml = `
+                            <div class="unpassed-table-container">
+                                <table class="unpassed-mini-table">
+                                    <thead><tr><th>#</th><th>اسم المشترك الذي لم يتم المرور عليه</th></tr></thead>
+                                    <tbody>${rows}</tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
 
-    const todayObj = new Date();
-    const todayDDMMYYYY = formatDateToDDMMYYYY(todayObj);
-    
-    const pastLimitObj = new Date(todayObj);
-    pastLimitObj.setMonth(pastLimitObj.getMonth() - selectedMonths);
-    const pastLimitDDMMYYYY = formatDateToDDMMYYYY(pastLimitObj);
-
-    const rangeFromRaw = document.getElementById('date_from')?.value;
-    const rangeToRaw = document.getElementById('date_to')?.value;
-    const rangeFromDDMMYYYY = rangeFromRaw ? toDDMMYYYY(rangeFromRaw) : null;
-    const rangeToDDMMYYYY = rangeToRaw ? toDDMMYYYY(rangeToRaw) : null;
-
-    const fK = document.getElementById('filter_keta3')?.value || '';
-    const fH = document.getElementById('filter_handsa')?.value || '';
-    const fG = document.getElementById('filter_general')?.value.trim().toLowerCase() || '';
-
-    let stats = { keta3: {} };
-    let filteredRecords = [];
-    const dateKeyRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
-
-    Object.entries(rawCustomersData).forEach(([customerKey, customerNode]) => {
-        if (!customerNode || typeof customerNode !== 'object' || customerKey.startsWith('_')) return;
-
-        let newestVisitDDMMYYYY = null;
-        let newestVisitNode = null;
-
-        Object.keys(customerNode).forEach(subKey => {
-            const cleanSubKey = subKey.trim();
-            if (dateKeyRegex.test(cleanSubKey) && typeof customerNode[subKey] === 'object') {
-                const subKeyDDMMYYYY = toDDMMYYYY(cleanSubKey);
-                if (!newestVisitDDMMYYYY || compareDDMMYYYY(subKeyDDMMYYYY, newestVisitDDMMYYYY) > 0) {
-                    newestVisitDDMMYYYY = subKeyDDMMYYYY;
-                    newestVisitNode = customerNode[subKey];
+                    chipsHtml += `
+                        <div class="stat-chip-m ${selectedClass}" onclick="toggleKeta3Filter('${name}')">
+                            <div class="title">
+                                <span>قطاع ${name}</span> 
+                                <i class="fas ${isSelected ? 'fa-chevron-up' : 'fa-list-ul'}" style="font-size:0.75rem;"></i>
+                            </div>
+                            <div class="val-row">
+                                <span class="val" style="color:var(--danger);">
+                                    لم يتم المرور: ${data.length} مشترك
+                                </span>
+                            </div>
+                            ${miniTableHtml}
+                        </div>
+                    `;
+                });
+                chipGroup.innerHTML = chipsHtml;
+            } else {
+                let chipsHtml = '';
+                if (stats && stats.keta3) {
+                    Object.entries(stats.keta3).forEach(([name, count]) => {
+                        if (name && name !== '-' && name !== '') {
+                            chipsHtml += `<div class="stat-chip-m" style="min-width:auto; padding:3px 10px; border-radius:16px;"><span>${name}</span><span class="val">${count}</span></div>`;
+                        }
+                    });
                 }
+                chipGroup.innerHTML = chipsHtml || `<span style="font-size:0.65rem;color:var(--text-muted);">لا توجد إحصائيات</span>`;
             }
-        });
-
-        let isWithinSelectedMonths = false;
-        if (newestVisitDDMMYYYY) {
-            const isAfterOrOnLimit = compareDDMMYYYY(newestVisitDDMMYYYY, pastLimitDDMMYYYY) >= 0;
-            const isBeforeOrOnToday = compareDDMMYYYY(newestVisitDDMMYYYY, todayDDMMYYYY) <= 0;
-            isWithinSelectedMonths = isAfterOrOnLimit && isBeforeOrOnToday;
         }
 
-        if (mode === 'passed') {
-            if (!isWithinSelectedMonths) return;
-        } 
-        else if (mode === 'delayed') {
-            if (isWithinSelectedMonths) return;
-        } 
-        else if (mode === 'range') {
-            if (!newestVisitDDMMYYYY) return;
-            let isAfterFrom = true;
-            let isBeforeTo = true;
-            if (rangeFromDDMMYYYY) isAfterFrom = compareDDMMYYYY(newestVisitDDMMYYYY, rangeFromDDMMYYYY) >= 0;
-            if (rangeToDDMMYYYY) isBeforeTo = compareDDMMYYYY(newestVisitDDMMYYYY, rangeToDDMMYYYY) <= 0;
-            if (!isAfterFrom || !isBeforeTo) return;
-        }
+        function renderResults(results, mode) {
+            const container = document.getElementById('results-container');
+            if (!container) return;
 
-        const metername = (newestVisitNode && newestVisitNode.metername) || customerNode.metername || customerNode.name || customerKey;
-        const keta3 = (newestVisitNode && newestVisitNode.keta3) || customerNode.keta3 || '-';
-        const handsa = (newestVisitNode && newestVisitNode.handsa) || customerNode.handsa || '-';
-        const power_factor = (newestVisitNode && newestVisitNode.power_factor) || customerNode.power_factor || '-';
-        const max_load = (newestVisitNode && newestVisitNode.max_load) || customerNode.max_load || '-';
+            if (results.length === 0) {
+                container.innerHTML = `<div class="empty-state-m"><i class="fas fa-search-minus"></i><p>لا توجد نتائج مطابقة لشروط البحث</p></div>`;
+                const tbody = document.querySelector("#masterTable tbody");
+                if (tbody) tbody.innerHTML = '';
+                return;
+            }
 
-        if (fK && keta3 !== fK) return;
-        if (fH && handsa !== fH) return;
+            let cardsHtml = '', masterRows = '';
 
-        // Pass customerKey to extractReadingsFromDateNode to get location from meters data
-        const readings = newestVisitNode ? extractReadingsFromDateNode(newestVisitNode, customerKey) : [];
+            results.forEach(record => {
+                let metersHtml = '';
+                if (record.readings.length === 0) {
+                    metersHtml = `<div class="m-meter-card"><div class="m-notes">⚠️ لا توجد قراءات تفصيلية مسجلة</div></div>`;
+                } else {
+                    record.readings.forEach(r => {
+                        const locationHtml = r.location ? `<div class="m-location">📍 <b>مكان التركيب:</b> ${r.location}</div>` : '';
+                        const noteHtml = r.note ? `<div class="m-notes">📝 ${r.note}</div>` : '';
 
-        if (fG) {
-            const meterNumbers = readings.map(r => r.meternumber || '').join(' ');
-            const locations = readings.map(r => r.location || '').join(' ');
-            const searchText = `${customerKey} ${metername} ${keta3} ${handsa} ${meterNumbers} ${locations} ${newestVisitDDMMYYYY || ''}`.toLowerCase();
-            if (!searchText.includes(fG)) return;
-        }
-
-        const sector = keta3 || '-';
-        stats.keta3[sector] = (stats.keta3[sector] || 0) + 1;
-
-        filteredRecords.push({
-            customerKey,
-            metername,
-            keta3,
-            handsa,
-            power_factor,
-            max_load,
-            latest_visit_date: newestVisitDDMMYYYY ? newestVisitDDMMYYYY : 'بدون تاريخ مرور',
-            readings
-        });
-    });
-
-    updateHeaderStats(stats, filteredRecords.length, mode, pastLimitDDMMYYYY, todayDDMMYYYY, selectedMonths);
-    renderResults(filteredRecords, mode);
-}
-
-function updateHeaderStats(stats, totalCount, mode, startDate, endDate, monthsCount) {
-    const totalEl = document.getElementById('headerTotalCount');
-    if (totalEl) totalEl.textContent = totalCount || 0;
-    
-    const modeEl = document.getElementById('modeDisplay');
-    if (modeEl) {
-        if (mode === 'passed') modeEl.textContent = `✅ تقرير تقرير تم المرور (خلال آخر ${monthsCount} أشهر): من ${startDate} إلى ${endDate}`;
-        else if (mode === 'delayed') modeEl.textContent = `⏰ تقرير المتاخرين بالمرور(جميع المشتركين باستثناء من مر عليهم خلال ${monthsCount} أشهر)`;
-        else if (mode === 'range') modeEl.textContent = `📅 بحث بالفترة المخصصة`;
-    }
-    
-    const chipGroup = document.getElementById('headerChipGroup');
-    if (chipGroup) {
-        let chipsHtml = '';
-        if (stats && stats.keta3) {
-            Object.entries(stats.keta3).forEach(([name, count]) => {
-                if (name && name !== '-' && name !== '') {
-                    chipsHtml += `<div class="stat-chip-m"><span>${name}</span><span class="val">${count}</span></div>`;
-                }
-            });
-        }
-        chipGroup.innerHTML = chipsHtml || `<span style="font-size:0.65rem;color:var(--text-muted);">لا توجد إحصائيات</span>`;
-    }
-}
-
-function renderResults(results, mode) {
-    const container = document.getElementById('results-container');
-    if (!container) return;
-
-    if (results.length === 0) {
-        container.innerHTML = `<div class="empty-state-m"><i class="fas fa-search-minus"></i><p>لا توجد نتائج مطابقة لشروط البحث</p></div>`;
-        const tbody = document.querySelector("#masterTable tbody");
-        if (tbody) tbody.innerHTML = '';
-        return;
-    }
-
-    let cardsHtml = '', masterRows = '';
-
-    results.forEach(record => {
-        let metersHtml = '';
-        if (record.readings.length === 0) {
-            metersHtml = `<div class="m-meter-card"><div class="m-notes">⚠️ لا توجد قراءات تفصيلية مسجلة</div></div>`;
-        } else {
-            record.readings.forEach(r => {
-                const locationHtml = r.location ? `<div class="m-location">📍 <b>مكان التركيب:</b> ${r.location}</div>` : '';
-                const noteHtml = r.note ? `<div class="m-notes">📝 ${r.note}</div>` : '';
-                
-                metersHtml += `<div class="m-meter-card">
+                        metersHtml += `<div class="m-meter-card">
                     <div class="m-meter-header">
                         <span>عداد: <span class="meter-tag">${r.meternumber || '-'}</span></span>
                         <span class="visit-date-badge">📅 ${record.latest_visit_date}</span>
@@ -1069,7 +1520,7 @@ function renderResults(results, mode) {
                     ${noteHtml}
                 </div>`;
 
-                masterRows += `<tr>
+                        masterRows += `<tr>
                     <td>${record.latest_visit_date}</td>
                     <td>${record.metername}</td>
                     <td>${r.meternumber || '-'}</td>
@@ -1082,11 +1533,11 @@ function renderResults(results, mode) {
                     <td>${r.location || ''}</td>
                     <td>${r.note || ''}</td>
                 </tr>`;
-            });
-        }
+                    });
+                }
 
-        if (record.readings.length === 0) {
-            masterRows += `<tr>
+                if (record.readings.length === 0) {
+                    masterRows += `<tr>
                 <td>${record.latest_visit_date}</td>
                 <td>${record.metername}</td>
                 <td>-</td>
@@ -1099,9 +1550,9 @@ function renderResults(results, mode) {
                 <td>-</td>
                 <td>لا توجد تفاصيل قراءات</td>
             </tr>`;
-        }
+                }
 
-        cardsHtml += `<div class="m-card">
+                cardsHtml += `<div class="m-card">
             <div class="m-card-header">
                 <div>
                     <div class="m-cust-name">👤 ${record.metername}</div>
@@ -1117,150 +1568,130 @@ function renderResults(results, mode) {
             </div>
             ${metersHtml}
         </div>`;
-    });
+            });
 
-    container.innerHTML = cardsHtml;
-    const tbody = document.querySelector("#masterTable tbody");
-    if (tbody) tbody.innerHTML = masterRows;
-}
+            container.innerHTML = cardsHtml;
+            const tbody = document.querySelector("#masterTable tbody");
+            if (tbody) tbody.innerHTML = masterRows;
+        }
 
-function updateUIWithNoData() {
-    const container = document.getElementById('results-container');
-    if (container) {
-        container.innerHTML = `<div class="empty-state-m"><i class="fas fa-database"></i><p>لا توجد بيانات للعرض</p></div>`;
-    }
-    const totalEl = document.getElementById('headerTotalCount');
-    if (totalEl) totalEl.textContent = '0';
-}
-
-function populateDropdowns() {
-    const kSet = new Set(), hSet = new Set();
-    const dateKeyRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
-
-    Object.entries(rawCustomersData).forEach(([key, node]) => {
-        if (!node || typeof node !== 'object' || key.startsWith('_')) return;
-
-        if (node.keta3 && node.keta3 !== '-') kSet.add(node.keta3);
-        if (node.handsa && node.handsa !== '-') hSet.add(node.handsa);
-
-        Object.keys(node).forEach(subKey => {
-            if (dateKeyRegex.test(subKey.trim()) && typeof node[subKey] === 'object') {
-                if (node[subKey].keta3 && node[subKey].keta3 !== '-') kSet.add(node[subKey].keta3);
-                if (node[subKey].handsa && node[subKey].handsa !== '-') hSet.add(node[subKey].handsa);
+        function populateDropdowns() {
+            const kSet = new Set(), hSet = new Set();
+            for (let custId in allCustomersData) {
+                const c = allCustomersData[custId];
+                if (c.keta3 && c.keta3 !== '-') kSet.add(c.keta3);
+                if (c.handsa && c.handsa !== '-') hSet.add(c.handsa);
             }
-        });
-    });
 
-    const kSel = document.getElementById('filter_keta3');
-    const hSel = document.getElementById('filter_handsa');
-    
-    if (kSel) {
-        kSel.innerHTML = '<option value="">جميع القطاعات</option>';
-        [...kSet].sort().forEach(k => kSel.innerHTML += `<option value="${k}">${k}</option>`);
-    }
-    if (hSel) {
-        hSel.innerHTML = '<option value="">جميع الهندسات</option>';
-        [...hSet].sort().forEach(h => hSel.innerHTML += `<option value="${h}">${h}</option>`);
-    }
-}
+            const kSel = document.getElementById('filter_keta3');
+            const hSel = document.getElementById('filter_handsa');
 
-export function exportData() {
-    const tbody = document.querySelector("#masterTable tbody");
-    if (!tbody || tbody.children.length === 0) {
-        Swal.fire('تنبيه', 'لا توجد بيانات للتصدير', 'info');
-        return;
-    }
-    
-    const rows = tbody.querySelectorAll('tr');
-    const data = [];
-    const headers = ['تاريخ المرور', 'اسم المشترك', 'رقم العداد', 'القطاع', 'الهندسة', 'أقصى حمل', 'معامل القدرة', 'ك.و.س', 'ك.ف.س', 'مكان التركيب', 'الملاحظات'];
-    data.push(headers);
-    
-    rows.forEach(row => {
-        const cols = row.querySelectorAll('td');
-        const rowData = [];
-        cols.forEach(col => rowData.push(col.textContent.trim()));
-        data.push(rowData);
-    });
-    
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'تقرير المرور');
-    XLSX.writeFile(wb, `تقرير_المرور_${new Date().toISOString().slice(0,10)}.xlsx`);
-    
-    Swal.fire('نجاح', 'تم تصدير البيانات بنجاح', 'success');
-}
-
-window.exportData = exportData;
-
-async function init() {
-    setTodayReferenceDate();
-    try {
-        // First load meters data to get locations
-        await loadMetersData();
-        
-        const passSnap = await get(ref(db, 'MD_Pass/customers'));
-        if (passSnap.exists()) {
-            rawCustomersData = passSnap.val();
-        } else {
-            const rootSnap = await get(ref(db, 'MD_Pass'));
-            if (rootSnap.exists() && rootSnap.val().customers) {
-                rawCustomersData = rootSnap.val().customers;
-            } else {
-                updateUIWithNoData();
-                return;
+            if (kSel) {
+                kSel.innerHTML = '<option value="">جميع القطاعات</option>';
+                [...kSet].sort().forEach(k => kSel.innerHTML += `<option value="${k}">${k}</option>`);
+            }
+            if (hSel) {
+                hSel.innerHTML = '<option value="">جميع الهندسات</option>';
+                [...hSet].sort().forEach(h => hSel.innerHTML += `<option value="${h}">${h}</option>`);
             }
         }
 
-        populateDropdowns();
+        export function exportData() {
+            const tbody = document.querySelector("#masterTable tbody");
+            if (!tbody || tbody.children.length === 0) {
+                Swal.fire('تنبيه', 'لا توجد بيانات للتصدير', 'info');
+                return;
+            }
 
-    } catch (err) {
-        console.error('❌ Error loading data:', err);
-        updateUIWithNoData();
-    }
-}
+            const rows = tbody.querySelectorAll('tr');
+            const data = [];
+            const headers = ['تاريخ المرور', 'اسم المشترك', 'رقم العداد', 'القطاع', 'الهندسة', 'أقصى حمل', 'معامل القدرة', 'ك.و.س', 'ك.ف.س', 'مكان التركيب', 'الملاحظات'];
+            data.push(headers);
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById('searchBtn')?.addEventListener('click', () => {
-        if (currentMode) runReport(currentMode);
-        else runReport('passed');
-    });
-    document.getElementById('btnSearchRange')?.addEventListener('click', () => runReport('range'));
-    document.getElementById('filter_general')?.addEventListener('input', () => {
-        if (currentMode) runReport(currentMode);
-    });
-    document.getElementById('filter_keta3')?.addEventListener('change', () => {
-        if (currentMode) runReport(currentMode);
-    });
-    document.getElementById('filter_handsa')?.addEventListener('change', () => {
-        if (currentMode) runReport(currentMode);
-    });
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                const rowData = [];
+                cols.forEach(col => rowData.push(col.textContent.trim()));
+                data.push(rowData);
+            });
 
-    document.getElementById('month_range')?.addEventListener('change', () => {
-        if (currentMode) runReport(currentMode);
-    });
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'تقرير المرور');
+            XLSX.writeFile(wb, `تقرير_المرور_${new Date().toISOString().slice(0, 10)}.xlsx`);
 
-    document.getElementById('navBtnSearch')?.addEventListener('click', () => runReport('passed'));
-    document.getElementById('navBtnDelayed')?.addEventListener('click', () => runReport('delayed'));
-    document.getElementById('navBtnExport')?.addEventListener('click', exportData);
+            Swal.fire('نجاح', 'تم تصدير البيانات بنجاح', 'success');
+        }
 
-    document.getElementById('openMenuBtn')?.addEventListener('click', () => {
-        document.getElementById('bottomSheet')?.classList.add('show');
-        document.getElementById('sheetOverlay')?.classList.add('show');
-    });
+        window.exportData = exportData;
 
-    document.getElementById('closeSheetBtn')?.addEventListener('click', () => {
-        document.getElementById('bottomSheet')?.classList.remove('show');
-        document.getElementById('sheetOverlay')?.classList.remove('show');
-    });
+        async function init() {
+            setTodayReferenceDate();
+            try {
+                await loadAllCustomersMaster();
 
-    document.getElementById('sheetOverlay')?.addEventListener('click', () => {
-        document.getElementById('bottomSheet')?.classList.remove('show');
-        document.getElementById('sheetOverlay')?.classList.remove('show');
-    });
+                const passSnap = await get(ref(db, 'MD_Pass/customers'));
+                if (passSnap.exists()) {
+                    rawCustomersData = passSnap.val();
+                } else {
+                    const rootSnap = await get(ref(db, 'MD_Pass'));
+                    if (rootSnap.exists() && rootSnap.val().customers) {
+                        rawCustomersData = rootSnap.val().customers;
+                    }
+                }
 
-    init();
-});
+                populateDropdowns();
+                document.getElementById('exportNotPassedBtn')?.addEventListener('click', exportNotPassedToExcel);
+
+                // Default view on load
+                runReport('passed');
+
+            } catch (err) {
+                console.error('❌ Error loading data:', err);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('searchBtn')?.addEventListener('click', () => {
+                if (currentMode) runReport(currentMode);
+                else runReport('passed');
+            });
+            document.getElementById('btnSearchRange')?.addEventListener('click', () => runReport('range'));
+            document.getElementById('filter_general')?.addEventListener('input', () => {
+                if (currentMode) runReport(currentMode);
+            });
+            document.getElementById('filter_keta3')?.addEventListener('change', () => {
+                if (currentMode) runReport(currentMode);
+            });
+            document.getElementById('filter_handsa')?.addEventListener('change', () => {
+                if (currentMode) runReport(currentMode);
+            });
+
+            document.getElementById('month_range')?.addEventListener('change', () => {
+                if (currentMode) runReport(currentMode);
+            });
+
+            document.getElementById('navBtnSearch')?.addEventListener('click', () => runReport('passed'));
+            document.getElementById('navBtnDelayed')?.addEventListener('click', () => runReport('delayed'));
+            document.getElementById('navBtnExport')?.addEventListener('click', exportData);
+
+            document.getElementById('openMenuBtn')?.addEventListener('click', () => {
+                document.getElementById('bottomSheet')?.classList.add('show');
+                document.getElementById('sheetOverlay')?.classList.add('show');
+            });
+
+            document.getElementById('closeSheetBtn')?.addEventListener('click', () => {
+                document.getElementById('bottomSheet')?.classList.remove('show');
+                document.getElementById('sheetOverlay')?.classList.remove('show');
+            });
+
+            document.getElementById('sheetOverlay')?.addEventListener('click', () => {
+                document.getElementById('bottomSheet')?.classList.remove('show');
+                document.getElementById('sheetOverlay')?.classList.remove('show');
+            });
+
+            init();
+        });
     </script>
 </body>
 

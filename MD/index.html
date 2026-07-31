@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
-    <title>لوحة التحكم الرئيسية · نظام إدارة كبار المشتركين</title>
-    
+    <title>لوحة التحكم · كبار المشتركين</title>
     <!-- Google Fonts & Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <style>
         :root {
             --primary: #1e293b;
@@ -24,7 +20,7 @@
             --warning: #f59e0b;
             --bg: #f1f5f9;
             --white: #ffffff;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
             --radius: 12px;
             --border: #e2e8f0;
             --text: #1e293b;
@@ -33,13 +29,7 @@
             --success-bg: #f0fdf4;
             --danger-bg: #fef2f2;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Cairo', sans-serif;
             background: var(--bg);
@@ -47,7 +37,6 @@
             min-height: 100vh;
             padding: 20px;
         }
-
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -55,8 +44,6 @@
             flex-direction: column;
             gap: 20px;
         }
-
-        /* ===== HEADER & TOP NAVIGATION ===== */
         .top-navbar {
             background: var(--white);
             border-radius: var(--radius);
@@ -68,13 +55,11 @@
             flex-wrap: wrap;
             gap: 16px;
         }
-
         .brand-title {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-
         .brand-title i {
             font-size: 1.8rem;
             color: var(--accent);
@@ -82,24 +67,19 @@
             padding: 10px;
             border-radius: var(--radius);
         }
-
         .brand-title h1 {
             font-size: 1.25rem;
             font-weight: 800;
             color: var(--primary);
         }
-
         .brand-title p {
             font-size: 0.75rem;
             color: var(--text-muted);
         }
-
-        /* ===== DROPDOWN NAV ===== */
         .modern-dropdown {
             position: relative;
             min-width: 220px;
         }
-
         .dropdown-btn {
             background: var(--primary);
             color: var(--white);
@@ -116,12 +96,10 @@
             transition: all 0.3s ease;
             gap: 10px;
         }
-
         .dropdown-btn:hover {
             background: var(--primary-light);
-            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+            box-shadow: 0 4px 12px rgba(30,41,59,0.2);
         }
-
         .dropdown-menu {
             position: absolute;
             top: calc(100% + 8px);
@@ -129,16 +107,14 @@
             right: 0;
             background: var(--white);
             border-radius: var(--radius);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
             display: none;
             z-index: 2000;
             border: 1px solid var(--border);
             overflow: hidden;
             animation: dropdownFade 0.25s ease;
         }
-
         .dropdown-menu.show { display: block; }
-
         .dropdown-item {
             padding: 12px 16px;
             cursor: pointer;
@@ -150,13 +126,11 @@
             align-items: center;
             gap: 10px;
         }
-
         .dropdown-item:hover {
             background: #f1f5f9;
             color: var(--accent);
             padding-right: 22px;
         }
-
         .dropdown-item .item-badge {
             background: var(--accent);
             color: white;
@@ -165,14 +139,11 @@
             border-radius: 20px;
             margin-right: auto;
         }
-
-        /* ===== KPI CARDS GRID ===== */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
             gap: 16px;
         }
-
         .kpi-card {
             background: var(--white);
             border-radius: var(--radius);
@@ -183,11 +154,9 @@
             align-items: center;
             justify-content: space-between;
         }
-
         .kpi-card.good { border-top-color: var(--success); }
         .kpi-card.warning-card { border-top-color: var(--warning); }
         .kpi-card.danger-card { border-top-color: var(--danger); }
-
         .kpi-info small {
             font-size: 0.7rem;
             color: var(--text-muted);
@@ -195,16 +164,13 @@
             display: block;
             margin-bottom: 4px;
         }
-
         .kpi-info strong {
             font-size: 1.6rem;
             font-weight: 800;
             color: var(--primary);
         }
-
         .kpi-info strong.good-color { color: var(--success); }
         .kpi-info strong.danger-color { color: var(--danger); }
-
         .kpi-icon {
             width: 48px;
             height: 48px;
@@ -214,21 +180,17 @@
             justify-content: center;
             font-size: 1.3rem;
         }
-
-        /* ===== MAIN CONTROL LAYOUT ===== */
         .main-control-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
-
         .panel-card {
             background: var(--white);
             border-radius: var(--radius);
             padding: 20px 22px;
             box-shadow: var(--shadow);
         }
-
         .panel-header {
             font-size: 1rem;
             font-weight: 700;
@@ -240,12 +202,7 @@
             border-bottom: 2px solid var(--bg);
             padding-bottom: 15px;
         }
-
-        .panel-header i {
-            color: var(--accent);
-            margin-left: 6px;
-        }
-
+        .panel-header i { color: var(--accent); margin-left: 6px; }
         .panel-header .badge-count {
             background: var(--accent);
             color: white;
@@ -253,15 +210,12 @@
             border-radius: 20px;
             font-size: 0.7rem;
         }
-
-        /* ===== QUICK ACCESS APP GRID ===== */
         .app-shortcut-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(130px,1fr));
             gap: 12px;
             margin-bottom: 20px;
         }
-
         .app-btn {
             background: #fafcff;
             border: 1px solid var(--border);
@@ -277,14 +231,12 @@
             gap: 8px;
             cursor: pointer;
         }
-
         .app-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
             border-color: var(--accent);
             background: var(--white);
         }
-
         .app-btn i {
             font-size: 1.5rem;
             color: var(--accent);
@@ -297,25 +249,17 @@
             align-items: center;
             justify-content: center;
         }
-
-        .app-btn span {
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        /* ===== MODERN TABLE STYLES ===== */
+        .app-btn span { font-size: 0.75rem; font-weight: 700; }
         .table-wrap {
             overflow-x: auto;
             max-height: 300px;
             overflow-y: auto;
         }
-
         .modern-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.8rem;
         }
-
         .modern-table th {
             background: #f8fafc;
             color: var(--text-muted);
@@ -326,42 +270,17 @@
             position: sticky;
             top: 0;
             z-index: 5;
-            background: #f8fafc;
         }
-
         .modern-table td {
             padding: 7px 10px;
             text-align: center;
             border-bottom: 1px solid var(--border);
         }
-
-        .modern-table tr:hover td {
-            background: #f8fafc;
-        }
-
-        .status-badge {
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            font-weight: 700;
-        }
-
-        .status-badge.good {
-            background: var(--success-bg);
-            color: var(--success);
-        }
-
-        .status-badge.bad {
-            background: var(--danger-bg);
-            color: var(--danger);
-        }
-
-        /* ===== SEARCH & RECENT ACTIVITY ===== */
+        .modern-table tr:hover td { background: #f8fafc; }
         .search-box-group {
             position: relative;
             margin-bottom: 12px;
         }
-
         .search-input {
             width: 100%;
             padding: 10px 14px 10px 40px;
@@ -371,12 +290,10 @@
             font-size: 0.85rem;
             outline: none;
         }
-
         .search-input:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
         }
-
         .search-box-group i {
             position: absolute;
             left: 12px;
@@ -384,15 +301,12 @@
             transform: translateY(-50%);
             color: var(--text-muted);
         }
-
-        /* ===== FILTER ROW ===== */
         .filter-row {
             display: flex;
             gap: 10px;
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
-
         .filter-row select {
             padding: 8px 12px;
             border: 1px solid var(--border);
@@ -402,544 +316,399 @@
             background: var(--white);
             outline: none;
             flex: 1;
-            min-width: 120px;
+            min-width: 100px;
         }
-
-        .filter-row select:focus {
-            border-color: var(--accent);
+        .filter-row select:focus { border-color: var(--accent); }
+        .btn-refresh {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--white);
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            transition: 0.2s;
         }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 992px) {
-            .main-control-grid {
-                grid-template-columns: 1fr;
-            }
+        .btn-refresh:hover { background: var(--bg); }
+        .status-badge {
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
         }
-
+        .status-badge.good { background: var(--success-bg); color: var(--success); }
+        .status-badge.bad { background: var(--danger-bg); color: var(--danger); }
+        @media (max-width: 992px) { .main-control-grid { grid-template-columns: 1fr; } }
         @media (max-width: 600px) {
-            .top-navbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .kpi-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .kpi-info strong {
-                font-size: 1.2rem;
-            }
-            .app-shortcut-grid {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
-            .filter-row {
-                flex-direction: column;
-            }
-            .filter-row select {
-                min-width: unset;
-            }
+            .top-navbar { flex-direction: column; align-items: stretch; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .kpi-info strong { font-size: 1.2rem; }
+            .app-shortcut-grid { grid-template-columns: 1fr 1fr; }
+            .filter-row { flex-direction: column; }
         }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .text-muted-small {
-            color: var(--text-muted);
+        .full-width { grid-column: 1 / -1; }
+        .debug-info {
             font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            padding: 8px;
+            background: #f8fafc;
+            border-radius: 6px;
+            display: none;
         }
     </style>
 </head>
-
 <body>
-    <div class="dashboard-container">
-        
-        <!-- ===== TOP NAVIGATION BAR ===== -->
-        <header class="top-navbar">
-            <div class="brand-title">
-                <i class="fas fa-microchip"></i>
-                <div>
-                    <h1>كبار المشتركين</h1>
-                    <p>نظام إدارة كبار المشتركين</p>
+<div class="dashboard-container">
+    <!-- TOP NAV -->
+    <header class="top-navbar">
+        <div class="brand-title">
+            <i class="fas fa-microchip"></i>
+            <div><h1>كبار المشتركين</h1><p>نظام إدارة كبار المشتركين</p></div>
+        </div>
+        <div class="modern-dropdown">
+            <button class="dropdown-btn" id="dropdownBtn">
+                <span><i class="fas fa-compass"></i> اختر للانتقال</span>
+                <span id="arrow">▾</span>
+            </button>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-item" data-page="index.html"><i class="fas fa-home"></i> <span>الصفحة الرئيسية</span><span class="item-badge">الحالية</span></div>
+                <div class="dropdown-item" data-page="MD.html"><i class="fas fa-users-cog"></i> <span>إدارة كبار المشتركين (MD)</span></div>
+                <div class="dropdown-item" data-page="MD_Add.html"><i class="fas fa-user-plus"></i> <span>إضافة مشترك جديد</span></div>
+                <div class="dropdown-item" data-page="MD_Site.html"><i class="fas fa-route"></i> <span>تسجيل مرور ميداني</span></div>
+                <div class="dropdown-item" data-page="MD_Pass.html"><i class="fas fa-chart-line"></i> <span>تقرير المرور العام</span></div>
+                <div class="dropdown-item" data-page="MD_PF.html"><i class="fas fa-bolt"></i> <span>تقرير معامل القدرة (PF)</span></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- KPI -->
+    <section class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-info"><small>إجمالي كبار المشتركين</small><strong id="kpi-customers">0</strong></div><div class="kpi-icon" style="background:#eff6ff;color:var(--accent);"><i class="fas fa-users"></i></div></div>
+        <div class="kpi-card good"><div class="kpi-info"><small>إجمالي العدادات المسجلة</small><strong id="kpi-meters">0</strong></div><div class="kpi-icon" style="background:#f0fdf4;color:var(--success);"><i class="fas fa-tachometer-alt"></i></div></div>
+        <div class="kpi-card warning-card"><div class="kpi-info"><small>إجمالي الزيارات (آخر 3 شهور)</small><strong id="kpi-visits">0</strong></div><div class="kpi-icon" style="background:#fffbeb;color:var(--warning);"><i class="fas fa-clipboard-check"></i></div></div>
+        <div class="kpi-card good"><div class="kpi-info"><small>PF ≥ 0.92 (جيد)</small><strong class="good-color" id="kpi-pf-good">0</strong></div><div class="kpi-icon" style="background:#f0fdf4;color:var(--success);"><i class="fas fa-check-circle"></i></div></div>
+        <div class="kpi-card danger-card"><div class="kpi-info"><small>PF &lt; 0.92 (منخفض)</small><strong class="danger-color" id="kpi-pf-bad">0</strong></div><div class="kpi-icon" style="background:#fef2f2;color:var(--danger);"><i class="fas fa-exclamation-triangle"></i></div></div>
+    </section>
+
+    <!-- MAIN GRID -->
+    <div class="main-control-grid">
+        <!-- Left: Shortcuts + Sector -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+            <div class="panel-card">
+                <div class="panel-header"><span><i class="fas fa-th-large"></i> الاختصارات والتطبيقات</span></div>
+                <div class="app-shortcut-grid">
+                    <a href="MD.html" class="app-btn"><i class="fas fa-users-cog"></i><span>إدارة المشتركين</span></a>
+                    <a href="MD_Add.html" class="app-btn"><i class="fas fa-user-plus" style="color:var(--success);background:#f0fdf4;"></i><span>إضافة مشترك</span></a>
+                    <a href="MD_Pass.html" class="app-btn"><i class="fas fa-map-marked-alt" style="color:var(--warning);background:#fffbeb;"></i><span>مرور ميداني</span></a>
+                    <a href="MD_Pass.html" class="app-btn"><i class="fas fa-chart-pie" style="color:#0891b2;background:#ecfeff;"></i><span>تقرير المرور</span></a>
+                    <a href="MD_PF.html" class="app-btn"><i class="fas fa-bolt" style="color:var(--pf-color);background:#f5f3ff;"></i><span>تقرير PF</span></a>
+                </div>
+            </div>
+            <div class="panel-card">
+                <div class="panel-header"><span><i class="fas fa-layer-group"></i> توزيع المشتركين حسب القطاع</span><span class="badge-count" id="sectorTotalCount">0</span></div>
+                <div class="table-wrap">
+                    <table class="modern-table"><thead><tr><th>القطاع</th><th>عدد المشتركين</th><th>النسبة المئوية</th></tr></thead>
+                    <tbody id="sectorTableBody"><tr><td colspan="3" style="text-align:center;color:#94a3b8;">جاري التحميل...</td></tr></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Quick Search + Newest Records (3 months) -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+            <div class="panel-card">
+                <div class="panel-header"><span><i class="fas fa-search"></i> بحث سريع بالمشتركين</span></div>
+                <div class="search-box-group">
+                    <input type="text" id="dashboardSearch" class="search-input" placeholder="اسم المشترك أو رقم العداد...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="table-wrap" style="max-height:220px;">
+                    <table class="modern-table"><thead><tr><th>اسم المشترك</th><th>القطاع</th><th>أقصى حمل</th><th>تاريخ المرور</th><th>PF</th></tr></thead>
+                    <tbody id="quickSearchBody"><tr><td colspan="5" style="text-align:center;color:#94a3b8;">جاري التحميل...</td></tr></tbody></table>
                 </div>
             </div>
 
-            <!-- Dropdown Navigation -->
-            <div class="modern-dropdown">
-                <button class="dropdown-btn" id="dropdownBtn">
-                    <span><i class="fas fa-compass"></i> اختر للأنتقال</span>
-                    <span id="arrow">▾</span>
-                </button>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <div class="dropdown-item" data-page="index.html">
-                        <i class="fas fa-home"></i> <span>الصفحة الرئيسية</span>
-                        <span class="item-badge">الحالية</span>
-                    </div>
-                    <div class="dropdown-item" data-page="MD.html">
-                        <i class="fas fa-users-cog"></i> <span>إدارة كبار المشتركين (MD)</span>
-                    </div>
-                    <div class="dropdown-item" data-page="MD_Add.html">
-                        <i class="fas fa-user-plus"></i> <span>إضافة مشترك جديد</span>
-                    </div>
-                    <div class="dropdown-item" data-page="MD_Site.html">
-                        <i class="fas fa-route"></i> <span>تسجيل مرور ميداني</span>
-                    </div>
-                    <div class="dropdown-item" data-page="MD_Pass.html">
-                        <i class="fas fa-chart-line"></i> <span>تقرير المرور العام</span>
-                    </div>
-                    <div class="dropdown-item" data-page="MD_PF.html">
-                        <i class="fas fa-bolt"></i> <span>تقرير معامل القدرة (PF)</span>
-                    </div>
+            <div class="panel-card">
+                <div class="panel-header">
+                    <span><i class="fas fa-clock"></i> أحدث التسجيلات (آخر 3 شهور)</span>
+                    <span class="badge-count" id="newestCount">0</span>
+                </div>
+                <div class="filter-row">
+                    <select id="filterKeta3"><option value="">كل القطاعات</option></select>
+                    <select id="filterHandsa"><option value="">كل الهندسات</option></select>
+                    <button class="btn-refresh" onclick="applyFilters()"><i class="fas fa-filter"></i> تطبيق</button>
+                </div>
+                <div class="table-wrap" style="max-height:200px;">
+                    <table class="modern-table"><thead><tr><th>اسم المشترك</th><th>القطاع</th><th>الهندسة</th><th>أقصى حمل</th><th>تاريخ المرور</th><th>PF</th></tr></thead>
+                    <tbody id="newestRecordsBody"><tr><td colspan="6" style="text-align:center;color:#94a3b8;">جاري التحميل...</td></tr></tbody>
                 </div>
             </div>
-        </header>
-
-        <!-- ===== KPI METRICS SECTION ===== -->
-        <section class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-info">
-                    <small>إجمالي كبار المشتركين</small>
-                    <strong id="kpi-customers">0</strong>
-                </div>
-                <div class="kpi-icon" style="background: #eff6ff; color: var(--accent);">
-                    <i class="fas fa-users"></i>
-                </div>
-            </div>
-
-            <div class="kpi-card good">
-                <div class="kpi-info">
-                    <small>إجمالي العدادات المسجلة</small>
-                    <strong id="kpi-meters">0</strong>
-                </div>
-                <div class="kpi-icon" style="background: #f0fdf4; color: var(--success);">
-                    <i class="fas fa-tachometer-alt"></i>
-                </div>
-            </div>
-
-            <div class="kpi-card warning-card">
-                <div class="kpi-info">
-                    <small>إجمالي الزيارات الميدانية</small>
-                    <strong id="kpi-visits">0</strong>
-                </div>
-                <div class="kpi-icon" style="background: #fffbeb; color: var(--warning);">
-                    <i class="fas fa-clipboard-check"></i>
-                </div>
-            </div>
-
-            <div class="kpi-card good">
-                <div class="kpi-info">
-                    <small>PF ≥ 0.92 (جيد)</small>
-                    <strong class="good-color" id="kpi-pf-good">0</strong>
-                </div>
-                <div class="kpi-icon" style="background: #f0fdf4; color: var(--success);">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-            </div>
-
-            <div class="kpi-card danger-card">
-                <div class="kpi-info">
-                    <small>PF &lt; 0.92 (منخفض)</small>
-                    <strong class="danger-color" id="kpi-pf-bad">0</strong>
-                </div>
-                <div class="kpi-icon" style="background: #fef2f2; color: var(--danger);">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== MAIN DASHBOARD WORKSPACE ===== -->
-        <div class="main-control-grid">
-            
-            <!-- Left Panel: Applications Shortcut & Sector Summary -->
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-                <div class="panel-card">
-                    <div class="panel-header">
-                        <span><i class="fas fa-th-large"></i> الاختصارات والتطبيقات</span>
-                    </div>
-                    <div class="app-shortcut-grid">
-                        <a href="MD.html" class="app-btn">
-                            <i class="fas fa-users-cog"></i>
-                            <span>إدارة المشتركين</span>
-                        </a>
-                        <a href="MD_Add.html" class="app-btn">
-                            <i class="fas fa-user-plus" style="color: var(--success); background: #f0fdf4;"></i>
-                            <span>إضافة مشترك</span>
-                        </a>
-                        <a href="MD_Pass.html" class="app-btn">
-                            <i class="fas fa-map-marked-alt" style="color: var(--warning); background: #fffbeb;"></i>
-                            <span>مرور ميداني</span>
-                        </a>
-                        <a href="MD_Pass.html" class="app-btn">
-                            <i class="fas fa-chart-pie" style="color: #0891b2; background: #ecfeff;"></i>
-                            <span>تقرير المرور</span>
-                        </a>
-                        <a href="MD_PF.html" class="app-btn">
-                            <i class="fas fa-bolt" style="color: var(--pf-color); background: #f5f3ff;"></i>
-                            <span>تقرير PF</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- ===== SECTOR SUMMARY TABLE (replaces chart) ===== -->
-                <div class="panel-card">
-                    <div class="panel-header">
-                        <span><i class="fas fa-layer-group"></i> توزيع المشتركين حسب القطاع</span>
-                        <span class="badge-count" id="sectorTotalCount">0</span>
-                    </div>
-                    <div class="table-wrap">
-                        <table class="modern-table">
-                            <thead>
-                                <tr>
-                                    <th>القطاع</th>
-                                    <th>عدد المشتركين</th>
-                                    <th>النسبة المئوية</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sectorTableBody">
-                                <tr>
-                                    <td colspan="3" style="text-align:center; color: #94a3b8;">جاري التحميل...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Panel: Quick Search & Newest Records -->
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-                <!-- ===== QUICK SEARCH ===== -->
-                <div class="panel-card">
-                    <div class="panel-header">
-                        <span><i class="fas fa-search"></i> بحث سريع بالمشتركين</span>
-                    </div>
-                    <div class="search-box-group">
-                        <input type="text" id="dashboardSearch" class="search-input" placeholder="اسم المشترك أو رقم العداد...">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <div class="table-wrap" style="max-height: 220px;">
-                        <table class="modern-table">
-                            <thead>
-                                <tr>
-                                    <th>اسم المشترك</th>
-                                    <th>القطاع</th>
-                                    <th>أقصى حمل</th>
-                                    <th>تاريخ المرور</th>
-                                    <th>PF</th>
-                                </tr>
-                            </thead>
-                            <tbody id="quickSearchBody">
-                                <tr>
-                                    <td colspan="5" style="text-align: center; color: #94a3b8;">جاري تحميل البيانات...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- ===== NEWEST RECORDS WITH FILTERS ===== -->
-                <div class="panel-card">
-                    <div class="panel-header">
-                        <span><i class="fas fa-clock"></i> أحدث التسجيلات (الشهر الحالي)</span>
-                        <span class="badge-count" id="newestCount">0</span>
-                    </div>
-                    
-                    <!-- Filters -->
-                    <div class="filter-row">
-                        <select id="filterKeta3">
-                            <option value="">كل القطاعات</option>
-                        </select>
-                        <select id="filterHandsa">
-                            <option value="">كل الهندسات</option>
-                        </select>
-                        <button class="btn-action btn-refresh" style="padding: 8px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); cursor: pointer; font-family: 'Cairo', sans-serif;" onclick="applyFilters()">
-                            <i class="fas fa-filter"></i> تطبيق
-                        </button>
-                    </div>
-
-                    <div class="table-wrap" style="max-height: 200px;">
-                        <table class="modern-table">
-                            <thead>
-                                <tr>
-                                    <th>اسم المشترك</th>
-                                    <th>القطاع</th>
-                                    <th>الهندسة</th>
-                                    <th>أقصى حمل</th>
-                                    <th>تاريخ المرور</th>
-                                    <th>PF</th>
-                                </tr>
-                            </thead>
-                            <tbody id="newestRecordsBody">
-                                <tr>
-                                    <td colspan="6" style="text-align: center; color: #94a3b8;">جاري التحميل...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
+</div>
 
-    <!-- ===== FIREBASE & DASHBOARD LOGIC ===== -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-        import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+<!-- FIREBASE & LOGIC -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAnKRhT5xJTBvsQKpW7e9w-hGSbAQJWTSo",
-            authDomain: "production1-ae85.firebaseapp.com",
-            databaseURL: "https://production1-ae85-default-rtdb.firebaseio.com",
-            projectId: "production1-ae85",
-            storageBucket: "production1-ae85.firebasestorage.app",
-            messagingSenderId: "490438031865",
-            appId: "1:490438031865:web:a4a69335989f30cd13a528"
-        };
+const firebaseConfig = {
+    apiKey: "AIzaSyAnKRhT5xJTBvsQKpW7e9w-hGSbAQJWTSo",
+    authDomain: "production1-ae85.firebaseapp.com",
+    databaseURL: "https://production1-ae85-default-rtdb.firebaseio.com",
+    projectId: "production1-ae85",
+    storageBucket: "production1-ae85.firebasestorage.app",
+    messagingSenderId: "490438031865",
+    appId: "1:490438031865:web:a4a69335989f30cd13a528"
+};
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-        let customerDataMD = {};
-        let visitsDataPass = {};
-        let allCustomersArray = [];
+let customerDataMD = {};
+let visitsDataPass = {};
+let allCustomersArray = [];
 
-        // ===== NAVIGATION DROPDOWN =====
-        document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('dropdownBtn');
-            const menu = document.getElementById('dropdownMenu');
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                menu.classList.toggle('show');
-            });
-            document.querySelectorAll('.dropdown-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const page = this.getAttribute('data-page');
-                    if (page) window.location.href = page;
-                });
-            });
-            window.addEventListener('click', () => menu.classList.remove('show'));
+// ===== DROPDOWN =====
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('dropdownBtn');
+    const menu = document.getElementById('dropdownMenu');
+    btn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('show'); });
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const page = this.getAttribute('data-page');
+            if (page) window.location.href = page;
         });
+    });
+    window.addEventListener('click', () => menu.classList.remove('show'));
+});
 
-        // ===== LOAD SYSTEM DATA =====
-        async function loadDashboardData() {
-            try {
-                const [snapMD, snapPass] = await Promise.all([
-                    get(ref(db, "MD/customers")),
-                    get(ref(db, "MD_Pass"))
-                ]);
+// ===== DATE HELPERS =====
+function parseDateDDMMYYYY(dateStr) {
+    if (!dateStr) return null;
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return null;
+    const day = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1;
+    const year = parseInt(parts[2]);
+    if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+    return new Date(year, month, day);
+}
 
-                customerDataMD = snapMD.exists() ? snapMD.val() : {};
-                visitsDataPass = snapPass.exists() ? snapPass.val() : {};
+function isDateInLast3Months(dateStr) {
+    const d = parseDateDDMMYYYY(dateStr);
+    if (!d) return false;
+    const now = new Date();
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    threeMonthsAgo.setHours(0,0,0,0);
+    d.setHours(0,0,0,0);
+    return d >= threeMonthsAgo && d <= now;
+}
 
-                // Build array for filtering
-                allCustomersArray = Object.keys(customerDataMD).map(id => ({
-                    id,
-                    ...customerDataMD[id],
-                    meters: customerDataMD[id].meters || {},
-                    meterCount: Object.keys(customerDataMD[id].meters || {}).length
-                }));
+function isDateInCurrentMonth(dateStr) {
+    const d = parseDateDDMMYYYY(dateStr);
+    if (!d) return false;
+    const now = new Date();
+    return (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth());
+}
 
-                calculateMetrics();
-                renderQuickSearch(customerDataMD);
-                renderSectorTable();
-                renderNewestRecords();
-                populateFilters();
+// ===== LOAD DATA =====
+async function loadDashboardData() {
+    try {
+        const [snapMD, snapPass] = await Promise.all([
+            get(ref(db, "MD/customers")),
+            get(ref(db, "MD_Pass"))
+        ]);
+        customerDataMD = snapMD.exists() ? snapMD.val() : {};
+        visitsDataPass = snapPass.exists() ? snapPass.val() : {};
 
-            } catch (err) {
-                console.error("Dashboard Loading Error:", err);
-            }
+        console.log("📊 Customer Data:", customerDataMD);
+        console.log("📋 Visit Data:", visitsDataPass);
+
+        allCustomersArray = Object.keys(customerDataMD).map(id => ({
+            id,
+            ...customerDataMD[id],
+            meters: customerDataMD[id].meters || {},
+            meterCount: Object.keys(customerDataMD[id].meters || {}).length
+        }));
+
+        calculateMetrics();
+        renderQuickSearch(customerDataMD);
+        renderSectorTable();
+        renderNewestRecords();
+        populateFilters();
+    } catch (err) {
+        console.error("Dashboard Loading Error:", err);
+        Swal.fire('خطأ', 'فشل تحميل البيانات من Firebase', 'error');
+    }
+}
+
+// ===== KPI CALCULATION =====
+function calculateMetrics() {
+    let totalCustomers = Object.keys(customerDataMD).length;
+    let totalMeters = 0;
+    let pfGood = 0, pfBad = 0;
+    let totalVisitsLast3Months = 0;
+
+    // Count meters and PF from customer data
+    for (let id in customerDataMD) {
+        const c = customerDataMD[id];
+        if (c.meters) totalMeters += Object.keys(c.meters).length;
+        const pf = parseFloat(c.power_factor);
+        if (pf > 0) { 
+            if (pf >= 0.92) pfGood++; 
+            else pfBad++; 
         }
+    }
 
-        // ===== CALCULATE KPIs =====
-        function calculateMetrics() {
-            let totalCustomers = Object.keys(customerDataMD).length;
-            let totalMeters = 0;
-            let pfGood = 0;
-            let pfBad = 0;
-            let totalVisits = 0;
-
-            for (let id in customerDataMD) {
-                const c = customerDataMD[id];
-                if (c.meters) totalMeters += Object.keys(c.meters).length;
-                
-                // PF classification
-                const pf = parseFloat(c.power_factor);
-                if (pf > 0) {
-                    if (pf >= 0.92) pfGood++;
-                    else pfBad++;
-                }
-            }
-
-            // Count visits
-            for (let id in visitsDataPass) {
-                if (id !== 'customers') {
-                    totalVisits += Object.keys(visitsDataPass[id] || {}).length;
-                }
-            }
-
-            document.getElementById('kpi-customers').innerText = totalCustomers;
-            document.getElementById('kpi-meters').innerText = totalMeters;
-            document.getElementById('kpi-visits').innerText = totalVisits;
-            document.getElementById('kpi-pf-good').innerText = pfGood;
-            document.getElementById('kpi-pf-bad').innerText = pfBad;
-        }
-
-        // ===== SECTOR SUMMARY TABLE =====
-        function renderSectorTable() {
-            const tbody = document.getElementById('sectorTableBody');
-            const sectorCounts = {};
-
-            for (let id in customerDataMD) {
-                const c = customerDataMD[id];
-                const sector = c.keta3 || 'غير محدد';
-                sectorCounts[sector] = (sectorCounts[sector] || 0) + 1;
-            }
-
-            const total = Object.values(sectorCounts).reduce((a, b) => a + b, 0);
-            document.getElementById('sectorTotalCount').innerText = total;
-
-            if (total === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: #94a3b8;">لا توجد بيانات</td></tr>';
-                return;
-            }
-
-            const sorted = Object.entries(sectorCounts).sort((a, b) => b[1] - a[1]);
-            tbody.innerHTML = sorted.map(([sector, count]) => `
-                <tr>
-                    <td><b>${sector}</b></td>
-                    <td>${count}</td>
-                    <td>${((count / total) * 100).toFixed(1)}%</td>
-                </tr>
-            `).join('');
-        }
-
-        // ===== QUICK SEARCH =====
-        function renderQuickSearch(data, query = '') {
-            const tbody = document.getElementById('quickSearchBody');
-            tbody.innerHTML = '';
-
-            const filtered = Object.keys(data).filter(id => {
-                const name = (data[id].metername || '').toLowerCase();
-                const meterNumbers = Object.values(data[id].meters || {}).map(m => m.meternumber || '').join(' ');
-                return name.includes(query.toLowerCase()) || 
-                       id.includes(query) || 
-                       meterNumbers.includes(query);
-            });
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">لا توجد نتائج</td></tr>';
-                return;
-            }
-
-            filtered.slice(0, 15).forEach(id => {
-                const c = data[id];
-                const maxLoad = c.max_load || '-';
-                const passingDate = c.passing_date || '-';
-                const pf = c.power_factor || '-';
-                tbody.innerHTML += `
-                    <tr>
-                        <td><b>${c.metername || id}</b></td>
-                        <td>${c.keta3 || '-'}</td>
-                        <td>${maxLoad}</td>
-                        <td>${passingDate}</td>
-                        <td>${pf}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        document.getElementById('dashboardSearch').addEventListener('input', (e) => {
-            renderQuickSearch(customerDataMD, e.target.value);
-        });
-
-        // ===== POPULATE FILTERS =====
-        function populateFilters() {
-            const keta3Set = new Set();
-            const handsaSet = new Set();
-
-            for (let id in customerDataMD) {
-                const c = customerDataMD[id];
-                if (c.keta3) keta3Set.add(c.keta3);
-                if (c.handsa) handsaSet.add(c.handsa);
-            }
-
-            const keta3Select = document.getElementById('filterKeta3');
-            const handsaSelect = document.getElementById('filterHandsa');
-
-            keta3Set.forEach(val => {
-                keta3Select.innerHTML += `<option value="${val}">${val}</option>`;
-            });
-            handsaSet.forEach(val => {
-                handsaSelect.innerHTML += `<option value="${val}">${val}</option>`;
-            });
-        }
-
-        // ===== APPLY FILTERS =====
-        window.applyFilters = function() {
-            renderNewestRecords();
-        };
-
-        // ===== RENDER NEWEST RECORDS (current month with filters) =====
-        function renderNewestRecords() {
-            const tbody = document.getElementById('newestRecordsBody');
-            const filterKeta3 = document.getElementById('filterKeta3').value;
-            const filterHandsa = document.getElementById('filterHandsa').value;
-
-            // Get current month start
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
-
-            // Filter customers with passing_date in current month
-            let filtered = allCustomersArray.filter(c => {
-                // Filter by sector
-                if (filterKeta3 && c.keta3 !== filterKeta3) return false;
-                if (filterHandsa && c.handsa !== filterHandsa) return false;
-
-                // Check if passing_date is in current month
-                if (c.passing_date) {
-                    const dateParts = c.passing_date.split('-');
-                    if (dateParts.length === 3) {
-                        const year = parseInt(dateParts[0]);
-                        const month = parseInt(dateParts[1]) - 1;
-                        if (year === currentYear && month === currentMonth) {
-                            return true;
-                        }
+    // Count visits from MD_Pass/customers/ structure
+    // Structure: MD_Pass -> customers -> [customerName] -> [dateKey] -> { ... }
+    if (visitsDataPass.customers) {
+        const customersVisits = visitsDataPass.customers;
+        for (let customerName in customersVisits) {
+            const visitDates = customersVisits[customerName];
+            if (typeof visitDates === 'object' && visitDates !== null) {
+                for (let dateKey in visitDates) {
+                    // dateKey format: "27-07-2025"
+                    if (isDateInLast3Months(dateKey)) {
+                        totalVisitsLast3Months++;
                     }
                 }
-                return false;
-            });
-
-            // Sort by passing_date (newest first)
-            filtered.sort((a, b) => {
-                if (!a.passing_date) return 1;
-                if (!b.passing_date) return -1;
-                return b.passing_date.localeCompare(a.passing_date);
-            });
-
-            document.getElementById('newestCount').innerText = filtered.length;
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #94a3b8;">لا توجد تسجيلات في الشهر الحالي</td></tr>';
-                return;
             }
-
-            tbody.innerHTML = filtered.slice(0, 20).map(c => `
-                <tr>
-                    <td><b>${c.metername || c.id}</b></td>
-                    <td>${c.keta3 || '-'}</td>
-                    <td>${c.handsa || '-'}</td>
-                    <td>${c.max_load || '-'}</td>
-                    <td>${c.passing_date || '-'}</td>
-                    <td>${c.power_factor || '-'}</td>
-                </tr>
-            `).join('');
         }
+    }
 
-        // ===== REFRESH =====
-        document.getElementById('btnRefresh')?.addEventListener('click', loadDashboardData);
+    // Also check for any other visit entries directly under MD_Pass (not just customers)
+    for (let key in visitsDataPass) {
+        if (key === 'customers') continue;
+        const entry = visitsDataPass[key];
+        if (typeof entry === 'object' && entry !== null) {
+            for (let subKey in entry) {
+                if (isDateInLast3Months(subKey)) {
+                    totalVisitsLast3Months++;
+                }
+            }
+        }
+    }
 
-        // Initial Load
-        loadDashboardData();
-    </script>
+    document.getElementById('kpi-customers').innerText = totalCustomers;
+    document.getElementById('kpi-meters').innerText = totalMeters;
+    document.getElementById('kpi-visits').innerText = totalVisitsLast3Months;
+    document.getElementById('kpi-pf-good').innerText = pfGood;
+    document.getElementById('kpi-pf-bad').innerText = pfBad;
+}
+
+// ===== SECTOR TABLE =====
+function renderSectorTable() {
+    const tbody = document.getElementById('sectorTableBody');
+    const sectorCounts = {};
+    for (let id in customerDataMD) {
+        const c = customerDataMD[id];
+        const sector = c.keta3 || 'غير محدد';
+        sectorCounts[sector] = (sectorCounts[sector] || 0) + 1;
+    }
+    const total = Object.values(sectorCounts).reduce((a,b) => a+b, 0);
+    document.getElementById('sectorTotalCount').innerText = total;
+    if (total === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#94a3b8;">لا توجد بيانات</td></tr>';
+        return;
+    }
+    const sorted = Object.entries(sectorCounts).sort((a,b) => b[1] - a[1]);
+    tbody.innerHTML = sorted.map(([sector, count]) => `
+        <tr><td><b>${sector}</b></td><td>${count}</td><td>${((count/total)*100).toFixed(1)}%</td></tr>
+    `).join('');
+}
+
+// ===== QUICK SEARCH =====
+function renderQuickSearch(data, query = '') {
+    const tbody = document.getElementById('quickSearchBody');
+    tbody.innerHTML = '';
+    const filtered = Object.keys(data).filter(id => {
+        const name = (data[id].metername || '').toLowerCase();
+        const meterNumbers = Object.values(data[id].meters || {}).map(m => m.meternumber || '').join(' ');
+        return name.includes(query.toLowerCase()) || id.includes(query) || meterNumbers.includes(query);
+    });
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;">لا توجد نتائج</td></tr>';
+        return;
+    }
+    filtered.slice(0, 15).forEach(id => {
+        const c = data[id];
+        tbody.innerHTML += `<tr>
+            <td><b>${c.metername || id}</b></td>
+            <td>${c.keta3 || '-'}</td>
+            <td>${c.max_load || '-'}</td>
+            <td>${c.passing_date || '-'}</td>
+            <td>${c.power_factor || '-'}</td>
+        </tr>`;
+    });
+}
+document.getElementById('dashboardSearch').addEventListener('input', (e) => {
+    renderQuickSearch(customerDataMD, e.target.value);
+});
+
+// ===== POPULATE FILTERS =====
+function populateFilters() {
+    const keta3Set = new Set(), handsaSet = new Set();
+    for (let id in customerDataMD) {
+        const c = customerDataMD[id];
+        if (c.keta3) keta3Set.add(c.keta3);
+        if (c.handsa) handsaSet.add(c.handsa);
+    }
+    const keta3Select = document.getElementById('filterKeta3');
+    const handsaSelect = document.getElementById('filterHandsa');
+    // Clear existing options (keep first "كل القطاعات")
+    keta3Select.innerHTML = '<option value="">كل القطاعات</option>';
+    handsaSelect.innerHTML = '<option value="">كل الهندسات</option>';
+    keta3Set.forEach(v => { keta3Select.innerHTML += `<option value="${v}">${v}</option>`; });
+    handsaSet.forEach(v => { handsaSelect.innerHTML += `<option value="${v}">${v}</option>`; });
+}
+
+// ===== APPLY FILTERS =====
+window.applyFilters = function() { renderNewestRecords(); };
+
+function renderNewestRecords() {
+    const tbody = document.getElementById('newestRecordsBody');
+    const filterKeta3 = document.getElementById('filterKeta3').value;
+    const filterHandsa = document.getElementById('filterHandsa').value;
+
+    // Filter: must have passing_date in last 3 months AND match sector/handsa
+    let filtered = allCustomersArray.filter(c => {
+        if (filterKeta3 && c.keta3 !== filterKeta3) return false;
+        if (filterHandsa && c.handsa !== filterHandsa) return false;
+        if (!c.passing_date) return false;
+        return isDateInLast3Months(c.passing_date);
+    });
+
+    // Sort by passing_date descending (newest first)
+    filtered.sort((a,b) => {
+        const da = parseDateDDMMYYYY(a.passing_date);
+        const db = parseDateDDMMYYYY(b.passing_date);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return db - da;
+    });
+
+    document.getElementById('newestCount').innerText = filtered.length;
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;">لا توجد تسجيلات في آخر 3 شهور</td></tr>';
+        return;
+    }
+    tbody.innerHTML = filtered.slice(0, 20).map(c => `
+        <tr>
+            <td><b>${c.metername || c.id}</b></td>
+            <td>${c.keta3 || '-'}</td>
+            <td>${c.handsa || '-'}</td>
+            <td>${c.max_load || '-'}</td>
+            <td>${c.passing_date || '-'}</td>
+            <td>${c.power_factor || '-'}</td>
+        </tr>
+    `).join('');
+}
+
+// ===== INIT =====
+loadDashboardData();
+</script>
 </body>
-
 </html>

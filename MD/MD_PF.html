@@ -167,6 +167,135 @@
             box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
         }
 
+        .report-section {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .report-section.visible {
+            display: block;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .report-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .report-title i {
+            color: var(--danger);
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-excel {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #217346;
+            color: white;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+
+        .btn-excel:hover {
+            background: #1a5c38;
+            transform: scale(1.02);
+        }
+
+        .btn-excel i {
+            font-size: 1rem;
+        }
+
+        .btn-excel:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 12px;
+        }
+
+        .report-item {
+            background: #f8fafc;
+            padding: 14px 18px;
+            border-radius: 8px;
+            border-right: 4px solid var(--danger);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .report-item:hover {
+            background: #f1f5f9;
+            transform: translateX(-3px);
+        }
+
+        .report-item .sector-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .report-item .report-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .report-item .not-passed-count {
+            font-weight: 800;
+            color: var(--danger);
+            font-size: 1rem;
+        }
+
+        .report-item .total-count {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .report-item .passed-count {
+            font-weight: 600;
+            color: var(--success);
+            font-size: 0.8rem;
+        }
+
         .stats-bar {
             background: var(--surface);
             border-radius: var(--radius);
@@ -510,6 +639,17 @@
             color: var(--text);
             text-decoration: none;
             font-weight: 600;
+            position: relative;
+        }
+
+        .sheet-item .item-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-right: auto;
+            white-space: nowrap;
         }
 
         .bottom-nav {
@@ -573,6 +713,67 @@
             font-size: 0.65rem;
             color: var(--text-muted);
         }
+
+        .badge-count {
+            background: var(--danger);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-right: 8px;
+        }
+
+        .report-summary {
+            background: var(--surface-card);
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .report-summary .total-all {
+            color: var(--text);
+        }
+
+        .report-summary .passed-all {
+            color: var(--success);
+        }
+
+        .report-summary .not-passed-all {
+            color: var(--danger);
+        }
+
+        @media (max-width: 600px) {
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .report-actions {
+                justify-content: flex-start;
+            }
+
+            .btn-excel {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .report-summary {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 
@@ -584,7 +785,7 @@
             <div class="header-top">
                 <div class="brand">
                     <i class="fas fa-bolt"></i>
-                    <span>تقرير معامل القدرة </span>
+                    <span>تقرير معامل القدرة</span>
                 </div>
                 <button class="nav-menu-btn" id="openMenuBtn">
                     <i class="fas fa-compass"></i> التنقل
@@ -617,7 +818,8 @@
                 </div>
 
                 <div class="form-group-m">
-                    <label class="form-label-m" for="filter_pf_status"><i class="fas fa-tachometer-alt"></i> فلتر معامل القدرة</label>
+                    <label class="form-label-m" for="filter_pf_status"><i class="fas fa-tachometer-alt"></i> فلتر معامل
+                        القدرة</label>
                     <select id="filter_pf_status" class="form-input-m">
                         <option value="all">جميع قيم PF</option>
                         <option value="less_092">أقل من 0.92 (&lt; 0.92)</option>
@@ -632,6 +834,33 @@
                 </div>
             </div>
         </header>
+
+        <div class="report-section" id="reportSection">
+            <div class="report-header">
+                <div class="report-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>تقرير المشتركين الذين لم يتم المرور عليهم</span>
+                    <span class="badge-count" id="totalNotPassed">0</span>
+                </div>
+                <div class="report-actions">
+                    <button class="btn-excel" id="exportNotPassedBtn" disabled>
+                        <i class="fas fa-file-excel"></i> تحميل إكسل
+                    </button>
+                </div>
+            </div>
+
+            <div class="report-summary" id="reportSummary">
+                <span class="total-all">إجمالي المشتركين: <span id="summaryTotal">0</span></span>
+                <span class="passed-all">تم المرور: <span id="summaryPassed">0</span></span>
+                <span class="not-passed-all">لم يتم المرور: <span id="summaryNotPassed">0</span></span>
+            </div>
+
+            <div class="report-grid" id="notPassedReport">
+                <div style="text-align:center;color:#94a3b8;grid-column:1/-1;padding:20px;">
+                    <i class="fas fa-info-circle"></i> اضغط على "عرض التقرير" لتحميل البيانات
+                </div>
+            </div>
+        </div>
 
         <div class="stats-bar" id="statsHeaderBar">
             <div class="stats-top">
@@ -668,8 +897,10 @@
             <a href="MD_Site.html" class="sheet-item">🔍 تسجيل مرور ميداني</a>
             <a href="MD_Pass.html" class="sheet-item">📅 تقرير المرور العام</a>
             <a href="index.html" class="sheet-item">🏠 الصفحة الرئيسية</a>
-            <a href="MD_PF.html" class="sheet-item"
-                style="border: 1px solid var(--pf-color); background: #f3e8ff;">⚡ تقرير معامل القدرة (الحالية)</a>
+            <a href="MD_PF.html" class="sheet-item" style="border: 1px solid var(--pf-color); background: #f3e8ff;">
+                ⚡ تقرير معامل القدرة (الحالية)
+                <span class="item-badge">الحالية</span>
+            </a>
         </div>
     </div>
 
@@ -726,6 +957,7 @@
         let passingData = null;
         let allCustomersData = null;
         let currentRenderedGroups = {};
+        let notPassedCustomers = [];
 
         const openBtn = document.getElementById('openMenuBtn');
         const closeBtn = document.getElementById('closeSheetBtn');
@@ -761,6 +993,32 @@
             XLSX.writeFile(wb, `Report_PF_${new Date().toISOString().slice(0, 10)}.xlsx`);
         };
 
+        function exportNotPassedToExcel() {
+            if (notPassedCustomers.length === 0) {
+                Swal.fire('تنبيه', 'لا يوجد مشتركين لم يتم المرور عليهم', 'info');
+                return;
+            }
+
+            const exportData = notPassedCustomers.map(c => ({
+                'اسم المشترك': c.name,
+                'القطاع': c.keta3,
+                'الهندسة': c.handsa,
+                'تاريخ أخر مرور': c.lastPassDate
+            }));
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            XLSX.utils.book_append_sheet(wb, ws, 'لم يتم المرور');
+
+            ws['!cols'] = [{ wch: 30 }, { wch: 25 }, { wch: 25 }, { wch: 20 }];
+            const fileName = `المشتركين_لم_يتم_المرور_${new Date().toLocaleDateString('ar-EG').replace(/\//g, '-')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+
+            Swal.fire('تم', `تم تحميل ${notPassedCustomers.length} مشترك بنجاح`, 'success');
+        }
+
+        document.getElementById('exportNotPassedBtn').addEventListener('click', exportNotPassedToExcel);
+
         function parseDateFlexible(raw) {
             if (!raw && raw !== 0) return null;
             const s = String(raw).trim().replace(/\//g, '-');
@@ -785,7 +1043,7 @@
 
         function calculateCustomerPFWithDateRange(records, startDateObj, endDateObj) {
             if (!records || records.length === 0) {
-                return { pf: 0, totalKwhDiff: 0, totalKvarhDiff: 0, hasData: false, oldestReading: null, newestReading: null };
+                return { pf: 0, totalKwhDiff: 0, totalKvarhDiff: 0, hasData: false, oldestReading: null, newestReading: null, newestDate: '-' };
             }
 
             let filteredRecords = records.filter(rec => {
@@ -797,7 +1055,7 @@
             });
 
             if (filteredRecords.length === 0) {
-                return { pf: 0, totalKwhDiff: 0, totalKvarhDiff: 0, hasData: false, oldestReading: null, newestReading: null };
+                return { pf: 0, totalKwhDiff: 0, totalKvarhDiff: 0, hasData: false, oldestReading: null, newestReading: null, newestDate: '-' };
             }
 
             filteredRecords.sort((a, b) => {
@@ -862,16 +1120,7 @@
 
             try {
                 const passSnap = await get(ref(db, 'MD_Pass/customers'));
-                if (passSnap.exists()) {
-                    passingData = passSnap.val();
-                } else {
-                    const rootSnap = await get(ref(db, 'MD_Pass'));
-                    if (rootSnap.exists() && rootSnap.val().customers) {
-                        passingData = rootSnap.val().customers;
-                    } else {
-                        passingData = {};
-                    }
-                }
+                passingData = passSnap.exists() ? passSnap.val() : {};
 
                 const customerSnap = await get(ref(db, 'MD/customers'));
                 if (customerSnap.exists()) {
@@ -903,71 +1152,168 @@
             }
         }
 
-        function getUnpassedCustomersReport(startDateObj, fK, fH) {
-            let unpassedKeta3 = {};
-            if (!startDateObj) return { unpassedKeta3 };
-
+        function getPassedCustomersInDateRange(startDateObj, endDateObj) {
             const passedCustomerIds = new Set();
             const dateRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
 
-            for (let custID in passingData) {
-                const custNode = passingData[custID];
+            for (let custId in passingData) {
+                const custNode = passingData[custId];
                 if (!custNode || typeof custNode !== 'object') continue;
 
-                Object.keys(custNode).forEach(dateKey => {
+                for (let dateKey in custNode) {
                     if (dateRegex.test(dateKey.trim())) {
                         let recordDate = parseDateFlexible(dateKey);
-                        if (recordDate && recordDate >= startDateObj) {
-                            passedCustomerIds.add(custID);
-                        }
+                        if (!recordDate) continue;
+
+                        if (startDateObj && recordDate < startDateObj) continue;
+                        if (endDateObj && recordDate > endDateObj) continue;
+
+                        passedCustomerIds.add(custId);
+                        break;
                     }
-                });
+                }
             }
+
+            return passedCustomerIds;
+        }
+
+        function calculateNotPassedReport(fK, fH, startDateObj, endDateObj) {
+            const passedIds = getPassedCustomersInDateRange(startDateObj, endDateObj);
+            notPassedCustomers = [];
+
+            let sectorData = {};
+            let totalAll = 0;
+            let totalPassed = 0;
 
             for (let custId in allCustomersData) {
                 const cust = allCustomersData[custId];
-                const custName = cust.metername || cust.name || custId;
                 const keta3 = cust.keta3 || 'غير محدد';
                 const handsa = cust.handsa || 'غير محدد';
 
                 if (fK && keta3 !== fK) continue;
                 if (fH && handsa !== fH) continue;
 
-                if (!passedCustomerIds.has(custId)) {
-                    if (!unpassedKeta3[keta3]) {
-                        unpassedKeta3[keta3] = { count: 0, names: [] };
+                totalAll++;
+
+                if (!sectorData[keta3]) {
+                    sectorData[keta3] = { total: 0, passed: 0, notPassed: 0, customers: [] };
+                }
+
+                sectorData[keta3].total++;
+
+                if (passedIds.has(custId)) {
+                    sectorData[keta3].passed++;
+                    totalPassed++;
+                } else {
+                    sectorData[keta3].notPassed++;
+
+                    let lastPassDate = 'لا يوجد مرور سابق';
+                    if (passingData && passingData[custId]) {
+                        const custNode = passingData[custId];
+                        const dateRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
+                        const dateKeys = Object.keys(custNode).filter(k => dateRegex.test(k.trim()));
+                        if (dateKeys.length > 0) {
+                            dateKeys.sort((a, b) => {
+                                const dA = parseDateFlexible(a);
+                                const dB = parseDateFlexible(b);
+                                return (dB || 0) - (dA || 0);
+                            });
+                            lastPassDate = dateKeys[0];
+                        } else if (custNode.pf_calculated_date) {
+                            lastPassDate = custNode.pf_calculated_date;
+                        }
                     }
-                    unpassedKeta3[keta3].count += 1;
-                    unpassedKeta3[keta3].names.push(custName);
+
+                    const custObj = {
+                        id: custId,
+                        name: cust.metername || cust.name || custId,
+                        keta3: keta3,
+                        handsa: handsa,
+                        lastPassDate: lastPassDate
+                    };
+                    sectorData[keta3].customers.push(custObj);
+                    notPassedCustomers.push(custObj);
                 }
             }
 
-            return { unpassedKeta3 };
+            const totalNotPassed = totalAll - totalPassed;
+            return { sectorData, totalAll, totalPassed, totalNotPassed };
         }
 
-        window.toggleKeta3Filter = function (keta3Name) {
-            const kSel = document.getElementById('filter_keta3');
-            if (kSel.value === keta3Name) {
-                kSel.value = "";
-            } else {
-                kSel.value = keta3Name;
+        function renderUnpassedReport(sectorData, totalAll, totalPassed, totalNotPassed) {
+            const container = document.getElementById('notPassedReport');
+            const reportSection = document.getElementById('reportSection');
+
+            document.getElementById('totalNotPassed').innerText = totalNotPassed;
+            document.getElementById('summaryTotal').innerText = totalAll;
+            document.getElementById('summaryPassed').innerText = totalPassed;
+            document.getElementById('summaryNotPassed').innerText = totalNotPassed;
+
+            reportSection.classList.add('visible');
+
+            const exportBtn = document.getElementById('exportNotPassedBtn');
+            exportBtn.disabled = (totalNotPassed === 0);
+
+            if (totalNotPassed === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;color:var(--success);grid-column:1/-1;padding:20px;">
+                        <i class="fas fa-check-circle" style="font-size:2rem;"></i>
+                        <p style="margin-top:10px;font-weight:700;">جميع المشتركين تم المرور عليهم في هذه الفترة</p>
+                    </div>
+                `;
+                return;
             }
+
+            const sortedSectors = Object.entries(sectorData)
+                .filter(([_, data]) => data.notPassed > 0)
+                .sort((a, b) => b[1].notPassed - a[1].notPassed);
+
+            container.innerHTML = sortedSectors.map(([sector, data]) => `
+                <div class="report-item" onclick="filterBySector('${sector}')">
+                    <div class="sector-name">قطاع ${sector}</div>
+                    <div class="report-stats">
+                        <span class="total-count">الإجمالي: ${data.total}</span>
+                        <span class="passed-count">تم المرور: ${data.passed}</span>
+                        <span class="not-passed-count">
+                            <i class="fas fa-user-times"></i>
+                            لم يتم المرور: ${data.notPassed}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.filterBySector = function (sectorName) {
+            const kSel = document.getElementById('filter_keta3');
+            kSel.value = (kSel.value === sectorName) ? "" : sectorName;
             runReport();
         };
 
-        function updateHeaderStats(unpassedKeta3) {
+        window.toggleKeta3Filter = function (keta3Name) {
+            const kSel = document.getElementById('filter_keta3');
+            kSel.value = (kSel.value === keta3Name) ? "" : keta3Name;
+            runReport();
+        };
+
+        function updateHeaderStats() {
             const chipGroup = document.getElementById('headerChipGroup');
             let chipsHtml = '';
             const currentKeta3Filter = document.getElementById('filter_keta3').value;
 
-            if (unpassedKeta3 && Object.keys(unpassedKeta3).length > 0) {
-                Object.entries(unpassedKeta3).forEach(([name, data]) => {
+            if (notPassedCustomers.length > 0) {
+                const grouped = {};
+                notPassedCustomers.forEach(c => {
+                    if (!grouped[c.keta3]) grouped[c.keta3] = [];
+                    grouped[c.keta3].push(c);
+                });
+
+                Object.entries(grouped).forEach(([name, data]) => {
                     const isSelected = currentKeta3Filter === name;
                     const selectedClass = isSelected ? 'selected-chip' : '';
 
                     let miniTableHtml = '';
-                    if (isSelected && data.names.length > 0) {
-                        let rows = data.names.map((n, idx) => `<tr><td>${idx + 1}</td><td>${n}</td></tr>`).join('');
+                    if (isSelected && data.length > 0) {
+                        let rows = data.map((n, idx) => `<tr><td>${idx + 1}</td><td>${n.name}</td></tr>`).join('');
                         miniTableHtml = `
                             <div class="unpassed-table-container">
                                 <table class="unpassed-mini-table">
@@ -986,7 +1332,7 @@
                             </div>
                             <div class="val-row">
                                 <span class="val" style="color:var(--danger);">
-                                    لم يتم المرور: ${data.count} مشترك
+                                    لم يتم المرور: ${data.length} مشترك
                                 </span>
                             </div>
                             ${miniTableHtml}
@@ -995,7 +1341,7 @@
                 });
             }
 
-            chipGroup.innerHTML = chipsHtml || `<span style="font-size:0.75rem;color:var(--text-muted);">جميع المشتركين تم المرور عليهم ضمن هذه الفترة</span>`;
+            chipGroup.innerHTML = chipsHtml || `<span style="font-size:0.75rem;color:var(--text-muted);">جميع المشتركين تم المرور عليهم</span>`;
         }
 
         async function runReport() {
@@ -1013,6 +1359,10 @@
             const endDateObj = end ? parseDateFlexible(end) : null;
             if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
 
+            const { sectorData, totalAll, totalPassed, totalNotPassed } = calculateNotPassedReport(fK, fH, startDateObj, endDateObj);
+            renderUnpassedReport(sectorData, totalAll, totalPassed, totalNotPassed);
+            updateHeaderStats();
+
             let customerRecords = {};
             const dateRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
 
@@ -1026,10 +1376,8 @@
                         let recordDate = parseDateFlexible(dateKey);
                         if (!recordDate) return;
 
-                        let match = true;
-                        if (startDateObj && recordDate < startDateObj) match = false;
-                        if (endDateObj && recordDate > endDateObj) match = false;
-                        if (!match) return;
+                        if (startDateObj && recordDate < startDateObj) return;
+                        if (endDateObj && recordDate > endDateObj) return;
 
                         const keta3 = v.keta3 || customerNode.keta3 || '-';
                         const handsa = v.handsa || customerNode.handsa || '-';
@@ -1038,16 +1386,11 @@
                         if (fK && keta3 !== fK) return;
                         if (fH && handsa !== fH) return;
 
-                        let readingsArray = [];
-                        if (v.readings) {
-                            readingsArray = Object.values(v.readings);
-                        }
+                        let readingsArray = v.readings ? Object.values(v.readings) : [];
 
-                        let generalMatch = false;
                         const meterNums = readingsArray.map(r => r.meternumber || '').join(' ');
                         const baseSearchStr = `${metername} ${keta3} ${handsa} ${meterNums}`.toLowerCase();
-                        if (fG === '' || baseSearchStr.includes(fG)) generalMatch = true;
-                        if (!generalMatch) return;
+                        if (fG !== '' && !baseSearchStr.includes(fG)) return;
 
                         if (!customerRecords[subID]) {
                             customerRecords[subID] = {
@@ -1092,11 +1435,10 @@
             });
 
             currentRenderedGroups = filteredGroups;
-            const { unpassedKeta3 } = getUnpassedCustomersReport(startDateObj, fK, fH);
-            renderMobileUI(filteredGroups, unpassedKeta3);
+            renderMobileUI(filteredGroups);
         }
 
-        function renderMobileUI(customerGroups, unpassedKeta3) {
+        function renderMobileUI(customerGroups) {
             const container = document.getElementById('results-container');
             const selectAllVal = document.getElementById('selectAllCheck').checked;
 
@@ -1115,9 +1457,11 @@
 
                     let metersHtml = '';
                     c.records.forEach(rec => {
+                        const visitDate = rec.dateKey || c.newestDate || '-';
+
                         rec.readings.forEach(r => {
                             detailCount++;
-                            const readingKwh = r.kwh || 0;
+                            const readingKwh = r.kwh != null ? r.kwh : 0;
 
                             metersHtml += `
                             <div class="m-meter-card">
@@ -1126,7 +1470,7 @@
                                     <span style="font-size:0.7rem; color:var(--text-muted);">${rec.dateKey}</span>
                                 </div>
                                 <div class="m-readings-row">
-                                    <div>ك.و.س: <span class="kwh-val">${r.kwh != null ? r.kwh : '0'}</span></div>
+                                    <div>ك.و.س: <span class="kwh-val">${readingKwh}</span></div>
                                     <div>ك.ف.س: <span class="kvarh-val">${r.kvarh != null ? r.kvarh : '0'}</span></div>
                                 </div>
                                 ${r.note ? `<div class="m-notes">📝 ${r.note}</div>` : ''}
@@ -1134,9 +1478,15 @@
                         `;
 
                             masterRows += `<tr>
-                            <td>${rec.dateKey}</td><td>${c.metername}</td><td>${r.meternumber || '-'}</td>
-                            <td>${c.keta3}</td><td>${c.handsa}</td><td>${c.max_load}</td>
-                            <td>${pfDisplay}</td><td>${readingKwh}</td><td>${r.kvarh || 0}</td>
+                            <td>${visitDate}</td>
+                            <td>${c.metername}</td>
+                            <td>${r.meternumber || '-'}</td>
+                            <td>${c.keta3}</td>
+                            <td>${c.handsa}</td>
+                            <td>${c.max_load}</td>
+                            <td>${pfDisplay}</td>
+                            <td>${readingKwh}</td>
+                            <td>${r.kvarh || 0}</td>
                             <td>${r.note || ''}</td>
                         </tr>`;
                         });
@@ -1174,8 +1524,6 @@
                 });
 
                 document.getElementById('headerTotalCount').textContent = detailCount;
-                updateHeaderStats(unpassedKeta3);
-
                 container.innerHTML = cardsHtml;
                 document.querySelector("#masterTable tbody").innerHTML = masterRows;
 
@@ -1194,7 +1542,6 @@
 
             } else {
                 document.getElementById('headerTotalCount').textContent = 0;
-                updateHeaderStats(unpassedKeta3);
                 container.innerHTML = `
                 <div class="empty-state-m">
                     <i class="fas fa-search-minus"></i>
@@ -1239,7 +1586,7 @@
                 showCancelButton: true,
                 confirmButtonText: 'نعم، تحديث لآخر تاريخ',
                 cancelButtonText: 'إلغاء',
-                confirmButtonColor: '#7c3aed'
+                confirmColor: '#7c3aed'
             });
 
             if (!confirmResult.isConfirmed) return;
@@ -1257,16 +1604,15 @@
                 const customer = currentRenderedGroups[subID];
                 if (customer && customer.hasPfData) {
                     const newPf = customer.pfResult.pf;
-                    const lastVisitDate = customer.newestDate; // Targets only the latest date
-                    
+                    const lastVisitDate = customer.newestDate;
+
                     if (newPf > 0 && lastVisitDate) {
                         updatePromises.push(set(ref(db, `MD/customers/${subID}/power_factor`), newPf));
                         updatePromises.push(set(ref(db, `MD/customers/${subID}/pf_calculated_date`), lastVisitDate));
-                        
+
                         updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/power_factor`), newPf));
                         updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/pf_calculated_date`), lastVisitDate));
 
-                        // ONLY updates the power_factor under the newest visit date node
                         updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/${lastVisitDate}/power_factor`), newPf));
 
                         updatedCount++;
@@ -1292,12 +1638,12 @@
         document.getElementById('navBtnSearch').onclick = () => runReport();
         document.getElementById('navBtnUpdatePF').onclick = () => updatePFInDatabase();
 
-        document.getElementById('filter_general').addEventListener('input', () => { if(passingData) runReport(); });
-        document.getElementById('filter_keta3').addEventListener('change', () => { if(passingData) runReport(); });
-        document.getElementById('filter_handsa').addEventListener('change', () => { if(passingData) runReport(); });
-        document.getElementById('filter_pf_status').addEventListener('change', () => { if(passingData) runReport(); });
-        document.getElementById('date_from').addEventListener('change', () => { if(passingData) runReport(); });
-        document.getElementById('date_to').addEventListener('change', () => { if(passingData) runReport(); });
+        document.getElementById('filter_general').addEventListener('input', () => { if (passingData) runReport(); });
+        document.getElementById('filter_keta3').addEventListener('change', () => { if (passingData) runReport(); });
+        document.getElementById('filter_handsa').addEventListener('change', () => { if (passingData) runReport(); });
+        document.getElementById('filter_pf_status').addEventListener('change', () => { if (passingData) runReport(); });
+        document.getElementById('date_from').addEventListener('change', () => { if (passingData) runReport(); });
+        document.getElementById('date_to').addEventListener('change', () => { if (passingData) runReport(); });
     </script>
 </body>
 

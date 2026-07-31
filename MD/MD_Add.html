@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>إضافة مشترك وعدادات - نظام الإدارة</title>
+    <title>إضافة مشترك وعدادات - كبار المشتركين</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -356,21 +356,6 @@
             transform: translateY(-1px);
         }
 
-        .back-link {
-            display: block;
-            text-align: right;
-            margin-top: 20px;
-            color: #64748b;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-
-        .back-link:hover {
-            color: var(--accent);
-        }
-
         /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
             .form-container {
@@ -473,7 +458,7 @@
 
         <div class="section-title">👤 البيانات العامة للمشترك</div>
         <div class="input-group">
-            <label>اسم المشترك الكامل</label>
+            <label>اسم المشترك </label>
             <input type="text" id="mname" placeholder="أدخل اسم المشترك">
         </div>
         <div class="row-flex">
@@ -548,9 +533,9 @@
             </div>
         </div>
         <div class="row-flex">
-            <div class="input-group"><label>معامل القدرة (PF)</label><input type="number" step="0.01" id="power_factor">
+            <div class="input-group"><label>معامل القدرة (PF)</label><input type="number" step="0.01" id="power_factor" value="0.00">
             </div>
-            <div class="input-group"><label>أقصى حمل</label><input type="number" id="max_load"></div>
+            <div class="input-group"><label>أقصى حمل</label><input type="number" id="max_load" value="0"></div>
         </div>
 
         <div id="meters-list">
@@ -559,20 +544,20 @@
                     <span>⚡ بيانات العداد (1)</span>
                 </div>
                 <div class="row-flex">
-                    <div class="input-group"><label>رقم العداد</label><input type="text" class="mno"></div>
-                    <div class="input-group"><label>نوع العداد</label><input class="mtype"></div>
-                    <div class="input-group"><label>تاريخ التركيب</label><input type="date" class="fix_date"></div>
-                    <div class="input-group"><label>تاريخ الإطلاق</label><input type="date" class="power_date"></div>
+                    <div class="input-group"><label>رقم العداد</label><input type="text" class="mno" value=""></div>
+                    <div class="input-group"><label>نوع العداد</label><input class="mtype" value=""></div>
+                    <div class="input-group"><label>تاريخ التركيب</label><input type="date" class="fix_date" value=""></div>
+                    <div class="input-group"><label>تاريخ الإطلاق</label><input type="date" class="power_date" value=""></div>
                 </div>
                 <div class="row-flex">
-                    <div class="input-group"><label>قراءة kWh</label><input type="number" class="kwh"></div>
-                    <div class="input-group"><label>قراءة kVARh</label><input type="number" class="kvarh"></div>
+                    <div class="input-group"><label>قراءة kWh</label><input type="number" class="kwh" value="0"></div>
+                    <div class="input-group"><label>قراءة kVARh</label><input type="number" class="kvarh" value="0"></div>
                     <div class="input-group"><label>الثابت</label><input type="number" class="constant" value="1"></div>
                 </div>
                 <div class="row-flex">
                     <div class="input-group"><label>VT Ratio</label><input class="vt" value="11000/110"></div>
                     <div class="input-group"><label>CT Ratio</label><input class="ct" value="200/5"></div>
-                    <div class="input-group"><label>المكان</label><input class="loc"></div>
+                    <div class="input-group"><label>المكان</label><input class="loc" value=""></div>
                 </div>
                 <div class="input-group"><label>ملاحظات العداد</label><textarea class="m-notes" rows="1"></textarea>
                 </div>
@@ -581,7 +566,6 @@
 
         <button class="btn-add-meter" onclick="addNewMeterForm()">➕ إضافة عداد آخر لنفس المشترك</button>
         <button class="btn-submit" onclick="saveAllToFirebase()">💾 حفظ كل البيانات في القاعدة</button>
-        <a href="MD.html" class="back-link">⬅️ العودة لصفحة السجلات</a>
     </div>
 
     <script type="module">
