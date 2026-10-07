@@ -5,7 +5,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>نظام إدارة المشتركين · البيانات الرئيسية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -662,32 +663,105 @@
             box-shadow: var(--shadow-md);
         }
 
-        .bottom-actions .btn-primary { background: var(--accent); color: #fff; }
-        .bottom-actions .btn-success { background: var(--success); color: #fff; }
-        .bottom-actions .btn-excel { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
-        .bottom-actions .btn-clear { background: var(--surface-card); color: var(--text); border: 1px solid var(--border); }
-        .bottom-actions .btn-danger { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
-        .bottom-actions .btn-warning { background: var(--warning); color: #fff; }
+        .bottom-actions .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
 
-        .hidden { display: none !important; }
-        .text-muted { color: var(--text-muted); }
-        .text-sm { font-size: 0.7rem; }
-        .mb-1 { margin-bottom: 4px; }
-        .fw-700 { font-weight: 700; }
-        .mt-1 { margin-top: 6px; }
-        .flex { display: flex; align-items: center; gap: 4px; }
+        .bottom-actions .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .bottom-actions .btn-excel {
+            background: #ecfdf5;
+            color: var(--success);
+            border: 1px solid #a7f3d0;
+        }
+
+        .bottom-actions .btn-clear {
+            background: var(--surface-card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .bottom-actions .btn-danger {
+            background: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+        }
+
+        .bottom-actions .btn-warning {
+            background: var(--warning);
+            color: #fff;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        .text-sm {
+            font-size: 0.7rem;
+        }
+
+        .mb-1 {
+            margin-bottom: 4px;
+        }
+
+        .fw-700 {
+            font-weight: 700;
+        }
+
+        .mt-1 {
+            margin-top: 6px;
+        }
+
+        .flex {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
         @media (max-width: 768px) {
-            .form-single { grid-template-columns: 1fr; gap: 8px; }
-            .main-card { flex-direction: column; align-items: stretch; gap: 6px; }
-            .main-card-header { flex-wrap: wrap; }
-            .main-info-grid { flex-wrap: wrap; gap: 4px 8px; }
-            .meter-detail-grid { grid-template-columns: 1fr 1fr; }
+            .form-single {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .main-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+            }
+
+            .main-card-header {
+                flex-wrap: wrap;
+            }
+
+            .main-info-grid {
+                flex-wrap: wrap;
+                gap: 4px 8px;
+            }
+
+            .meter-detail-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 480px) {
-            .bottom-actions .btn { font-size: 0.6rem; padding: 6px 10px; min-width: 60px; }
-            .meter-detail-grid { grid-template-columns: 1fr; }
+            .bottom-actions .btn {
+                font-size: 0.6rem;
+                padding: 6px 10px;
+                min-width: 60px;
+            }
+
+            .meter-detail-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -706,8 +780,10 @@
 
             <div class="form-container" id="formContainer">
                 <div class="form-single" id="formSingle">
-                    <div class="form-group"><label><i class="fas fa-user"></i> اسم المشترك</label><input id="mname" placeholder="اسم المشترك"></div>
-                    <div class="form-group"><label><i class="fas fa-hashtag"></i> رقم العداد</label><input id="mno" placeholder="رقم العداد"></div>
+                    <div class="form-group"><label><i class="fas fa-user"></i> اسم المشترك</label><input id="mname"
+                            placeholder="اسم المشترك"></div>
+                    <div class="form-group"><label><i class="fas fa-hashtag"></i> رقم العداد</label><input id="mno"
+                            placeholder="رقم العداد"></div>
                     <div class="form-group"><label><i class="fas fa-layer-group"></i> القطاع</label>
                         <select id="keta3">
                             <option value="">اختر</option>
@@ -777,15 +853,24 @@
                             <option>هندسة برج البرلس</option>
                         </select>
                     </div>
-                    <div class="form-group"><label><i class="fas fa-calendar-plus"></i> تاريخ الرفع</label><input type="date" id="inspection_date"></div>
-                    <div class="form-group"><label><i class="fas fa-calendar-check"></i> تاريخ التركيب</label><input type="date" id="fix_date"></div>
-                    <div class="form-group"><label><i class="fas fa-calendar-alt"></i> تاريخ الإطلاق</label><input type="date" id="power_date"></div>
-                    <div class="form-group"><label><i class="fas fa-arrows-alt-h"></i> VT Ratio</label><input id="vt_ratio"></div>
-                    <div class="form-group"><label><i class="fas fa-arrows-alt-h"></i> CT Ratio</label><input id="ct_ratio"></div>
-                    <div class="form-group"><label><i class="fas fa-cog"></i> الثابت</label><input id="constant" type="number" step="any"></div>
-                    <div class="form-group"><label><i class="fas fa-map-pin"></i> المكان</label><input id="location"></div>
-                    <div class="form-group"><label><i class="fas fa-microchip"></i> نوع العداد</label><input id="mtype"></div>
-                    <div class="form-group full"><label><i class="fas fa-sticky-note"></i> ملاحظات</label><textarea id="notes" rows="1" placeholder="ملاحظات"></textarea></div>
+                    <div class="form-group"><label><i class="fas fa-calendar-plus"></i> تاريخ الرفع</label><input
+                            type="date" id="inspection_date"></div>
+                    <div class="form-group"><label><i class="fas fa-calendar-check"></i> تاريخ التركيب</label><input
+                            type="date" id="fix_date"></div>
+                    <div class="form-group"><label><i class="fas fa-calendar-alt"></i> تاريخ الإطلاق</label><input
+                            type="date" id="power_date"></div>
+                    <div class="form-group"><label><i class="fas fa-arrows-alt-h"></i> VT Ratio</label><input
+                            id="vt_ratio"></div>
+                    <div class="form-group"><label><i class="fas fa-arrows-alt-h"></i> CT Ratio</label><input
+                            id="ct_ratio"></div>
+                    <div class="form-group"><label><i class="fas fa-cog"></i> الثابت</label><input id="constant"
+                            type="number" step="any"></div>
+                    <div class="form-group"><label><i class="fas fa-map-pin"></i> المكان</label><input id="location">
+                    </div>
+                    <div class="form-group"><label><i class="fas fa-microchip"></i> نوع العداد</label><input id="mtype">
+                    </div>
+                    <div class="form-group full"><label><i class="fas fa-sticky-note"></i> ملاحظات</label><textarea
+                            id="notes" rows="1" placeholder="ملاحظات"></textarea></div>
                 </div>
             </div>
 
@@ -821,12 +906,17 @@
     </div>
 
     <div class="bottom-actions">
-        <button class="btn btn-excel" onclick="protectedAction('upload')"><i class="fas fa-file-excel"></i> رفع إكسيل</button>
-        <button id="saveBtn" class="btn btn-primary" onclick="quickSave()"><i class="fas fa-save"></i> حفظ/تحديث</button>
-        <button id="addMeterBtn" class="btn btn-success" onclick="addNewMeter()"><i class="fas fa-plus"></i> عداد جديد</button>
-        <button id="updateAllBtn" class="btn btn-warning" onclick="updateCustomerData()" style="display:none;"><i class="fas fa-sync"></i> تحديث الكل</button>
+        <button class="btn btn-excel" onclick="protectedAction('upload')"><i class="fas fa-file-excel"></i> رفع
+            إكسيل</button>
+        <button id="saveBtn" class="btn btn-primary" onclick="quickSave()"><i class="fas fa-save"></i>
+            حفظ/تحديث</button>
+        <button id="addMeterBtn" class="btn btn-success" onclick="addNewMeter()"><i class="fas fa-plus"></i> عداد
+            جديد</button>
+        <button id="updateAllBtn" class="btn btn-warning" onclick="updateCustomerData()" style="display:none;"><i
+                class="fas fa-sync"></i> تحديث الكل</button>
         <button class="btn btn-clear" onclick="clearForm()"><i class="fas fa-eraser"></i> تفريغ</button>
-        <button class="btn btn-danger" onclick="protectedAction('deleteAll')"><i class="fas fa-trash"></i> مسح الكل</button>
+        <button class="btn btn-danger" onclick="protectedAction('deleteAll')"><i class="fas fa-trash"></i> مسح
+            الكل</button>
     </div>
 
     <script type="module">
@@ -879,6 +969,62 @@
         // Helpers
         function sanitizeKey(key) {
             return key ? String(key).replace(/[.#$\[\]\(\)\/\s]/g, "").trim() : "unknown";
+        }
+        /* ---------- Arabic-normalized select setter ---------- */
+        function normalizeArabic(str) {
+            return String(str ?? "")
+                .replace(/[\u064B-\u0652\u0640]/g, "")   // tashkeel + tatweel
+                .replace(/[أإآٱ]/g, "ا")
+                .replace(/ى/g, "ي")
+                .replace(/ئ/g, "ي")
+                .replace(/ؤ/g, "و")
+                .replace(/ة/g, "ه")
+                .replace(/[^\u0621-\u064A0-9A-Za-z]/g, "") // drop spaces, dashes, punctuation
+                .toLowerCase();
+        }
+
+        function clearInjectedOptions(selectEl) {
+            selectEl.querySelectorAll('option[data-injected="1"]').forEach(o => o.remove());
+        }
+
+        function setSelectValue(selectEl, rawValue) {
+            if (!selectEl) return;
+            const val = (rawValue === null || rawValue === undefined) ? "" : String(rawValue).trim();
+
+            if (!val || val === "-" || val === "undefined") {   // no real value
+                selectEl.value = "";
+                return;
+            }
+
+            const opts = Array.from(selectEl.options);
+
+            // 1) exact match
+            let match = opts.find(o => o.value.trim() === val);
+
+            // 2) normalized match
+            if (!match) {
+                const n = normalizeArabic(val);
+                match = opts.find(o => normalizeArabic(o.value) === n);
+            }
+
+            // 3) partial / contains match
+            if (!match) {
+                const n = normalizeArabic(val);
+                match = opts.find(o => {
+                    const oN = normalizeArabic(o.value);
+                    return oN && (oN.includes(n) || n.includes(oN));
+                });
+            }
+
+            if (match) { selectEl.value = match.value; return; }
+
+            // 4) value not in the list -> inject it so the data is never lost
+            const opt = document.createElement("option");
+            opt.value = val;
+            opt.textContent = val;
+            opt.dataset.injected = "1";
+            selectEl.appendChild(opt);
+            selectEl.value = val;
         }
 
         function formatExcelDate(val) {
@@ -1165,9 +1311,17 @@
         }
 
         function populateFormValues(c, m = {}) {
+            const keta3El = document.getElementById("keta3");
+            const handsaEl = document.getElementById("handsa");
+
+            // remove any option injected on a previous open, then set safely
+            clearInjectedOptions(keta3El);
+            clearInjectedOptions(handsaEl);
+
             document.getElementById("mname").value = c.metername || "";
-            document.getElementById("keta3").value = c.keta3 || "";
-            document.getElementById("handsa").value = c.handsa || "";
+            setSelectValue(keta3El, c.keta3);
+            setSelectValue(handsaEl, c.handsa);
+
             document.getElementById("mno").value = m.meternumber || "";
             document.getElementById("inspection_date").value = m.inspection_date || "";
             document.getElementById("fix_date").value = m.fix_date || "";
@@ -1178,28 +1332,12 @@
             document.getElementById("location").value = m.location || "";
             document.getElementById("mtype").value = m.metertype || "";
             document.getElementById("notes").value = m.note || "";
-            document.querySelectorAll("#formSingle input, #formSingle select, #formSingle textarea").forEach(i => i.disabled = false);
+
+            document.querySelectorAll("#formSingle input, #formSingle select, #formSingle textarea")
+                .forEach(i => i.disabled = false);
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        window.showMainCard = function (customerId) {
-            const wrapper = document.querySelector(`.card-wrapper[data-customer-id="${customerId}"]`);
-            if (!wrapper) return;
-            const mainCard = wrapper.querySelector(`#mainCard_${customerId}`);
-            if (mainCard) mainCard.style.display = 'flex';
-            wrapper.querySelectorAll('.meter-card').forEach(c => c.classList.remove('visible'));
-            wrapper.querySelectorAll('.meter-row-active').forEach(r => r.classList.remove('meter-row-active'));
-
-            ensureFormVisible();
-            const c = allCustomers[customerId];
-            if (c) {
-                editIDs = { cID: customerId, mKey: null };
-                populateFormValues(c);
-                updateAllBtn.style.display = "inline-flex";
-                saveBtn.style.display = "none";
-                addMeterBtn.style.display = "none";
-            }
-        };
 
         window.showMeterCard = function (customerId, meterKey) {
             const wrapper = document.querySelector(`.card-wrapper[data-customer-id="${customerId}"]`);

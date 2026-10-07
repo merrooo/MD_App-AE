@@ -83,6 +83,7 @@ npx cap add android
 ------------------
 Step 9: Copy Web Assets to Android
 npx cap copy
+npx cap open android
 ------------------
 Step 10 Sync Your Project
 npx cap sync android
@@ -125,3 +126,9 @@ ic_launcher_foreground.png
 Important:
 
 ** Keep the same file names for you new image
+
+-----------------------------------------------------------
+
+For update node or gives error 
+Please install the latest LTS version.
+winget install OpenJS.NodeJS.LTS --accept-source-agreements --accept-package-agreements
