@@ -254,10 +254,21 @@
             font-size: 0.9rem;
         }
 
-        .summary-bar .summary-item.customers i { color: var(--primary); }
-        .summary-bar .summary-item.meters i { color: var(--success); }
-        .summary-bar .summary-item.visits i { color: var(--warning); }
-        .summary-bar .summary-item.archives i { color: var(--archive); }
+        .summary-bar .summary-item.customers i {
+            color: var(--primary);
+        }
+
+        .summary-bar .summary-item.meters i {
+            color: var(--success);
+        }
+
+        .summary-bar .summary-item.visits i {
+            color: var(--warning);
+        }
+
+        .summary-bar .summary-item.archives i {
+            color: var(--archive);
+        }
 
         /* ===== CUSTOMER CARDS ===== */
         .results-container {
@@ -363,9 +374,17 @@
             color: #fff;
         }
 
-        .section-head .title.meters .icon { background: var(--success); }
-        .section-head .title.visits .icon { background: var(--warning); }
-        .section-head .title.archives .icon { background: var(--archive); }
+        .section-head .title.meters .icon {
+            background: var(--success);
+        }
+
+        .section-head .title.visits .icon {
+            background: var(--warning);
+        }
+
+        .section-head .title.archives .icon {
+            background: var(--archive);
+        }
 
         .section-head .count-badge {
             background: var(--surface-card);
@@ -490,8 +509,15 @@
             color: var(--text-muted);
         }
 
-        .reading-chip .vals .kwh { color: var(--success); font-weight: 700; }
-        .reading-chip .vals .kvarh { color: var(--accent); font-weight: 700; }
+        .reading-chip .vals .kwh {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .reading-chip .vals .kvarh {
+            color: var(--accent);
+            font-weight: 700;
+        }
 
         .reading-chip.highlight {
             background: #fef3c7;
@@ -532,7 +558,9 @@
             flex-wrap: wrap;
         }
 
-        .archive-meta b { color: var(--text); }
+        .archive-meta b {
+            color: var(--text);
+        }
 
         .archive-meters {
             display: grid;
@@ -557,7 +585,9 @@
             font-family: monospace;
         }
 
-        .archive-meter-chip .top-row .mno { color: var(--archive); }
+        .archive-meter-chip .top-row .mno {
+            color: var(--archive);
+        }
 
         .archive-meter-chip .specs {
             font-size: 0.66rem;
@@ -675,7 +705,9 @@
             display: none;
         }
 
-        .sheet-overlay.show { display: block; }
+        .sheet-overlay.show {
+            display: block;
+        }
 
         .bottom-sheet {
             position: fixed;
@@ -690,7 +722,9 @@
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
         }
 
-        .bottom-sheet.show { bottom: 0; }
+        .bottom-sheet.show {
+            bottom: 0;
+        }
 
         .sheet-header {
             display: flex;
@@ -735,15 +769,45 @@
         }
 
         @media (max-width: 640px) {
-            body { padding: 8px; }
-            .filters-grid { grid-template-columns: 1fr; }
-            .summary-bar { flex-direction: column; align-items: stretch; }
-            .summary-bar .summary-item { justify-content: center; }
-            .customer-card-header { flex-direction: column; align-items: stretch; text-align: center; }
-            .customer-info-row { grid-template-columns: 1fr 1fr; }
-            .meters-table { font-size: 0.65rem; }
-            .meters-table th, .meters-table td { padding: 4px 2px; }
-            .archive-meter-chip .readings { grid-template-columns: 1fr; }
+            body {
+                padding: 8px;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .summary-bar .summary-item {
+                justify-content: center;
+            }
+
+            .customer-card-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .customer-info-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .meters-table {
+                font-size: 0.65rem;
+            }
+
+            .meters-table th,
+            .meters-table td {
+                padding: 4px 2px;
+            }
+
+            .archive-meter-chip .readings {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -856,6 +920,7 @@
             <i class="fas fa-times" id="closeSheetBtn" style="cursor: pointer; font-size: 1.1rem;"></i>
         </div>
         <div class="sheet-menu">
+            <a href="index.html" class="sheet-item">🏠 الصفحة الرئيسية</a>
             <a href="MD.html" class="sheet-item">📊 بيانات كبار المشتركين</a>
             <a href="MD_Add.html" class="sheet-item">➕ إضافة مشترك جديد</a>
             <a href="MD_Site.html" class="sheet-item">🔍 تسجيل مرور ميداني</a>
@@ -864,7 +929,6 @@
             <a href="MD_Archive.html" class="sheet-item active">📚 الأرشيف الشامل
                 <span class="item-badge">الحالية</span>
             </a>
-            <a href="index.html" class="sheet-item">🏠 الصفحة الرئيسية</a>
         </div>
     </div>
 
@@ -1321,10 +1385,10 @@
                                 return undefined;
                             };
 
-                            const prevKwh   = pick(m.prev_kwh,   m.prevKwh,   m.kwh_reading);
+                            const prevKwh = pick(m.prev_kwh, m.prevKwh, m.kwh_reading);
                             const prevKvarh = pick(m.prev_kvarh, m.prevKvarh, m.kvarh_reading);
-                            const newKwh    = pick(m.new_kwh,    m.newKwh,    m.kwh);
-                            const newKvarh  = pick(m.new_kvarh,  m.newKvarh,  m.kvarh);
+                            const newKwh = pick(m.new_kwh, m.newKwh, m.kwh);
+                            const newKvarh = pick(m.new_kvarh, m.newKvarh, m.kvarh);
 
                             // ✅ عرض "-" عند عدم وجود قيمة (بدلاً من "0" المضلِّل)
                             const fmt = (v) => {
