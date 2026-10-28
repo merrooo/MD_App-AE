@@ -383,6 +383,7 @@
             let rowsHtml = '';
             let meterTypes = [];
             let locations = [];
+            let notes = [];
 
             if (readingKeys.length > 0) {
                 readingKeys.forEach((key) => {
@@ -391,9 +392,11 @@
 
                     const mType = permMeter.metertype || item.metertype || '';
                     const mLoc = permMeter.location || item.location || visit.location || '';
+                    const mnote = permMeter.note || item.note || '';
 
                     if (mType && !meterTypes.includes(mType)) meterTypes.push(mType);
                     if (mLoc && !locations.includes(mLoc)) locations.push(mLoc);
+                    if (mnote && !notes.includes(mnote)) notes.push(mnote);
 
                     rowsHtml += `
                     <tr>
@@ -417,7 +420,11 @@
             const arabicDay = getArabicDayName(selectedDate);
             const meterTypeStr = meterTypes.join(' - ') || '';
             const locationStr = locations.join(' - ') || visit.location || '';
-            const dynamicNoteText = `تم حساب اقصى حمل من خلال العداد/العدادات المركبة &nbsp;&nbsp;&nbsp;&nbsp; ${locationStr} &nbsp;&nbsp;&nbsp;&nbsp; طراز &nbsp;&nbsp;&nbsp;&nbsp; ${meterTypeStr}`;
+            const noteStr = notes.join(' - ') || '';
+            const dynamicNoteText =
+                `تم حساب اقصى حمل من خلال العداد/العدادات المركبة   ${locationStr}` +
+                `   طراز    ${meterTypeStr}` +
+                `       ${noteStr}`;
 
             const html = `
             <div class="doc-content">
@@ -448,7 +455,7 @@
                                 <option value="">اختر العضو الأول</option>
                                 <option>م/ مروة ابراهيم شهاب</option>
                                 <option>م/ احمد رمضان</option>
-                                <option>م/ كريم كبشة</option>
+                                <option>----------------------</option>
                                 <option value="ADD_NEW" style="color: #27ae60; font-weight: bold;">[ ➕ إضافة عضو جديد... ]</option>
                             </select>
                         </div>
@@ -458,7 +465,7 @@
                                 <option value="">اختر العضو الثاني</option>
                                 <option>م/ مروة ابراهيم شهاب</option>
                                 <option>م/ احمد رمضان</option>
-                                <option>م/ كريم كبشة</option>
+                                <option>----------------------</option>
                                 <option value="ADD_NEW" style="color: #27ae60; font-weight: bold;">[ ➕ إضافة عضو جديد... ]</option>
                             </select>
                         </div>
@@ -468,7 +475,7 @@
                                 <option value="">اختر العضو الثالث</option>
                                 <option>م/ مروة ابراهيم شهاب</option>
                                 <option>م/ احمد رمضان</option>
-                                <option>م/ كريم كبشة</option>
+                                <option>----------------------</option>
                                 <option value="ADD_NEW" style="color: #27ae60; font-weight: bold;">[ ➕ إضافة عضو جديد... ]</option>
                             </select>
                         </div>
