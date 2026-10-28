@@ -169,14 +169,22 @@
             margin-top: 4px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 4px;
         }
 
         .note-line {
             border-bottom: 1px dotted #000;
             min-height: 16px;
             width: 100%;
-            line-height: 3;
+            padding: 3px 0;
+            font-size: 11px;
+            line-height: 1.7;
+            font-weight: 600;
+        }
+
+        .note-line.dynamic-notes {
+            word-break: break-word;
+            line-height: 1.7;
             font-size: 11px;
         }
 
@@ -381,50 +389,79 @@
             const readingKeys = Object.keys(readings);
 
             let rowsHtml = '';
-            let meterTypes = [];
-            let locations = [];
-            let notes = [];
+            const meterDataList = [];
 
             if (readingKeys.length > 0) {
                 readingKeys.forEach((key) => {
                     const item = readings[key] || {};
                     const permMeter = customerMeters[key] || customerMeters[item.meternumber] || {};
 
-                    const mType = permMeter.metertype || item.metertype || '';
+                    const meterNum = item.meternumber || key || '';
                     const mLoc = permMeter.location || item.location || visit.location || '';
+                    const mType = permMeter.metertype || item.metertype || '';
                     const mnote = permMeter.note || item.note || '';
 
-                    if (mType && !meterTypes.includes(mType)) meterTypes.push(mType);
-                    if (mLoc && !locations.includes(mLoc)) locations.push(mLoc);
-                    if (mnote && !notes.includes(mnote)) notes.push(mnote);
-
                     rowsHtml += `
-                    <tr>
-                        <td>${item.meternumber || key}</td>
-                        <td>${item.kwh || ''}</td>
-                        <td>${item.kvarh || ''}</td>
-                        <td>${permMeter.vt_ratio || item.vt_ratio || ''}</td>
-                        <td>${permMeter.ct_ratio || item.ct_ratio || ''}</td>
-                        <td>${permMeter.constant || item.constant || ''}</td>
-                    </tr>
-                `;
+                        <tr>
+                            <td>${meterNum}</td>
+                            <td>${item.kwh || ''}</td>
+                            <td>${item.kvarh || ''}</td>
+                            <td>${permMeter.vt_ratio || item.vt_ratio || ''}</td>
+                            <td>${permMeter.ct_ratio || item.ct_ratio || ''}</td>
+                            <td>${permMeter.constant || item.constant || ''}</td>
+                        </tr>
+                    `;
+
+                    // ✅ بناء مكونات كل عداد للجملة النهائية
+                    const meterParts = [];
+
+                    // رقم العداد
+                    if (meterNum) meterParts.push(meterNum);
+
+                    // كلمة "المركب" ثابتة (إذا وجد أي بيانات مكان أو نوع)
+                    if (mLoc || mType) meterParts.push('المركب');
+
+                    // مكان التركيب
+                    if (mLoc) meterParts.push(mLoc);
+
+                    // طراز + النوع
+                    if (mType) {
+                        meterParts.push('طراز');
+                        meterParts.push(mType);
+                    }
+
+                    // ونتيجة المرور + الملاحظة
+                    if (mnote) {
+                        meterParts.push('ونتيجة المرور');
+                        meterParts.push(mnote);
+                    }
+
+                    if (meterParts.length > 0) {
+                        meterDataList.push(meterParts.join(' '));
+                    }
                 });
             } else {
                 rowsHtml = `
-                <tr>
-                    <td style="height:24px;"></td><td></td><td></td><td></td><td></td><td></td>
-                </tr>
-            `;
+                    <tr>
+                        <td style="height:24px;"></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                `;
+            }
+
+            // ✅ بناء النص النهائي:
+            // "تم حساب معامل القدرة من خلال العداد رقم 2 المركب محطة طراز EDMI ونتيجة المرور مرور-4
+            //  والعداد رقم 3 المركب محطة طراز اسكرا ونتيجة المرور مرور-2"
+            let dynamicNoteText = '';
+            if (meterDataList.length === 0) {
+                dynamicNoteText = 'لا توجد عدادات مسجلة';
+            } else {
+                dynamicNoteText = 'تم حساب معامل القدرة من خلال العداد رقم ' + meterDataList[0];
+                for (let i = 1; i < meterDataList.length; i++) {
+                    dynamicNoteText += ' والعداد رقم ' + meterDataList[i];
+                }
             }
 
             const arabicDay = getArabicDayName(selectedDate);
-            const meterTypeStr = meterTypes.join(' - ') || '';
-            const locationStr = locations.join(' - ') || visit.location || '';
-            const noteStr = notes.join(' - ') || '';
-            const dynamicNoteText =
-                `تم حساب اقصى حمل من خلال العداد/العدادات المركبة   ${locationStr}` +
-                `   طراز    ${meterTypeStr}` +
-                `       ${noteStr}`;
 
             const html = `
             <div class="doc-content">
@@ -445,7 +482,6 @@
                     <div>أنه في يوم &nbsp; <span style="min-width: 80px; text-align: center; font-weight: 700;">${arabicDay}</span>&nbsp; الموافق &nbsp; <span style="min-width: 110px; text-align: center; font-weight: 700;">${selectedDate}</span>&nbsp; وبحضور كلا من :</div>
                 </div>
 
-                <!-- 1. قسم اللجنة والمشترك الرئيسي -->
                 <div class="signature-section">
                     <div class="committee-box">
                         <p style="font-weight: bold; font-size: 11.5px; margin-bottom: 2px; color: #1e40af;">اللجنة :-</p>
@@ -487,7 +523,6 @@
                     </div>
                 </div>
                 </div>
-                <!-- 2. جدول القياسات -->
                 <div style="font-weight: bold; font-size: 12px; margin-bottom: 3px;">تم قياس الآتى :-</div>
                 <table class="layout-table">
                     <thead>
@@ -508,7 +543,6 @@
                     </tbody>
                 </table>
 
-                <!-- 3. جدول العدادات -->
                 <div style="font-weight: bold; font-size: 12px; margin-bottom: 3px;">بيانات العدادات :-</div>
                 <table class="layout-table">
                     <thead>
@@ -526,16 +560,14 @@
                     </tbody>
                 </table>
 
-                <!-- 4. الملاحظات -->
                 <div class="notes-section">
                     <div>ملاحظات :-</div>
                     <div class="notes-lines">
-                        <div class="note-line">${dynamicNoteText}</div>
+                        <div class="note-line dynamic-notes">${dynamicNoteText}</div>
                         <div class="note-line">${visit.general_notes || ''}</div>
                     </div>
                 </div>
 
-                <!-- 5. قسم التوقيع السفلي (هذا محضر منا بذلك - وعن المشترك) -->
                 <div class="bottom-signatures">
                     <div class="sig-box">
                         <p style="font-weight: bold; font-size: 12px; color: #1e40af;">هذا محضر منا بذلك- :</p>

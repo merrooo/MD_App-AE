@@ -362,9 +362,17 @@
             font-weight: 700;
         }
 
-        .report-summary .total-all { color: var(--text); }
-        .report-summary .passed-all { color: var(--success); }
-        .report-summary .not-passed-all { color: var(--danger); }
+        .report-summary .total-all {
+            color: var(--text);
+        }
+
+        .report-summary .passed-all {
+            color: var(--success);
+        }
+
+        .report-summary .not-passed-all {
+            color: var(--danger);
+        }
 
         .report-grid {
             display: grid;
@@ -913,7 +921,8 @@
                     <label class="form-label-m" for="date_to"><i class="fas fa-calendar-alt"></i> تاريخ إلى</label>
                     <input type="date" id="date_to" class="form-input-m">
                 </div>
-                <button class="btn-search-m btn-range-m" id="btnSearchRange"><i class="fas fa-filter"></i> بحث بالفترة المخصصة</button>
+                <button class="btn-search-m btn-range-m" id="btnSearchRange"><i class="fas fa-filter"></i> بحث بالفترة
+                    المخصصة</button>
             </div>
 
             <div class="search-row">
@@ -933,7 +942,8 @@
             </div>
 
             <div class="form-group-m full-width" style="margin-top:4px;">
-                <label class="form-label-m" for="filter_general"><i class="fas fa-search"></i> بحث عام (في النتائج الحالية)</label>
+                <label class="form-label-m" for="filter_general"><i class="fas fa-search"></i> بحث عام (في النتائج
+                    الحالية)</label>
                 <input type="text" id="filter_general" class="form-input-m"
                     placeholder="ابحث باسم المشترك، القطاع، الهندسة أو رقم العداد...">
             </div>
@@ -973,7 +983,8 @@
                 <div class="mode-display" id="modeDisplay">👆 في انتظار اختيار نوع التقرير</div>
             </div>
             <div class="stat-chips-wrapper" id="headerChipGroup">
-                <span style="font-size:0.65rem;color:var(--text-muted);">حدد فترة المرور أعلاه ثم اضغط "تقرير ما تم المرور عليه" أو "تقرير المتأخرين بالمرور"</span>
+                <span style="font-size:0.65rem;color:var(--text-muted);">حدد فترة المرور أعلاه ثم اضغط "تقرير ما تم
+                    المرور عليه" أو "تقرير المتأخرين بالمرور"</span>
             </div>
         </div>
 
@@ -995,18 +1006,20 @@
             <a href="MD.html" class="sheet-item">📊 بيانات كبار المشتركين</a>
             <a href="MD_Add.html" class="sheet-item">➕ إضافة مشترك جديد</a>
             <a href="MD_Site.html" class="sheet-item">🔍 تسجيل مرور ميداني</a>
-            <a href="MD_Pass.html" class="sheet-item active" style="border:1px solid var(--accent);background:#eff6ff;">📅
-                تقرير المرور العام
+            <a href="MD_Pass.html" class="sheet-item active">
+                📅 تقرير المرور العام
                 <span class="item-badge">الحالية</span>
             </a>
-            <a href="index.html" class="sheet-item">🏠 الصفحة الرئيسية</a>
             <a href="MD_PF.html" class="sheet-item">⚡ تقرير معامل القدرة</a>
+            <a href="MD_Archive.html" class="sheet-item">📚 الأرشيف الشامل</a>
         </div>
     </div>
 
     <nav class="bottom-nav">
-        <div class="nav-item" id="navBtnSearch"><i class="fas fa-check-circle"></i><span> تقرير ماتم المرور عليه</span></div>
-        <div class="nav-item" id="navBtnDelayed"><i class="fas fa-hourglass-end"></i><span>تقرير المتاخرين بالمرور</span></div>
+        <div class="nav-item" id="navBtnSearch"><i class="fas fa-check-circle"></i><span> تقرير ماتم المرور عليه</span>
+        </div>
+        <div class="nav-item" id="navBtnDelayed"><i class="fas fa-hourglass-end"></i><span>تقرير المتاخرين
+                بالمرور</span></div>
         <div class="nav-item" id="navBtnExport"><i class="fas fa-file-excel"></i><span>تصدير</span></div>
     </nav>
 

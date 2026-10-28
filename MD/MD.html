@@ -771,11 +771,11 @@
         <header class="top-header">
             <div class="header-row">
                 <div class="brand"><i class="fas fa-database"></i><span>إدارة المشتركين</span></div>
-                <button class="toggle-form-btn" id="toggleFormBtn" title="إظهار / إخفاء نموذج الإدخال">
+                <button type="button" class="toggle-form-btn" id="toggleFormBtn" title="إظهار / إخفاء نموذج الإدخال">
                     <i class="fas fa-chevron-up" id="toggleIcon"></i>
                     <span id="toggleLabel">إخفاءالبيانات</span>
                 </button>
-                <button class="nav-btn" id="openMenuBtn"><i class="fas fa-compass"></i> التنقل</button>
+                <button type="button" class="nav-btn" id="openMenuBtn"><i class="fas fa-compass"></i> التنقل</button>
             </div>
 
             <div class="form-container" id="formContainer">
@@ -879,7 +879,7 @@
 
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو رقم العداد...">
-            <button onclick="loadDataFromFirebase()"><i class="fas fa-sync-alt"></i></button>
+            <button type="button" onclick="loadDataFromFirebase()"><i class="fas fa-sync-alt"></i></button>
         </div>
 
         <div class="grid" id="cardsGrid">
@@ -889,34 +889,52 @@
         </div>
     </div>
 
+    <!-- ✅ قائمة التنقل - مُصحَّحة بالكامل -->
     <div class="sheet-overlay" id="sheetOverlay"></div>
     <div class="bottom-sheet" id="bottomSheet">
         <div class="sheet-header">
-            <h4><i class="fas fa-compass"></i> قائمة الصفحات</h4><i class="fas fa-times" id="closeSheetBtn"></i>
+            <h4><i class="fas fa-compass"></i> قائمة الصفحات</h4>
+            <i class="fas fa-times" id="closeSheetBtn" style="cursor: pointer;"></i>
         </div>
         <div class="sheet-menu">
-            <a href="MD.html" class="sheet-item active"><i class="fas fa-database"></i> بيانات المشتركين</a>
-            <span class="item-badge">الحالية</span>
-            <a href="MD_Add.html" class="sheet-item"><i class="fas fa-user-plus"></i> إضافة مشترك جديد</a>
-            <a href="MD_Site.html" class="sheet-item"><i class="fas fa-clipboard-check"></i> تسجيل مرور ميداني</a>
-            <a href="MD_Pass.html" class="sheet-item"><i class="fas fa-chart-pie"></i> تقرير المرور العام</a>
-            <a href="index.html" class="sheet-item"><i class="fas fa-home"></i> الصفحة الرئيسية</a>
-            <a href="MD_PF.html" class="sheet-item"><i class="fas fa-bolt"></i> تقرير معامل القدرة</a>
+            <a href="MD.html" class="sheet-item active">
+                <i class="fas fa-database"></i> بيانات المشتركين
+                <span class="item-badge">الحالية</span>
+            </a>
+            <a href="MD_Add.html" class="sheet-item">➕ إضافة مشترك جديد</a>
+            <a href="MD_Site.html" class="sheet-item">🔍 تسجيل مرور ميداني</a>
+            <a href="MD_Pass.html" class="sheet-item">📅 تقرير المرور العام</a>
+            <a href="MD_PF.html" class="sheet-item">⚡ تقرير معامل القدرة</a>
+            <a href="MD_Archive.html" class="sheet-item">📚 الأرشيف الشامل</a>
         </div>
     </div>
 
+    <!-- ✅ أزرار الإجراءات - محمية ضد أي انتقال غير مقصود -->
     <div class="bottom-actions">
-        <button class="btn btn-excel" onclick="protectedAction('upload')"><i class="fas fa-file-excel"></i> رفع
-            إكسيل</button>
-        <button id="saveBtn" class="btn btn-primary" onclick="quickSave()"><i class="fas fa-save"></i>
-            حفظ/تحديث</button>
-        <button id="addMeterBtn" class="btn btn-success" onclick="addNewMeter()"><i class="fas fa-plus"></i> عداد
-            جديد</button>
-        <button id="updateAllBtn" class="btn btn-warning" onclick="updateCustomerData()" style="display:none;"><i
-                class="fas fa-sync"></i> تحديث الكل</button>
-        <button class="btn btn-clear" onclick="clearForm()"><i class="fas fa-eraser"></i> تفريغ</button>
-        <button class="btn btn-danger" onclick="protectedAction('deleteAll')"><i class="fas fa-trash"></i> مسح
-            الكل</button>
+        <button type="button" class="btn btn-excel"
+            onclick="event.preventDefault(); event.stopPropagation(); protectedAction('upload')">
+            <i class="fas fa-file-excel"></i> رفع إكسيل
+        </button>
+        <button type="button" id="saveBtn" class="btn btn-primary"
+            onclick="event.preventDefault(); event.stopPropagation(); quickSave()">
+            <i class="fas fa-save"></i> حفظ/تحديث
+        </button>
+        <button type="button" id="addMeterBtn" class="btn btn-success"
+            onclick="event.preventDefault(); event.stopPropagation(); addNewMeter()">
+            <i class="fas fa-plus"></i> عداد جديد
+        </button>
+        <button type="button" id="updateAllBtn" class="btn btn-warning" style="display:none;"
+            onclick="event.preventDefault(); event.stopPropagation(); updateCustomerData()">
+            <i class="fas fa-sync"></i> تحديث الكل
+        </button>
+        <button type="button" class="btn btn-clear"
+            onclick="event.preventDefault(); event.stopPropagation(); clearForm()">
+            <i class="fas fa-eraser"></i> تفريغ
+        </button>
+        <button type="button" class="btn btn-danger"
+            onclick="event.preventDefault(); event.stopPropagation(); protectedAction('deleteAll')">
+            <i class="fas fa-trash"></i> مسح الكل
+        </button>
     </div>
 
     <script type="module">
@@ -941,7 +959,10 @@
 
         let allCustomers = {};
         let allCustomerIds = [];
-        const ADMIN_PASS = "1";
+
+        // ✅ كلمة المرور لجميع عمليات الحذف
+        const ADMIN_PASS = "123";
+
         let editIDs = { cID: null, mKey: null };
         let formVisible = true;
 
@@ -958,6 +979,29 @@
         const saveBtn = document.getElementById("saveBtn");
         const addMeterBtn = document.getElementById("addMeterBtn");
 
+        // ============================================================
+        // 🔐 دالة مساعدة: طلب كلمة المرور قبل أي عملية حذف
+        // ============================================================
+        async function requirePassword(actionLabel = 'هذه العملية') {
+            const { value: password } = await Swal.fire({
+                title: 'كلمة المرور مطلوبة',
+                text: actionLabel,
+                input: 'password',
+                inputPlaceholder: 'أدخل كلمة المرور',
+                showCancelButton: true,
+                confirmButtonText: 'تأكيد',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#dc2626',
+                inputValidator: (value) => {
+                    if (!value) return 'يجب إدخال كلمة المرور';
+                }
+            });
+            if (password === undefined) return false; // ألغى المستخدم
+            if (password === ADMIN_PASS) return true;
+            Swal.fire('خطأ', 'كلمة المرور غير صحيحة!', 'error');
+            return false;
+        }
+
         // UI Form Mode Toggler
         toggleBtn.addEventListener('click', () => {
             formVisible = !formVisible;
@@ -970,16 +1014,16 @@
         function sanitizeKey(key) {
             return key ? String(key).replace(/[.#$\[\]\(\)\/\s]/g, "").trim() : "unknown";
         }
-        /* ---------- Arabic-normalized select setter ---------- */
+
         function normalizeArabic(str) {
             return String(str ?? "")
-                .replace(/[\u064B-\u0652\u0640]/g, "")   // tashkeel + tatweel
+                .replace(/[\u064B-\u0652\u0640]/g, "")
                 .replace(/[أإآٱ]/g, "ا")
                 .replace(/ى/g, "ي")
                 .replace(/ئ/g, "ي")
                 .replace(/ؤ/g, "و")
                 .replace(/ة/g, "ه")
-                .replace(/[^\u0621-\u064A0-9A-Za-z]/g, "") // drop spaces, dashes, punctuation
+                .replace(/[^\u0621-\u064A0-9A-Za-z]/g, "")
                 .toLowerCase();
         }
 
@@ -991,23 +1035,20 @@
             if (!selectEl) return;
             const val = (rawValue === null || rawValue === undefined) ? "" : String(rawValue).trim();
 
-            if (!val || val === "-" || val === "undefined") {   // no real value
+            if (!val || val === "-" || val === "undefined") {
                 selectEl.value = "";
                 return;
             }
 
             const opts = Array.from(selectEl.options);
 
-            // 1) exact match
             let match = opts.find(o => o.value.trim() === val);
 
-            // 2) normalized match
             if (!match) {
                 const n = normalizeArabic(val);
                 match = opts.find(o => normalizeArabic(o.value) === n);
             }
 
-            // 3) partial / contains match
             if (!match) {
                 const n = normalizeArabic(val);
                 match = opts.find(o => {
@@ -1018,7 +1059,6 @@
 
             if (match) { selectEl.value = match.value; return; }
 
-            // 4) value not in the list -> inject it so the data is never lost
             const opt = document.createElement("option");
             opt.value = val;
             opt.textContent = val;
@@ -1056,18 +1096,17 @@
         closeBtn.addEventListener('click', () => toggleSheet(false));
         overlay.addEventListener('click', () => toggleSheet(false));
 
+        // ============================================================
+        // 🔐 جميع عمليات الحذف محمية بكلمة المرور
+        // ============================================================
         window.protectedAction = async function (type) {
-            const { value: password } = await Swal.fire({
-                title: 'كلمة المرور مطلوبة',
-                input: 'password',
-                inputPlaceholder: 'أدخل كلمة المرور',
-                showCancelButton: true
-            });
-            if (password === ADMIN_PASS) {
-                if (type === 'upload') document.getElementById('excelFile').click();
-                if (type === 'deleteAll') deleteAllData();
-            } else if (password !== undefined) {
-                Swal.fire("خطأ", "كلمة المرور غير صحيحة", "error");
+            if (type === 'upload') {
+                // رفع الملف يحتاج كلمة مرور أيضاً
+                if (!await requirePassword('رفع ملف إكسيل')) return;
+                document.getElementById('excelFile').click();
+            } else if (type === 'deleteAll') {
+                if (!await requirePassword('مسح قاعدة البيانات بالكامل')) return;
+                await deleteAllData();
             }
         };
 
@@ -1157,44 +1196,62 @@
             }
         };
 
-        window.deleteAllData = async function () {
+        // 🔐 حذف الكل - داخلياً بعد التحقق من كلمة المرور
+        async function deleteAllData() {
             const result = await Swal.fire({
                 title: 'حذف كلي؟',
                 text: "سيتم مسح كل شيء من القاعدتين!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
-                confirmButtonText: 'نعم، احذف الكل'
+                confirmButtonText: 'نعم، احذف الكل',
+                cancelButtonText: 'إلغاء'
             });
             if (result.isConfirmed) {
                 await Promise.all([remove(ref(dbMD, "MD/customers")), remove(ref(dbPass, "MD_Pass/customers"))]);
                 loadDataFromFirebase();
                 Swal.fire("تم", "تم مسح قاعدة البيانات", "success");
             }
-        };
+        }
 
+        // 🔐 حذف مشترك - محمي بكلمة المرور
         window.deleteCustomer = async function (cID) {
+            const ok = await requirePassword(`حذف المشترك: ${allCustomers[cID]?.metername || cID}`);
+            if (!ok) return;
+
             const result = await Swal.fire({
                 title: 'حذف مشترك؟',
                 text: `هل تريد حذف ${allCustomers[cID]?.metername || cID} وجميع عداداته؟`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
-                confirmButtonText: 'نعم، احذف'
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
             });
             if (result.isConfirmed) {
-                await Promise.all([remove(ref(dbMD, `MD/customers/${cID}`)), remove(ref(dbPass, `MD_Pass/customers/${cID}`))]);
+                await Promise.all([
+                    remove(ref(dbMD, `MD/customers/${cID}`)),
+                    remove(ref(dbPass, `MD_Pass/customers/${cID}`))
+                ]);
                 loadDataFromFirebase();
+                Swal.fire("تم", "تم حذف المشترك بنجاح", "success");
             }
         };
 
+        // 🔐 حذف عداد - محمي بكلمة المرور
         window.deleteMeter = async function (cID, mKey) {
+            const meterNum = allCustomers[cID]?.meters?.[mKey]?.meternumber || mKey;
+            const ok = await requirePassword(`حذف العداد رقم: ${meterNum}`);
+            if (!ok) return;
+
             const result = await Swal.fire({
                 title: 'حذف العداد؟',
+                html: `هل تريد حذف العداد <b>${meterNum}</b>؟`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
-                confirmButtonText: 'نعم، احذف'
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
             });
             if (result.isConfirmed) {
                 await Promise.all([
@@ -1202,6 +1259,7 @@
                     remove(ref(dbPass, `MD_Pass/customers/${cID}/meters/${mKey}`))
                 ]);
                 loadDataFromFirebase();
+                Swal.fire("تم", "تم حذف العداد بنجاح", "success");
             }
         };
 
@@ -1243,7 +1301,7 @@
                     return `<div class="meter-card" id="meterCard_${id}_${mKey}" data-customer="${id}" data-meterkey="${mKey}">
                         <div class="meter-card-header">
                             <div class="meter-card-title"><i class="fas fa-microchip"></i> تفاصيل العداد: <span style="color:var(--text);">${m.meternumber || '-'}</span></div>
-                            <button class="back-btn" onclick="showMainCard('${id}')"><i class="fas fa-arrow-right"></i> العودة</button>
+                            <button type="button" class="back-btn" onclick="showMainCard('${id}')"><i class="fas fa-arrow-right"></i> العودة</button>
                         </div>
                         <div class="meter-detail-grid">
                             <div><span class="label">رقم العداد:</span> <span class="value">${m.meternumber || '-'}</span></div>
@@ -1272,7 +1330,7 @@
                                 <i class="fas fa-user-circle"></i> ${c.metername}
                                 <span class="badge">${meterCount} عداد</span>
                             </div>
-                            <button class="delete-btn" onclick="event.stopPropagation(); deleteCustomer('${id}')"><i class="fas fa-trash"></i> حذف</button>
+                            <button type="button" class="delete-btn" onclick="event.stopPropagation(); deleteCustomer('${id}')"><i class="fas fa-trash"></i> حذف</button>
                         </div>
                         <div class="main-info-grid">
                             <span>القطاع: <b>${c.keta3 || '-'}</b></span>
@@ -1314,7 +1372,6 @@
             const keta3El = document.getElementById("keta3");
             const handsaEl = document.getElementById("handsa");
 
-            // remove any option injected on a previous open, then set safely
             clearInjectedOptions(keta3El);
             clearInjectedOptions(handsaEl);
 
@@ -1358,6 +1415,14 @@
                 saveBtn.style.display = "inline-flex";
                 addMeterBtn.style.display = "inline-flex";
             }
+        };
+
+        window.showMainCard = function (customerId) {
+            const wrapper = document.querySelector(`.card-wrapper[data-customer-id="${customerId}"]`);
+            if (!wrapper) return;
+            const mainCard = wrapper.querySelector(`#mainCard_${customerId}`);
+            if (mainCard) mainCard.style.display = 'flex';
+            wrapper.querySelectorAll('.meter-card').forEach(c => c.classList.remove('visible'));
         };
 
         // Form Action Functions

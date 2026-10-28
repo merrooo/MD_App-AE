@@ -708,31 +708,31 @@
                 <span class="arrow" id="arrow">▾</span>
             </button>
             <div class="dropdown-menu" id="dropdownMenu">
-                <div class="dropdown-item" data-page="MD.html">
+                <a href="MD.html" class="dropdown-item">
                     <span class="item-icon">📊</span>
                     <span class="item-label">بيانات كبار المشتركين</span>
-                </div>
-                <div class="dropdown-item" data-page="MD_Add.html">
+                </a>
+                <a href="MD_Add.html" class="dropdown-item">
                     <span class="item-icon">➕</span>
                     <span class="item-label">إضافة مشترك جديد</span>
-                </div>
-                <div class="dropdown-item" data-page="MD_Site.html">
+                </a>
+                <a href="MD_Site.html" class="dropdown-item active">
                     <span class="item-icon">🔍</span>
                     <span class="item-label">تسجيل مرور ميداني</span>
                     <span class="item-badge">الحالية</span>
-                </div>
-                <div class="dropdown-item" data-page="MD_Pass.html">
+                </a>
+                <a href="MD_Pass.html" class="dropdown-item">
                     <span class="item-icon">📅</span>
                     <span class="item-label">تقرير المرور العام</span>
-                </div>
-                <div class="dropdown-item" data-page="index.html">
-                    <span class="item-icon">🏠</span>
-                    <span class="item-label">الصفحة الرئيسية</span>
-                </div>
-                <div class="dropdown-item" data-page="MD_PF.html">
+                </a>
+                <a href="MD_PF.html" class="dropdown-item">
                     <span class="item-icon">⚡</span>
                     <span class="item-label">تقرير معامل القدرة</span>
-                </div>
+                </a>
+                <a href="MD_Archive.html" class="dropdown-item">
+                    <span class="item-icon">📚</span>
+                    <span class="item-label">الأرشيف الشامل</span>
+                </a>
             </div>
         </div>
 
@@ -805,12 +805,12 @@
 
     <script>
         // ===== DROPDOWN =====
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const btn = document.getElementById('dropdownBtn');
             const menu = document.getElementById('dropdownMenu');
             const arrow = document.getElementById('arrow');
 
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 menu.classList.toggle('show');
                 arrow.classList.toggle('open');
@@ -818,7 +818,7 @@
 
             const items = document.querySelectorAll('.dropdown-item');
             items.forEach(item => {
-                item.addEventListener('click', function() {
+                item.addEventListener('click', function () {
                     const page = this.getAttribute('data-page');
                     if (page) {
                         window.location.href = page;
@@ -826,7 +826,7 @@
                 });
             });
 
-            window.addEventListener('click', function() {
+            window.addEventListener('click', function () {
                 if (menu.classList.contains('show')) {
                     menu.classList.remove('show');
                     arrow.classList.remove('open');
@@ -835,7 +835,7 @@
         });
 
         // ===== UNLOCK DATE =====
-        window.unlockDateInput = function() {
+        window.unlockDateInput = function () {
             const SECRET_PASS = "123";
 
             Swal.fire({
@@ -883,12 +883,12 @@
         }
 
         // ===== Listen to date input changes =====
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const dateInput = document.getElementById('passing_date');
-            dateInput.addEventListener('change', function() {
+            dateInput.addEventListener('change', function () {
                 updateFormattedDateDisplay(this.value);
             });
-            dateInput.addEventListener('input', function() {
+            dateInput.addEventListener('input', function () {
                 updateFormattedDateDisplay(this.value);
             });
         });
@@ -946,7 +946,7 @@
             resultsDiv.style.display = found ? 'block' : 'none';
         });
 
-        window.selectCustomer = function(key) {
+        window.selectCustomer = function (key) {
             selectedCustomerKey = key;
             const data = allCustomers[key];
             searchInput.value = data.metername;
@@ -964,17 +964,17 @@
             for (let mKey in data.meters) {
                 const meter = data.meters[mKey];
                 tbody.innerHTML += `
-                        <tr class="meter-row" data-mkey="${mKey}" data-mno="${meter.meternumber}">
-                            <td class="meter-number">${meter.meternumber}</td>
-                            <td><small>${meter.location || '-'}<br>ثابت: ${meter.constant}</small></td>
-                            <td><small>جهد: ${meter.vt_ratio}<br>تيار: ${meter.ct_ratio}</small></td>
-                            <td class="prev-reading">${meter.kwh_reading || 0}</td>
-                            <td class="prev-reading">${meter.kvarh_reading || 0}</td>
-                            <td><input type="number" class="new-kwh new-input" placeholder="0"></td>
-                            <td><input type="number" class="new-kvarh new-input" placeholder="0"></td>
-                            <td><textarea class="visit-note note-area" placeholder="ملاحظات..."></textarea></td>
-                        </tr>
-                    `;
+                    <tr class="meter-row" data-mkey="${mKey}" data-mno="${meter.meternumber}">
+                        <td class="meter-number">${meter.meternumber}</td>
+                        <td><small>${meter.location || '-'}<br>ثابت: ${meter.constant}</small></td>
+                        <td><small>جهد: ${meter.vt_ratio}<br>تيار: ${meter.ct_ratio}</small></td>
+                        <td class="prev-reading">${meter.kwh_reading || 0}</td>
+                        <td class="prev-reading">${meter.kvarh_reading || 0}</td>
+                        <td><input type="number" class="new-kwh new-input" placeholder="0"></td>
+                        <td><input type="number" class="new-kvarh new-input" placeholder="0"></td>
+                        <td><textarea class="visit-note note-area" placeholder="ملاحظات..."></textarea></td>
+                    </tr>
+                `;
             }
 
             const dateInput = document.getElementById('passing_date');
@@ -982,7 +982,6 @@
             dateInput.value = today;
             dateInput.setAttribute('readonly', 'readonly');
 
-            // Update formatted date display
             const display = document.getElementById('formattedDateDisplay');
             if (display) {
                 const parts = today.split('-');
@@ -992,66 +991,113 @@
             document.getElementById('mainContent').classList.remove('hidden');
         };
 
-        window.savePassingRecord = async function() {
+        // ================================================================
+        // ✅ الحفظ + الأرشفة الكاملة في MD_Archive
+        // ================================================================
+        window.savePassingRecord = async function () {
             const passingDate = document.getElementById('passing_date').value;
             if (!passingDate) return Swal.fire("خطأ", "يرجى تحديد تاريخ المرور", "error");
 
-            // Format the date as DD-MM-YYYY to use as the node key
             const formattedDate = formatDateToDDMMYYYY(passingDate);
+            const customerData = allCustomers[selectedCustomerKey] || {};
 
             const rows = document.querySelectorAll('.meter-row');
             let readingsForPass = {};
             let updates = {};
+            let archiveMeters = {};          // ← بيانات كاملة لكل عداد للأرشيف
 
             rows.forEach(row => {
                 const mKey = row.getAttribute('data-mkey');
+                const mNo = row.getAttribute('data-mno');
                 const newKwh = row.querySelector('.new-kwh').value;
                 const newKvarh = row.querySelector('.new-kvarh').value;
                 const note = row.querySelector('.visit-note').value;
 
+                // بيانات العداد الأصلية من MD/customers
+                const meter = (customerData.meters && customerData.meters[mKey]) || {};
+
+                // لـ MD_Pass (كما كان)
                 readingsForPass[mKey] = {
-                    meternumber: row.getAttribute('data-mno'),
+                    meternumber: mNo,
                     kwh: newKwh || 0,
                     kvarh: newKvarh || 0,
                     note: note || ""
                 };
 
+                // ✅ لـ MD_Archive — بيانات كاملة
+                archiveMeters[mNo] = {
+                    mKey: mKey,
+                    meternumber: mNo,
+                    metertype: meter.metertype || '',
+                    location: meter.location || '',
+                    constant: meter.constant || '',
+                    vt_ratio: meter.vt_ratio || '',
+                    ct_ratio: meter.ct_ratio || '',
+                    prev_kwh: meter.kwh_reading || 0,
+                    prev_kvarh: meter.kvarh_reading || 0,
+                    new_kwh: newKwh !== "" ? parseFloat(newKwh) : 0,
+                    new_kvarh: newKvarh !== "" ? parseFloat(newKvarh) : 0,
+                    note: note || ''
+                };
+
+                // تحديث القراءات في MD/customers (كما كان)
                 if (newKwh !== "" || newKvarh !== "") {
                     const baseRef = `MD/customers/${selectedCustomerKey}/meters/${mKey}`;
-
                     if (newKwh !== "") updates[`${baseRef}/kwh_reading`] = parseFloat(newKwh);
                     if (newKvarh !== "") updates[`${baseRef}/kvarh_reading`] = parseFloat(newKvarh);
-
                     updates[`${baseRef}/note`] = note || "";
                     updates[`${baseRef}/inspection_date`] = formattedDate;
                 }
             });
 
-            updates[`MD/customers/${selectedCustomerKey}/power_factor`] = document.getElementById('edit_pf').value;
-            updates[`MD/customers/${selectedCustomerKey}/max_load`] = document.getElementById('edit_max').value;
+            const pf = document.getElementById('edit_pf').value;
+            const maxL = document.getElementById('edit_max').value;
+
+            updates[`MD/customers/${selectedCustomerKey}/power_factor`] = pf;
+            updates[`MD/customers/${selectedCustomerKey}/max_load`] = maxL;
             updates[`MD/customers/${selectedCustomerKey}/passing_date`] = formattedDate;
 
-            // Create historical record
+            // سجل المرور (كما كان)
             const historicalRecord = {
                 metername: document.getElementById('disp_name').innerText,
                 readings: readingsForPass,
                 keta3: document.getElementById('disp_keta3').innerText,
                 handsa: document.getElementById('disp_handsa').innerText,
-                power_factor: document.getElementById('edit_pf').value,
-                max_load: document.getElementById('edit_max').value
+                power_factor: pf,
+                max_load: maxL
+            };
+
+            // ✅ سجل الأرشيف الكامل
+            const archiveRecord = {
+                customer_id: selectedCustomerKey,
+                metername: document.getElementById('disp_name').innerText,
+                keta3: document.getElementById('disp_keta3').innerText,
+                handsa: document.getElementById('disp_handsa').innerText,
+                location: customerData.location || '',
+                activity: customerData.activity || '',
+                power_factor: pf,
+                max_load: maxL,
+                passing_date: formattedDate,
+                archived_at: new Date().toISOString(),
+                meters_count: Object.keys(archiveMeters).length,
+                meters: archiveMeters
             };
 
             try {
                 Swal.fire({ title: 'جاري تحديث البيانات ...', didOpen: () => Swal.showLoading() });
 
-                // Save directly under MD_Pass/customers/{customerKey}/{formattedDate}
+                // 1) MD_Pass
                 await set(ref(db, `MD_Pass/customers/${selectedCustomerKey}/${formattedDate}`), historicalRecord);
 
+                // 2) ✅ MD_Archive — بيانات كاملة
+                await set(ref(db, `MD_Archive/customers/${selectedCustomerKey}/${formattedDate}`), archiveRecord);
+
+                // 3) تحديث MD/customers
                 for (let path in updates) {
                     await set(ref(db, path), updates[path]);
                 }
 
-                Swal.fire("تم بنجاح", "تم تحديث القراءات، الملاحظات، وتاريخ المعاينة", "success")
+                Swal.fire("تم بنجاح", "تم تحديث القراءات، الملاحظات، وتاريخ المعاينة (وأرشفة البيانات)", "success")
                     .then(() => location.reload());
             } catch (e) {
                 console.error(e);
@@ -1059,7 +1105,6 @@
             }
         };
 
-        // Helper function to format date to DD-MM-YYYY
         function formatDateToDDMMYYYY(dateStr) {
             if (!dateStr) return '--/--/----';
             const parts = dateStr.split('-');
