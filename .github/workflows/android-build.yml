@@ -30,7 +30,7 @@ jobs:
         run: |
           ls -la $ANDROID_HOME | head -5
           echo "=== Lab folder ==="
-          ls -la Lab/
+          ls -la MD/
           echo "=== android folder ==="
           ls -la android/ | head -10
 
