@@ -148,3 +148,76 @@ origin  https://github.com/merrooo/MD_App-AE.git (fetch)
 origin  https://github.com/merrooo/MD_App-AE.git (push)
 
 
+📋 STEP 19 — Watch the build
+Browser: https://github.com/merrooo/MD_App-AE/actions
+
+New run appears within 30 seconds:
+
+Status	Meaning	Action
+🟡 Yellow dot	Running	Wait ~6 min
+🟢 Green ✓	Success	Go to Step 20
+🔴 Red ❌	Failed	Click run → click build → find ❌ step → paste last 10–15 lines
+Expected steps in order:
+
+Verify structure → === MD folder === shown ✅
+
+Install npm deps → ✅
+
+Sync Capacitor → Copying web assets from MD... ✅
+
+Pin Gradle to 8.14.3 → ✅
+
+Decode keystore → keystore size shown ✅
+
+Build signed APK → ~5 min ✅
+
+Copy APK → dist/MD-v1.0.0.apk ✅
+
+Publish Release → ✅
+
+📋 STEP 20 — Download the APK
+Browser: https://github.com/merrooo/MD_App-AE/releases
+
+Click MD-v1.0.0.apk → downloads to phone or PC.
+
+📋 STEP 21 — Install on phone
+Transfer MD-v1.0.0.apk to phone (USB, WhatsApp to self, Google Drive)
+
+Tap the APK file
+
+If prompted: Settings → Allow install from this source
+
+Tap Install
+
+App shows as "MD" on launcher
+
+Installs alongside TVJ App (no conflict — different package com.merrooo.mdapp vs com.merrooo.tvjcalibration)
+
+📋 STEP 22 — For every future MD update
+powershell
+git add -A
+git commit -m "update description"
+git push origin main
+
+git tag -d v1.0.1
+git push origin :refs/tags/v1.0.1
+git tag v1.0.1
+git push origin v1.0.1
+Tag must be recreated every time — pushing main alone does NOT trigger the build.
+
+🎯 Do These Now (in order)
+Steps 12–16 — verify everything (5 min, no risk)
+Step 17–18 — commit and re-tag (triggers build)
+Step 19 — watch the build
+Step 20–21 — download and install
+
+🚨 What's Actually Blocking the Build
+From the error you pasted:
+
+text
+=== Lab folder ===
+ls: cannot access 'Lab/': No such file or directory
+Error: Process completed with exit code 2.
+Only the workflow file references Lab/ — everything else is already MD. Step 14 is the one fix that turns this failure into a passing build. Everything else (Steps 12, 15, 16) is verification — no risk if done or skipped.
+
+Run Step 14 first, verify with the Select-String commands, then run Steps 17–18 to push and re-tag. Paste the Actions result afterward.
