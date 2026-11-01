@@ -1,7 +1,7 @@
 {
   "appId": "com.merrooo.mdapp",
   "appName": "MD",
-  "webDir": "Lab",
+  "webDir": "MD",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "plugins": {
