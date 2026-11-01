@@ -1,0 +1,150 @@
+Power Shell in the folder of Project:-
+
+▶️  STEP 1 — Rename the project folder
+
+cd C:\Users\Admin\Desktop
+Rename-Item Lap_APP MD_APP
+cd MD_APP
+Get-Location
+
+📋 Expected output for each step
+Step 2
+powershell
+
+(Get-Content capacitor.config.json) -replace '"appId": "com\.merrooo\.lapapp"', '"appId": "com.merrooo.mdapp"' -replace '"appName": "Lap"', '"appName": "MD"' | Set-Content capacitor.config.json
+Get-Content capacitor.config.json
+
+Expect:
+
+json
+{
+  "appId": "com.merrooo.mdapp",
+  "appName": "MD",
+  "webDir": "Lab",
+  ...
+}
+Step 3
+powershell
+
+(Get-Content android\app\build.gradle) -replace 'applicationId "com\.merrooo\.lapapp"', 'applicationId "com.merrooo.mdapp"' | Set-Content android\app\build.gradle
+Select-String -Path android\app\build.gradle -Pattern 'applicationId'
+
+Expect:
+
+text
+android\app\build.gradle:7:        applicationId "com.merrooo.mdapp"
+
+Step 4
+powershell
+
+$p="android\app\src\main\res\values\strings.xml"; (Get-Content $p -Raw) -replace '<string name="app_name">Lap</string>', '<string name="app_name">MD</string>' -replace '<string name="title_activity_main">Lap</string>', '<string name="title_activity_main">MD</string>' -replace '<string name="package_name">com\.merrooo\.lapapp</string>', '<string name="package_name">com.merrooo.mdapp</string>' -replace '<string name="custom_url_scheme">com\.merrooo\.lapapp</string>', '<string name="custom_url_scheme">com.merrooo.mdapp</string>' | Set-Content $p
+Get-Content $p
+
+Expect:
+
+xml
+<resources>
+    <string name="app_name">MD</string>
+    <string name="title_activity_main">MD</string>
+    <string name="package_name">com.merrooo.mdapp</string>
+    <string name="custom_url_scheme">com.merrooo.mdapp</string>
+</resources>
+
+STEP 5 — Update workflow APK filename
+powershell
+
+(Get-Content .github\workflows\android-build.yml) -replace 'dist/Lap-\$\{GITHUB_REF_NAME\}\.apk', 'dist/MD-${GITHUB_REF_NAME}.apk' | Set-Content .github\workflows\android-build.yml
+Select-String -Path .github\workflows\android-build.yml -Pattern 'dist/'
+
+Expect: dist/MD-${GITHUB_REF_NAME}.apk
+
+STEP 6 — Fresh keystore for MD
+powershell
+
+Rename-Item release.keystore release.keystore.lap.bak
+keytool -genkey -v -keystore release.keystore -alias md-key -keyalg RSA -keysize 2048 -validity 10000 -storepass "MdApp2026!" -keypass "MdApp2026!" -dname "CN=MD, O=MD, C=EG"
+keytool -list -keystore release.keystore -storepass "MdApp2026!"
+
+Expect: Alias name: md-key, Entry type: PrivateKeyEntry
+
+New-Item -ItemType Directory -Path "C:\Users\Admin\Desktop\_keystore-backups" -Force -ErrorAction SilentlyContinue
+Move-Item release.keystore.lap.bak "C:\Users\Admin\Desktop\_keystore-backups\Lap_keystore.bak" -ErrorAction SilentlyContinue
+Get-ChildItem *.keystore* | Select-Object Name
+
+STEP 7 — Move old keystore out of repo
+powershell
+
+New-Item -ItemType Directory -Path "C:\Users\Admin\Desktop\_keystore-backups" -Force -ErrorAction SilentlyContinue
+Move-Item release.keystore.lap.bak "C:\Users\Admin\Desktop\_keystore-backups\Lap_keystore.bak" -ErrorAction SilentlyContinue
+Get-ChildItem *.keystore* | Select-Object Name
+
+Expect: only release.keystore
+
+STEP 8 - Browser: https://github.com/merrooo/MD_App-AE
+
+STEP 9 — Reconnect git
+powershell
+
+Remove-Item -Recurse -Force .git
+git init
+git branch -M main
+git remote add origin https://github.com/merrooo/MD_App.git
+git remote -v
+
+Expect: origin https://github.com/merrooo/MD_App.git (twice)
+
+STEP 10 — Copy keystore Base64
+powershell
+
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Users\Admin\Desktop\MD_APP\release.keystore")) | Set-Clipboard
+
+Excepect
+it's already copied in you calibord just right click by mouse and put in the step 11
+
+STEP 11 — Add 4 secrets (browser)
+https://github.com/merrooo/MD_App/settings/secrets/actions
+you will find in settings and in the left side bar called Secrets and variables -> Actions -> you will find green button called 
+New repository Secret 
+
+Name	                    Secret
+ANDROID_KEYSTORE_BASE64	    (paste clipboard)
+ANDROID_KEYSTORE_PASSWORD	MdApp2026!
+ANDROID_KEY_ALIAS	        md-key
+ANDROID_KEY_PASSWORD	    MdApp2026!
+
+
+New secret
+Name *
+ANDROID_KEYSTORE_BASE64
+Secret *
+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
+
+Name	                    Secret
+ANDROID_KEYSTORE_BASE64	    (paste clipboard)
+Name	                    Secret
+ANDROID_KEYSTORE_PASSWORD	MdApp2026!
+Name	                    Secret
+ANDROID_KEY_ALIAS	        md-key
+Name	                    Secret
+ANDROID_KEY_PASSWORD	    MdApp2026!
+
+STEP 12 — Verify staging
+powershell
+
+git status --short
+
+Must NOT contain: node_modules/, release.keystore, Output/
+
+STEP 13 — remote to right repo
+powershell
+
+git remote set-url origin https://github.com/merrooo/MD_App-AE.git
+git remote -v
+
+Must show:
+
+text
+origin  https://github.com/merrooo/MD_App-AE.git (fetch)
+origin  https://github.com/merrooo/MD_App-AE.git (push)
+
+

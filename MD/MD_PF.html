@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>تقرير حالة المرور والقطاعات · نظام الإدارة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-card: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.95);
+            --border: #cbd5e1;
+            --border-focus: #0284c7;
+            --primary: #0284c7;
+            --accent: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --pf-color: #7c3aed;
+            --radius: 16px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .app-header {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 16px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .brand i {
+            color: var(--pf-color);
+            font-size: 1.4rem;
+        }
+
+        .nav-menu-btn {
+            background: var(--surface-card);
+            border: 1px solid #e2e8f0;
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group-m {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+        }
+
+        .form-label-m {
+            font-size: 0.75rem;
+            color: var(--text);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-label-m i {
+            color: var(--primary);
+            font-size: 0.85rem;
+        }
+
+        .form-input-m {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            padding: 0 12px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        select.form-input-m {
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: left 10px center;
+            padding-left: 30px;
+        }
+
+        .form-input-m:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .report-section {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .report-section.visible {
+            display: block;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .report-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .report-title i {
+            color: var(--danger);
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-excel {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #217346;
+            color: white;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+
+        .btn-excel:hover {
+            background: #1a5c38;
+            transform: scale(1.02);
+        }
+
+        .btn-excel i {
+            font-size: 1rem;
+        }
+
+        .btn-excel:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 12px;
+        }
+
+        .report-item {
+            background: #f8fafc;
+            padding: 14px 18px;
+            border-radius: 8px;
+            border-right: 4px solid var(--danger);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .report-item:hover {
+            background: #f1f5f9;
+            transform: translateX(-3px);
+        }
+
+        .report-item .sector-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .report-item .report-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .report-item .not-passed-count {
+            font-weight: 800;
+            color: var(--danger);
+            font-size: 1rem;
+        }
+
+        .report-item .total-count {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .report-item .passed-count {
+            font-weight: 600;
+            color: var(--success);
+            font-size: 0.8rem;
+        }
+
+        .stats-bar {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stats-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .total-badge-m {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .total-badge-m span {
+            color: var(--pf-color);
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-right: 4px;
+        }
+
+        .select-all-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--pf-color);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .select-all-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--pf-color);
+            cursor: pointer;
+        }
+
+        .stat-chips-wrapper {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+            align-items: flex-start;
+        }
+
+        .stat-chip-m {
+            background: var(--surface-card);
+            border: 1px solid #cbd5e1;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-weight: 700;
+            min-width: 240px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: right;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .stat-chip-m:hover {
+            border-color: var(--pf-color);
+            transform: translateY(-1px);
+        }
+
+        .stat-chip-m.selected-chip {
+            background: #f3e8ff;
+            border-color: var(--pf-color);
+            box-shadow: 0 0 0 2px var(--pf-color);
+        }
+
+        .stat-chip-m .title {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-chip-m .val-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .stat-chip-m .val {
+            color: var(--text);
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+
+        .unpassed-table-container {
+            margin-top: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #ffffff;
+        }
+
+        .unpassed-mini-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+        }
+
+        .unpassed-mini-table th {
+            background: #e2e8f0;
+            color: var(--text);
+            padding: 4px 8px;
+            text-align: right;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .unpassed-mini-table td {
+            padding: 4px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .results-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .m-card {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: var(--shadow);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .m-card.selected {
+            border-color: var(--pf-color);
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.12);
+        }
+
+        .m-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .m-cust-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cust-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--pf-color);
+            cursor: pointer;
+        }
+
+        .m-cust-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-print-m {
+            background: #eff6ff;
+            color: var(--accent);
+            border: 1px solid #bfdbfe;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+        }
+
+        .m-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 12px;
+            background: var(--surface-card);
+            padding: 10px;
+            border-radius: var(--radius-sm);
+        }
+
+        .m-info-item {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .m-info-item b {
+            color: var(--text);
+        }
+
+        .pf-value-tag {
+            color: var(--pf-color) !important;
+            font-weight: 800;
+        }
+
+        .pf-danger {
+            color: var(--danger) !important;
+        }
+
+        .pf-success {
+            color: var(--success) !important;
+        }
+
+        .m-meter-card {
+            background: #f8fafc;
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            margin-top: 4px;
+            border-right: 4px solid var(--pf-color);
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            border-left: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .m-meter-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .meter-tag {
+            background: #f3e8ff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            color: var(--pf-color);
+        }
+
+        .m-readings-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.75rem;
+            background: #ffffff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .kwh-val {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .kvarh-val {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .sheet-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: 1999;
+            display: none;
+        }
+
+        .sheet-overlay.show {
+            display: block;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-radius: 24px 24px 0 0;
+            border-top: 1px solid #e2e8f0;
+            padding: 20px;
+            z-index: 2000;
+            transition: bottom 0.3s ease;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .bottom-sheet.show {
+            bottom: 0;
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sheet-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sheet-item {
+            padding: 12px;
+            background: var(--surface-card);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .sheet-item .item-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-right: auto;
+            white-space: nowrap;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 999;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--pf-color);
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .empty-state-m {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid #e2e8f0;
+        }
+
+        .empty-state-m i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #cbd5e1;
+        }
+
+        #masterTable {
+            display: none;
+        }
+
+        .text-sm {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .badge-count {
+            background: var(--danger);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-right: 8px;
+        }
+
+        .report-summary {
+            background: var(--surface-card);
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .report-summary .total-all {
+            color: var(--text);
+        }
+
+        .report-summary .passed-all {
+            color: var(--success);
+        }
+
+        .report-summary .not-passed-all {
+            color: var(--danger);
+        }
+
+        @media (max-width: 600px) {
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .report-actions {
+                justify-content: flex-start;
+            }
+
+            .btn-excel {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .report-summary {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <header class="app-header">
+            <div class="header-top">
+                <div class="brand">
+                    <i class="fas fa-bolt"></i>
+                    <span>تقرير معامل القدرة</span>
+                </div>
+                <button class="nav-menu-btn" id="openMenuBtn">
+                    <i class="fas fa-compass"></i> التنقل
+                </button>
+            </div>
+
+            <div class="filters-grid">
+                <div class="form-group-m">
+                    <label class="form-label-m" for="date_from"><i class="far fa-calendar-alt"></i> التاريخ من</label>
+                    <input type="date" id="date_from" class="form-input-m" value="2026-01-01">
+                </div>
+
+                <div class="form-group-m">
+                    <label class="form-label-m" for="date_to"><i class="far fa-calendar-check"></i> التاريخ إلى</label>
+                    <input type="date" id="date_to" class="form-input-m" value="2026-12-31">
+                </div>
+
+                <div class="form-group-m">
+                    <label class="form-label-m" for="filter_keta3"><i class="fas fa-layer-group"></i> القطاع</label>
+                    <select id="filter_keta3" class="form-input-m">
+                        <option value="">جميع القطاعات</option>
+                    </select>
+                </div>
+
+                <div class="form-group-m">
+                    <label class="form-label-m" for="filter_handsa"><i class="fas fa-draw-polygon"></i> الهندسة</label>
+                    <select id="filter_handsa" class="form-input-m">
+                        <option value="">جميع الهندسات</option>
+                    </select>
+                </div>
+
+                <div class="form-group-m">
+                    <label class="form-label-m" for="filter_pf_status"><i class="fas fa-tachometer-alt"></i> فلتر معامل
+                        القدرة</label>
+                    <select id="filter_pf_status" class="form-input-m">
+                        <option value="all">جميع قيم PF</option>
+                        <option value="less_092">أقل من 0.92 (&lt; 0.92)</option>
+                        <option value="more_092">أكبر من أو يساوي 0.92 (&ge; 0.92)</option>
+                    </select>
+                </div>
+
+                <div class="form-group-m full-width">
+                    <label class="form-label-m" for="filter_general"><i class="fas fa-search"></i> بحث عام</label>
+                    <input type="text" id="filter_general" class="form-input-m"
+                        placeholder="ابحث باسم المشترك أو رقم العداد...">
+                </div>
+            </div>
+        </header>
+
+        <div class="report-section" id="reportSection">
+            <div class="report-header">
+                <div class="report-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>تقرير المشتركين الذين لم يتم المرور عليهم</span>
+                    <span class="badge-count" id="totalNotPassed">0</span>
+                </div>
+                <div class="report-actions">
+                    <button class="btn-excel" id="exportNotPassedBtn" disabled>
+                        <i class="fas fa-file-excel"></i> تحميل إكسل
+                    </button>
+                </div>
+            </div>
+
+            <div class="report-summary" id="reportSummary">
+                <span class="total-all">إجمالي المشتركين: <span id="summaryTotal">0</span></span>
+                <span class="passed-all">تم المرور: <span id="summaryPassed">0</span></span>
+                <span class="not-passed-all">لم يتم المرور: <span id="summaryNotPassed">0</span></span>
+            </div>
+
+            <div class="report-grid" id="notPassedReport">
+                <div style="text-align:center;color:#94a3b8;grid-column:1/-1;padding:20px;">
+                    <i class="fas fa-info-circle"></i> اضغط على "عرض التقرير" لتحميل البيانات
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-bar" id="statsHeaderBar">
+            <div class="stats-top">
+                <div class="total-badge-m">
+                    إجمالي القراءات المعروضة: <span id="headerTotalCount">0</span>
+                </div>
+                <label class="select-all-wrapper" for="selectAllCheck">
+                    <input type="checkbox" id="selectAllCheck" unchecked>
+                    <span>تحديد الكل لحساب معامل القدرة</span>
+                </label>
+            </div>
+            <div class="stat-chips-wrapper" id="headerChipGroup">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">اضغط على "عرض التقرير" لعرض
+                    الإحصائيات...</span>
+            </div>
+        </div>
+
+        <main class="results-wrapper" id="results-container">
+            <div class="empty-state-m">
+                <i class="fas fa-inbox"></i>
+                <p>اضغط على زر "عرض التقرير" بالأسفل لتحميل البيانات</p>
+            </div>
+        </main>
+    </div>
+
+    <div class="sheet-overlay" id="sheetOverlay"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="sheet-header">
+            <h4 style="font-size: 0.95rem;">قائمة الصفحات</h4>
+            <i class="fas fa-times" id="closeSheetBtn" style="cursor: pointer; font-size: 1.1rem;"></i>
+        </div>
+        <div class="sheet-menu">
+            <a href="index.html" class="sheet-item">🏠 الصفحة الرئيسية</a>
+            <a href="MD.html" class="sheet-item">📊 بيانات كبار المشتركين</a>
+            <a href="MD_Add.html" class="sheet-item">➕ إضافة مشترك جديد</a>
+            <a href="MD_Site.html" class="sheet-item">🔍 تسجيل مرور ميداني</a>
+            <a href="MD_Pass.html" class="sheet-item">📅 تقرير المرور العام</a>
+            <a href="MD_PF.html" class="sheet-item" style="border: 1px solid var(--pf-color); background: #f3e8ff;">
+                ⚡ تقرير معامل القدرة
+                <span class="item-badge">الحالية</span>
+            </a>
+            <a href="MD_Archive.html" class="sheet-item">📚 الأرشيف الشامل</a>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" id="navBtnSearch">
+            <i class="fas fa-sliders-h"></i>
+            <span>عرض التقرير</span>
+        </div>
+        <div class="nav-item" id="navBtnUpdatePF">
+            <i class="fas fa-sync-alt"></i>
+            <span>حساب PF</span>
+        </div>
+        <div class="nav-item" id="navBtnExport" onclick="exportData()">
+            <i class="fas fa-file-excel"></i>
+            <span>تصدير</span>
+        </div>
+    </nav>
+
+    <table id="masterTable">
+        <thead>
+            <tr>
+                <th>تاريخ المرور</th>
+                <th>اسم المشترك</th>
+                <th>رقم العداد</th>
+                <th>القطاع</th>
+                <th>الهندسة</th>
+                <th>أقصى حمل</th>
+                <th>معامل القدرة</th>
+                <th>القراءة كيلوات ساعة</th>
+                <th>القراءة كيلو فار ساعة</th>
+                <th>الملاحظات</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnKRhT5xJTBvsQKpW7e9w-hGSbAQJWTSo",
+            authDomain: "production1-ae85.firebaseapp.com",
+            databaseURL: "https://production1-ae85-default-rtdb.firebaseio.com",
+            projectId: "production1-ae85",
+            storageBucket: "production1-ae85.firebasestorage.app",
+            messagingSenderId: "490438031865",
+            appId: "1:490438031865:web:a4a69335989f30cd13a528"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let passingData = null;
+        let allCustomersData = null;
+        let currentRenderedGroups = {};
+        let notPassedCustomers = [];
+
+        const openBtn = document.getElementById('openMenuBtn');
+        const closeBtn = document.getElementById('closeSheetBtn');
+        const sheet = document.getElementById('bottomSheet');
+        const overlay = document.getElementById('sheetOverlay');
+
+        function toggleSheet(show) {
+            if (show) {
+                sheet.classList.add('show');
+                overlay.classList.add('show');
+            } else {
+                sheet.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        }
+
+        openBtn.addEventListener('click', () => toggleSheet(true));
+        closeBtn.addEventListener('click', () => toggleSheet(false));
+        overlay.addEventListener('click', () => toggleSheet(false));
+
+        window.exportData = function () {
+            const rows = document.querySelectorAll("#masterTable tbody tr");
+            if (rows.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'تنبيه',
+                    text: 'لا توجد بيانات متاحة حالياً لتصديرها، يرجى عرض التقرير أولاً.',
+                    confirmButtonText: 'حسناً'
+                });
+                return;
+            }
+            const wb = XLSX.utils.table_to_book(document.getElementById("masterTable"));
+            XLSX.writeFile(wb, `Report_PF_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        };
+
+        function exportNotPassedToExcel() {
+            if (notPassedCustomers.length === 0) {
+                Swal.fire('تنبيه', 'لا يوجد مشتركين لم يتم المرور عليهم', 'info');
+                return;
+            }
+
+            const exportData = notPassedCustomers.map(c => ({
+                'اسم المشترك': c.name,
+                'القطاع': c.keta3,
+                'الهندسة': c.handsa,
+                'تاريخ أخر مرور': c.lastPassDate
+            }));
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            XLSX.utils.book_append_sheet(wb, ws, 'لم يتم المرور');
+
+            ws['!cols'] = [{ wch: 30 }, { wch: 25 }, { wch: 25 }, { wch: 20 }];
+            const fileName = `المشتركين_لم_يتم_المرور_${new Date().toLocaleDateString('ar-EG').replace(/\//g, '-')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+
+            Swal.fire('تم', `تم تحميل ${notPassedCustomers.length} مشترك بنجاح`, 'success');
+        }
+
+        document.getElementById('exportNotPassedBtn').addEventListener('click', exportNotPassedToExcel);
+
+        function parseDateFlexible(raw) {
+            if (!raw && raw !== 0) return null;
+            const s = String(raw).trim().replace(/\//g, '-');
+            if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(s)) {
+                const parts = s.split('-');
+                return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+            }
+            if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(s)) {
+                const parts = s.split('-');
+                return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            }
+            const dt = new Date(s);
+            return isNaN(dt.getTime()) ? null : dt;
+        }
+
+        function calculatePFFromDiff(kwhDiff, kvarhDiff) {
+            if (kwhDiff <= 0) return 0;
+            const ratio = Math.abs(kvarhDiff) / kwhDiff;
+            const angle = Math.atan(ratio);
+            return Math.round(Math.cos(angle) * 100) / 100;
+        }
+
+        function calculateCustomerPFWithDateRange(records, startDateObj, endDateObj) {
+            if (!records || records.length === 0) {
+                return { pf: 0, totalKwhDiff: 0, totalKvarhDiff: 0, hasData: false, oldestReading: null, newestReading: null, newestDate: '-' };
+            }
+
+            let filteredRecords = records.filter(rec => {
+                const recDate = parseDateFlexible(rec.dateKey);
+                if (!recDate) return false;
+                if (startDateObj && recDate < startDateObj) return false;
+                if (endDateObj && recDate > endDateObj) return false;
+                return true;
+            });
+
+            if (filteredRecords.length === 0) {
+                return { pf: 0, totalKwhDiff: 0, totalKvarhDiff: 0, hasData: false, oldestReading: null, newestReading: null, newestDate: '-' };
+            }
+
+            filteredRecords.sort((a, b) => {
+                const dateA = parseDateFlexible(a.dateKey);
+                const dateB = parseDateFlexible(b.dateKey);
+                return dateA - dateB;
+            });
+
+            const oldest = filteredRecords[0];
+            const newest = filteredRecords[filteredRecords.length - 1];
+
+            const oldestReadings = oldest.readings || [];
+            const newestReadings = newest.readings || [];
+
+            let totalKwhDiff = 0;
+            let totalKvarhDiff = 0;
+            let hasData = false;
+
+            const maxLen = Math.max(oldestReadings.length, newestReadings.length);
+            for (let i = 0; i < maxLen; i++) {
+                const oldR = oldestReadings[i] || {};
+                const newR = newestReadings[i] || {};
+
+                const oldKwh = parseFloat(oldR.kwh) || 0;
+                const newKwh = parseFloat(newR.kwh) || 0;
+                const oldKvarh = parseFloat(oldR.kvarh) || 0;
+                const newKvarh = parseFloat(newR.kvarh) || 0;
+
+                if (newKwh > 0 || newKvarh > 0 || oldKwh > 0 || oldKvarh > 0) {
+                    const kwhDiff = newKwh - oldKwh;
+                    const kvarhDiff = newKvarh - oldKvarh;
+                    if (kwhDiff > 0) {
+                        totalKwhDiff += kwhDiff;
+                        totalKvarhDiff += kvarhDiff;
+                        hasData = true;
+                    }
+                }
+            }
+
+            const pf = calculatePFFromDiff(totalKwhDiff, totalKvarhDiff);
+
+            return {
+                pf: pf,
+                totalKwhDiff: totalKwhDiff,
+                totalKvarhDiff: totalKvarhDiff,
+                hasData: hasData,
+                oldestReading: oldest,
+                newestReading: newest,
+                oldestDate: oldest.dateKey,
+                newestDate: newest.dateKey
+            };
+        }
+
+        async function ensureDataLoaded() {
+            if (passingData && allCustomersData) return true;
+
+            Swal.fire({
+                title: 'جاري تحميل البيانات...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const passSnap = await get(ref(db, 'MD_Pass/customers'));
+                passingData = passSnap.exists() ? passSnap.val() : {};
+
+                const customerSnap = await get(ref(db, 'MD/customers'));
+                if (customerSnap.exists()) {
+                    allCustomersData = customerSnap.val();
+                    const kSet = new Set(), hSet = new Set();
+
+                    for (let custId in allCustomersData) {
+                        const c = allCustomersData[custId];
+                        if (c.keta3) kSet.add(c.keta3);
+                        if (c.handsa) hSet.add(c.handsa);
+                    }
+
+                    const kSel = document.getElementById('filter_keta3');
+                    const hSel = document.getElementById('filter_handsa');
+                    kSel.innerHTML = '<option value="">جميع القطاعات</option>';
+                    hSel.innerHTML = '<option value="">جميع الهندسات</option>';
+                    [...kSet].sort().forEach(k => kSel.innerHTML += `<option value="${k}">${k}</option>`);
+                    [...hSet].sort().forEach(h => hSel.innerHTML += `<option value="${h}">${h}</option>`);
+                } else {
+                    allCustomersData = {};
+                }
+
+                Swal.close();
+                return true;
+            } catch (err) {
+                console.error("❌ Data Fetch Error:", err);
+                Swal.fire('خطأ', 'فشل في تحميل البيانات من قاعدة البيانات', 'error');
+                return false;
+            }
+        }
+
+        function getPassedCustomersInDateRange(startDateObj, endDateObj) {
+            const passedCustomerIds = new Set();
+            const dateRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
+
+            for (let custId in passingData) {
+                const custNode = passingData[custId];
+                if (!custNode || typeof custNode !== 'object') continue;
+
+                for (let dateKey in custNode) {
+                    if (dateRegex.test(dateKey.trim())) {
+                        let recordDate = parseDateFlexible(dateKey);
+                        if (!recordDate) continue;
+
+                        if (startDateObj && recordDate < startDateObj) continue;
+                        if (endDateObj && recordDate > endDateObj) continue;
+
+                        passedCustomerIds.add(custId);
+                        break;
+                    }
+                }
+            }
+
+            return passedCustomerIds;
+        }
+
+        function calculateNotPassedReport(fK, fH, startDateObj, endDateObj) {
+            const passedIds = getPassedCustomersInDateRange(startDateObj, endDateObj);
+            notPassedCustomers = [];
+
+            let sectorData = {};
+            let totalAll = 0;
+            let totalPassed = 0;
+
+            for (let custId in allCustomersData) {
+                const cust = allCustomersData[custId];
+                const keta3 = cust.keta3 || 'غير محدد';
+                const handsa = cust.handsa || 'غير محدد';
+
+                if (fK && keta3 !== fK) continue;
+                if (fH && handsa !== fH) continue;
+
+                totalAll++;
+
+                if (!sectorData[keta3]) {
+                    sectorData[keta3] = { total: 0, passed: 0, notPassed: 0, customers: [] };
+                }
+
+                sectorData[keta3].total++;
+
+                if (passedIds.has(custId)) {
+                    sectorData[keta3].passed++;
+                    totalPassed++;
+                } else {
+                    sectorData[keta3].notPassed++;
+
+                    let lastPassDate = 'لا يوجد مرور سابق';
+                    if (passingData && passingData[custId]) {
+                        const custNode = passingData[custId];
+                        const dateRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
+                        const dateKeys = Object.keys(custNode).filter(k => dateRegex.test(k.trim()));
+                        if (dateKeys.length > 0) {
+                            dateKeys.sort((a, b) => {
+                                const dA = parseDateFlexible(a);
+                                const dB = parseDateFlexible(b);
+                                return (dB || 0) - (dA || 0);
+                            });
+                            lastPassDate = dateKeys[0];
+                        } else if (custNode.pf_calculated_date) {
+                            lastPassDate = custNode.pf_calculated_date;
+                        }
+                    }
+
+                    const custObj = {
+                        id: custId,
+                        name: cust.metername || cust.name || custId,
+                        keta3: keta3,
+                        handsa: handsa,
+                        lastPassDate: lastPassDate
+                    };
+                    sectorData[keta3].customers.push(custObj);
+                    notPassedCustomers.push(custObj);
+                }
+            }
+
+            const totalNotPassed = totalAll - totalPassed;
+            return { sectorData, totalAll, totalPassed, totalNotPassed };
+        }
+
+        function renderUnpassedReport(sectorData, totalAll, totalPassed, totalNotPassed) {
+            const container = document.getElementById('notPassedReport');
+            const reportSection = document.getElementById('reportSection');
+
+            document.getElementById('totalNotPassed').innerText = totalNotPassed;
+            document.getElementById('summaryTotal').innerText = totalAll;
+            document.getElementById('summaryPassed').innerText = totalPassed;
+            document.getElementById('summaryNotPassed').innerText = totalNotPassed;
+
+            reportSection.classList.add('visible');
+
+            const exportBtn = document.getElementById('exportNotPassedBtn');
+            exportBtn.disabled = (totalNotPassed === 0);
+
+            if (totalNotPassed === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;color:var(--success);grid-column:1/-1;padding:20px;">
+                        <i class="fas fa-check-circle" style="font-size:2rem;"></i>
+                        <p style="margin-top:10px;font-weight:700;">جميع المشتركين تم المرور عليهم في هذه الفترة</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sortedSectors = Object.entries(sectorData)
+                .filter(([_, data]) => data.notPassed > 0)
+                .sort((a, b) => b[1].notPassed - a[1].notPassed);
+
+            container.innerHTML = sortedSectors.map(([sector, data]) => `
+                <div class="report-item" onclick="filterBySector('${sector}')">
+                    <div class="sector-name">قطاع ${sector}</div>
+                    <div class="report-stats">
+                        <span class="total-count">الإجمالي: ${data.total}</span>
+                        <span class="passed-count">تم المرور: ${data.passed}</span>
+                        <span class="not-passed-count">
+                            <i class="fas fa-user-times"></i>
+                            لم يتم المرور: ${data.notPassed}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.filterBySector = function (sectorName) {
+            const kSel = document.getElementById('filter_keta3');
+            kSel.value = (kSel.value === sectorName) ? "" : sectorName;
+            runReport();
+        };
+
+        window.toggleKeta3Filter = function (keta3Name) {
+            const kSel = document.getElementById('filter_keta3');
+            kSel.value = (kSel.value === keta3Name) ? "" : keta3Name;
+            runReport();
+        };
+
+        function updateHeaderStats() {
+            const chipGroup = document.getElementById('headerChipGroup');
+            let chipsHtml = '';
+            const currentKeta3Filter = document.getElementById('filter_keta3').value;
+
+            if (notPassedCustomers.length > 0) {
+                const grouped = {};
+                notPassedCustomers.forEach(c => {
+                    if (!grouped[c.keta3]) grouped[c.keta3] = [];
+                    grouped[c.keta3].push(c);
+                });
+
+                Object.entries(grouped).forEach(([name, data]) => {
+                    const isSelected = currentKeta3Filter === name;
+                    const selectedClass = isSelected ? 'selected-chip' : '';
+
+                    let miniTableHtml = '';
+                    if (isSelected && data.length > 0) {
+                        let rows = data.map((n, idx) => `<tr><td>${idx + 1}</td><td>${n.name}</td></tr>`).join('');
+                        miniTableHtml = `
+                            <div class="unpassed-table-container">
+                                <table class="unpassed-mini-table">
+                                    <thead><tr><th>#</th><th>اسم المشترك الذي لم يتم المرور عليه</th></tr></thead>
+                                    <tbody>${rows}</tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+
+                    chipsHtml += `
+                        <div class="stat-chip-m ${selectedClass}" onclick="toggleKeta3Filter('${name}')">
+                            <div class="title">
+                                <span>قطاع ${name}</span> 
+                                <i class="fas ${isSelected ? 'fa-chevron-up' : 'fa-list-ul'}" style="font-size:0.75rem;"></i>
+                            </div>
+                            <div class="val-row">
+                                <span class="val" style="color:var(--danger);">
+                                    لم يتم المرور: ${data.length} مشترك
+                                </span>
+                            </div>
+                            ${miniTableHtml}
+                        </div>
+                    `;
+                });
+            }
+
+            chipGroup.innerHTML = chipsHtml || `<span style="font-size:0.75rem;color:var(--text-muted);">جميع المشتركين تم المرور عليهم</span>`;
+        }
+
+        async function runReport() {
+            const loaded = await ensureDataLoaded();
+            if (!loaded) return;
+
+            const start = document.getElementById('date_from').value;
+            const end = document.getElementById('date_to').value;
+            const fK = document.getElementById('filter_keta3').value;
+            const fH = document.getElementById('filter_handsa').value;
+            const fPF = document.getElementById('filter_pf_status').value;
+            const fG = document.getElementById('filter_general').value.trim().toLowerCase();
+
+            const startDateObj = start ? parseDateFlexible(start) : null;
+            const endDateObj = end ? parseDateFlexible(end) : null;
+            if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
+
+            const { sectorData, totalAll, totalPassed, totalNotPassed } = calculateNotPassedReport(fK, fH, startDateObj, endDateObj);
+            renderUnpassedReport(sectorData, totalAll, totalPassed, totalNotPassed);
+            updateHeaderStats();
+
+            let customerRecords = {};
+            const dateRegex = /^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/;
+
+            for (let subID in passingData) {
+                const customerNode = passingData[subID];
+                if (!customerNode || typeof customerNode !== 'object') continue;
+
+                Object.keys(customerNode).forEach(dateKey => {
+                    if (dateRegex.test(dateKey.trim())) {
+                        const v = customerNode[dateKey];
+                        let recordDate = parseDateFlexible(dateKey);
+                        if (!recordDate) return;
+
+                        if (startDateObj && recordDate < startDateObj) return;
+                        if (endDateObj && recordDate > endDateObj) return;
+
+                        const keta3 = v.keta3 || customerNode.keta3 || '-';
+                        const handsa = v.handsa || customerNode.handsa || '-';
+                        const metername = v.metername || customerNode.metername || customerNode.name || subID;
+
+                        if (fK && keta3 !== fK) return;
+                        if (fH && handsa !== fH) return;
+
+                        let readingsArray = v.readings ? Object.values(v.readings) : [];
+
+                        const meterNums = readingsArray.map(r => r.meternumber || '').join(' ');
+                        const baseSearchStr = `${metername} ${keta3} ${handsa} ${meterNums}`.toLowerCase();
+                        if (fG !== '' && !baseSearchStr.includes(fG)) return;
+
+                        if (!customerRecords[subID]) {
+                            customerRecords[subID] = {
+                                customerId: subID,
+                                metername: metername,
+                                keta3: keta3,
+                                handsa: handsa,
+                                max_load: v.max_load || customerNode.max_load || '-',
+                                rawPf: v.power_factor || customerNode.power_factor || '-',
+                                records: []
+                            };
+                        }
+
+                        customerRecords[subID].records.push({
+                            dateKey: dateKey,
+                            readings: readingsArray,
+                            raw: v
+                        });
+                    }
+                });
+            }
+
+            let filteredGroups = {};
+            Object.keys(customerRecords).forEach(id => {
+                const c = customerRecords[id];
+                const pfResult = calculateCustomerPFWithDateRange(c.records, startDateObj, endDateObj);
+                const avgPf = pfResult.pf;
+
+                if (fPF === 'less_092' && avgPf >= 0.92) return;
+                if (fPF === 'more_092' && avgPf < 0.92) return;
+
+                filteredGroups[id] = {
+                    ...c,
+                    pfResult: pfResult,
+                    pfDisplay: pfResult.hasData ? pfResult.pf.toFixed(2) : c.rawPf,
+                    totalKwhDiff: pfResult.totalKwhDiff,
+                    totalKvarhDiff: pfResult.totalKvarhDiff,
+                    oldestDate: pfResult.oldestDate,
+                    newestDate: pfResult.newestDate,
+                    hasPfData: pfResult.hasData
+                };
+            });
+
+            currentRenderedGroups = filteredGroups;
+            renderMobileUI(filteredGroups);
+        }
+
+        function renderMobileUI(customerGroups) {
+            const container = document.getElementById('results-container');
+            const selectAllVal = document.getElementById('selectAllCheck').checked;
+
+            const customerKeys = Object.keys(customerGroups);
+            let detailCount = 0;
+
+            if (customerKeys.length > 0) {
+                let cardsHtml = '';
+                let masterRows = '';
+
+                customerKeys.forEach(id => {
+                    const c = customerGroups[id];
+                    const pfDisplay = c.pfDisplay;
+                    const pfValue = typeof pfDisplay === 'string' ? parseFloat(pfDisplay) : pfDisplay;
+                    const pfBadgeClass = pfValue > 0 ? (pfValue < 0.92 ? 'pf-danger' : 'pf-success') : '';
+
+                    let metersHtml = '';
+                    c.records.forEach(rec => {
+                        const visitDate = rec.dateKey || c.newestDate || '-';
+
+                        rec.readings.forEach(r => {
+                            detailCount++;
+                            const readingKwh = r.kwh != null ? r.kwh : 0;
+
+                            metersHtml += `
+                            <div class="m-meter-card">
+                                <div class="m-meter-header">
+                                    <span>عداد: <span class="meter-tag">${r.meternumber || '-'}</span></span>
+                                    <span style="font-size:0.7rem; color:var(--text-muted);">${rec.dateKey}</span>
+                                </div>
+                                <div class="m-readings-row">
+                                    <div>ك.و.س: <span class="kwh-val">${readingKwh}</span></div>
+                                    <div>ك.ف.س: <span class="kvarh-val">${r.kvarh != null ? r.kvarh : '0'}</span></div>
+                                </div>
+                                ${r.note ? `<div class="m-notes">📝 ${r.note}</div>` : ''}
+                            </div>
+                        `;
+
+                            masterRows += `<tr>
+                            <td>${visitDate}</td>
+                            <td>${c.metername}</td>
+                            <td>${r.meternumber || '-'}</td>
+                            <td>${c.keta3}</td>
+                            <td>${c.handsa}</td>
+                            <td>${c.max_load}</td>
+                            <td>${pfDisplay}</td>
+                            <td>${readingKwh}</td>
+                            <td>${r.kvarh || 0}</td>
+                            <td>${r.note || ''}</td>
+                        </tr>`;
+                        });
+                    });
+
+                    const calcInfo = c.hasPfData ? `
+                        <div class="text-sm" style="margin-top:4px; padding:4px 8px; background:#f3e8ff; border-radius:4px;">
+                            <i class="fas fa-calculator"></i> 
+                            ΔkWh: ${c.totalKwhDiff.toFixed(1)} | ΔkVARh: ${c.totalKvarhDiff.toFixed(1)} 
+                            | الفترة: ${c.oldestDate || '?'} → ${c.newestDate || '?'}
+                        </div>
+                    ` : '';
+
+                    cardsHtml += `
+                    <div class="m-card ${selectAllVal ? 'selected' : ''}" id="card_${c.customerId}">
+                        <div class="m-card-header">
+                            <div class="m-cust-header-left">
+                                <input type="checkbox" class="cust-checkbox" data-custid="${c.customerId}" ${selectAllVal ? 'checked' : ''}>
+                                <div class="m-cust-name">👤 ${c.metername}</div>
+                            </div>
+                            <button class="btn-print-m" onclick="window.location.href='MD_PF_Print.html?customerId=${encodeURIComponent(c.customerId)}'">
+                                🖨️ طباعة
+                            </button>
+                        </div>
+                        <div class="m-info-grid">
+                            <div class="m-info-item">القطاع: <b>${c.keta3}</b></div>
+                            <div class="m-info-item">الهندسة: <b>${c.handsa}</b></div>
+                            <div class="m-info-item">معامل القدرة: <b class="pf-value-tag ${pfBadgeClass}">${pfDisplay}</b></div>
+                            <div class="m-info-item">أقصى حمل: <b>${c.max_load}</b></div>
+                        </div>
+                        ${calcInfo}
+                        ${metersHtml}
+                    </div>
+                `;
+                });
+
+                document.getElementById('headerTotalCount').textContent = detailCount;
+                container.innerHTML = cardsHtml;
+                document.querySelector("#masterTable tbody").innerHTML = masterRows;
+
+                document.querySelectorAll('.cust-checkbox').forEach(chk => {
+                    chk.addEventListener('change', (e) => {
+                        const custId = e.target.getAttribute('data-custid');
+                        const cardEl = document.getElementById(`card_${custId}`);
+                        if (e.target.checked) {
+                            cardEl.classList.add('selected');
+                        } else {
+                            cardEl.classList.remove('selected');
+                            document.getElementById('selectAllCheck').checked = false;
+                        }
+                    });
+                });
+
+            } else {
+                document.getElementById('headerTotalCount').textContent = 0;
+                container.innerHTML = `
+                <div class="empty-state-m">
+                    <i class="fas fa-search-minus"></i>
+                    <p>لا توجد نتائج متطابقة مع معايير البحث والفلترة</p>
+                </div>
+            `;
+                document.querySelector("#masterTable tbody").innerHTML = '';
+            }
+        }
+
+        document.getElementById('selectAllCheck').addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            document.querySelectorAll('.cust-checkbox').forEach(chk => {
+                chk.checked = isChecked;
+                const custId = chk.getAttribute('data-custid');
+                const cardEl = document.getElementById(`card_${custId}`);
+                if (cardEl) {
+                    if (isChecked) cardEl.classList.add('selected');
+                    else cardEl.classList.remove('selected');
+                }
+            });
+        });
+
+        async function updatePFInDatabase() {
+            const selectedCheckboxes = document.querySelectorAll('.cust-checkbox:checked');
+            const selectedCustIds = Array.from(selectedCheckboxes).map(chk => chk.getAttribute('data-custid'));
+
+            if (selectedCustIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'تنبيه',
+                    text: 'يرجى تحديد مشترك واحد على الأقل عبر مربع الاختيار (Checkbox) لتحديث معامل القدرة.',
+                    confirmButtonText: 'حسناً'
+                });
+                return;
+            }
+
+            const confirmResult = await Swal.fire({
+                title: 'تأكيد التحديث',
+                text: `هل تريد تحديث معامل القدرة لـ ${selectedCustIds.length} مشترك محدد (لآخر تاريخ مرور فقط)؟`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، تحديث لآخر تاريخ',
+                cancelButtonText: 'إلغاء',
+                confirmColor: '#7c3aed'
+            });
+
+            if (!confirmResult.isConfirmed) return;
+
+            Swal.fire({
+                title: 'جاري التحديث...',
+                text: `تحديث ${selectedCustIds.length} مشترك`,
+                didOpen: () => Swal.showLoading()
+            });
+
+            let updatePromises = [];
+            let updatedCount = 0;
+
+            selectedCustIds.forEach(subID => {
+                const customer = currentRenderedGroups[subID];
+                if (customer && customer.hasPfData) {
+                    const newPf = customer.pfResult.pf;
+                    const lastVisitDate = customer.newestDate;
+
+                    if (newPf > 0 && lastVisitDate) {
+                        updatePromises.push(set(ref(db, `MD/customers/${subID}/power_factor`), newPf));
+                        updatePromises.push(set(ref(db, `MD/customers/${subID}/pf_calculated_date`), lastVisitDate));
+
+                        updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/power_factor`), newPf));
+                        updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/pf_calculated_date`), lastVisitDate));
+
+                        updatePromises.push(set(ref(db, `MD_Pass/customers/${subID}/${lastVisitDate}/power_factor`), newPf));
+
+                        updatedCount++;
+                    }
+                }
+            });
+
+            try {
+                await Promise.all(updatePromises);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم التحديث بنجاح',
+                    text: `تم تحديث معامل القدرة في أحدث تاريخ مرور لـ ${updatedCount} مشترك محدد`,
+                    confirmButtonText: 'حسناً'
+                });
+                await runReport();
+            } catch (error) {
+                console.error('Error updating PF:', error);
+                Swal.fire('خطأ', 'فشل تحديث البيانات: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('navBtnSearch').onclick = () => runReport();
+        document.getElementById('navBtnUpdatePF').onclick = () => updatePFInDatabase();
+
+        document.getElementById('filter_general').addEventListener('input', () => { if (passingData) runReport(); });
+        document.getElementById('filter_keta3').addEventListener('change', () => { if (passingData) runReport(); });
+        document.getElementById('filter_handsa').addEventListener('change', () => { if (passingData) runReport(); });
+        document.getElementById('filter_pf_status').addEventListener('change', () => { if (passingData) runReport(); });
+        document.getElementById('date_from').addEventListener('change', () => { if (passingData) runReport(); });
+        document.getElementById('date_to').addEventListener('change', () => { if (passingData) runReport(); });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MD</string>
+    <string name="title_activity_main">MD</string>
+    <string name="package_name">com.merrooo.mdapp</string>
+    <string name="custom_url_scheme">com.merrooo.mdapp</string>
+</resources>
+
+
+
