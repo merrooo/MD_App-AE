@@ -1,0 +1,4 @@
+open power shell in my project folder and type this 
+
+cd C:\Amir\Build-exe\Desktop_Driver
+npx serve -l 3000
